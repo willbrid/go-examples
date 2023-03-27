@@ -122,4 +122,71 @@ func main() {
 			fmt.Println("y at position", index)
 		}
 	}
+
+	var product3 string = "Kayak"
+	for index, character := range product3 {
+		switch character {
+		case 'K':
+			fmt.Println("Uppercase character")
+			fallthrough
+		case 'k':
+			fmt.Println("k at position", index)
+		case 'y':
+			fmt.Println("y at position", index)
+		}
+	}
+
+	var product4 string = "Kayak"
+	for index, character := range product4 {
+		switch character {
+		case 'K', 'k':
+			if character == 'k' {
+				fmt.Println("Lowercase k at position", index)
+			}
+			fmt.Println("Uppercase K at position", index)
+		case 'y':
+			fmt.Println("k at position", index)
+		default:
+			fmt.Println("Character", string(character), "at position", index)
+		}
+	}
+
+	for counter5 := 0; counter5 < 20; counter5++ {
+		switch counter5 / 2 {
+		case 2, 3, 5, 7:
+			fmt.Println("Prime value: ", counter5/2)
+		default:
+			fmt.Println("Non-prime value: ", counter5/2)
+		}
+	}
+
+	for counter5 := 0; counter5 < 20; counter5++ {
+		switch val := counter5 / 2; val {
+		case 2, 3, 5, 7:
+			fmt.Println("Prime value: ", val)
+		default:
+			fmt.Println("Non-prime value: ", val)
+		}
+	}
+
+	for counter6 := 0; counter6 < 10; counter6++ {
+		switch {
+		case counter6 == 0:
+			fmt.Println("Zero value")
+		case counter6 < 3:
+			fmt.Println(counter6, "is < 3")
+		case counter6 >= 3 && counter6 < 7:
+			fmt.Println(counter6, "is >= 3 && < 7")
+		default:
+			fmt.Println(counter6, "is >= 7")
+		}
+	}
+
+	var counter7 int = 0
+target:
+	fmt.Println("Counter : ", counter7)
+	counter7++
+	if counter7 < 5 {
+		goto target
+	}
 }
