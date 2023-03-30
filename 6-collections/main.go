@@ -89,4 +89,39 @@ func main() {
 	fmt.Println("Tableau : ", names16)
 	fmt.Println("Longueur : ", len(names16))
 	fmt.Println("Capacité : ", cap(names16))
+
+	var names17 []string = make([]string, 3, 7)
+	names17[0] = "Kayak"
+	names17[1] = "Lifejacket"
+	names17[2] = "Paddle"
+	moreName := []string{"Hat Gloves"}
+	appendedNames17 := append(names17, moreName...)
+	fmt.Println("AppendedNames : ", appendedNames17)
+
+	var products [4]string = [4]string{"Kayak", "Lifejacket", "Paddle", "Hat"}
+	someNames := products[1:3]
+	allNames := products[:]
+	fmt.Println("SomeNames : ", someNames)
+	fmt.Println("SomeNames len : ", len(someNames), " cap : ", cap(someNames))
+	fmt.Println("AllNames : ", allNames)
+	fmt.Println("AllNames len : ", len(allNames), " cap : ", cap(allNames))
+	someNames = append(someNames, "Gloves")
+	fmt.Println("SomeNames : ", someNames)
+	fmt.Println("SomeNames len : ", len(someNames), " cap : ", cap(someNames))
+	fmt.Println("AllNames : ", allNames)
+	fmt.Println("AllNames len : ", len(allNames), " cap : ", cap(allNames))
+	someNames = append(someNames, "Boots")
+	fmt.Println("SomeNames : ", someNames)
+	fmt.Println("SomeNames len : ", len(someNames), " cap : ", cap(someNames))
+	fmt.Println("AllNames : ", allNames)
+	fmt.Println("AllNames len : ", len(allNames), " cap : ", cap(allNames))
+
+	var products1 [4]string = [4]string{"Kayak", "Lifejacket", "Paddle", "Hat"}
+	someNames1 := products1[1:3:3]
+	allNames1 := products1[:]
+	someNames1 = append(someNames1, "Gloves")
+	fmt.Println("SomeNames : ", someNames1)
+	fmt.Println("SomeNames len : ", len(someNames1), " cap : ", cap(someNames1))
+	fmt.Println("AllNames : ", allNames1)
+	fmt.Println("AllNames len : ", len(allNames1), " cap : ", cap(allNames1))
 }
