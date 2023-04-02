@@ -1,6 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+	"sort"
+	"strconv"
+)
 
 func main() {
 	fmt.Println("Hello, Collections")
@@ -124,4 +129,146 @@ func main() {
 	fmt.Println("SomeNames len : ", len(someNames1), " cap : ", cap(someNames1))
 	fmt.Println("AllNames : ", allNames1)
 	fmt.Println("AllNames len : ", len(allNames1), " cap : ", cap(allNames1))
+
+	var products2 [4]string = [4]string{"Kayak", "Lifejacket", "Paddle", "Hat"}
+	allNames2 := products2[1:]
+	someNames2 := make([]string, 2)
+	copy(someNames2, allNames2)
+	fmt.Println("SomeNames2 : ", someNames2)
+	fmt.Println("AllNames2 : ", allNames2)
+
+	var products3 [4]string = [4]string{"Kayak", "Lifejacket", "Paddle", "Hat"}
+	allNames3 := products3[1:]
+	var someNames3 []string // Variable non initialisée : la copie n'est pas effective
+	copy(someNames3, allNames3)
+	fmt.Println("SomeNames3 : ", someNames3)
+	fmt.Println("AllNames3 : ", allNames3)
+
+	var products4 [4]string = [4]string{"Kayak", "Lifejacket", "Paddle", "Hat"}
+	allNames4 := products4[1:]
+	someNames4 := []string{"Boots", "Canoe"}
+	copy(someNames4[1:], allNames4[2:3]) // Le tableau source allNames4 sera copié à partir de la position 2 et
+	// La copie va être positionné à partir de la position 1 du tableau destination someNames4
+	fmt.Println("SomeNames4 : ", someNames4)
+	fmt.Println("AllNames4 : ", allNames4)
+
+	var products5 [4]string = [4]string{"Kayak", "Lifejacket", "Paddle", "Hat"}
+	replacementProducts := []string{"Canoe", "Boots"}
+	copy(products5[:], replacementProducts)
+	fmt.Println("products5 : ", products5) // La copie sera effective uniquement sur les deux premiers éléments du tableau products5
+
+	var products6 [4]string = [4]string{"Kayak", "Lifejacket", "Paddle", "Hat"}
+	replacementProducts1 := []string{"Canoe", "Boots"}
+	copy(products6[0:1], replacementProducts1)
+	fmt.Println("products6 : ", products6) // La copie sera effective uniquement sur le premier élément du tableau products6
+
+	var products7 [4]string = [4]string{"Kayak", "Lifejacket", "Paddle", "Hat"}
+	deleted := append(products7[:2], products7[3:]...)
+	fmt.Println("Deleted : ", deleted) // On forme le tableau deleted en ajoutant au deux premiers éléments (0 et 1),
+	// l'élément numéro 3 : d'où cela supprime l'élément numéro 2
+
+	var products8 [4]string = [4]string{"Kayak", "Lifejacket", "Paddle", "Hat"}
+	for index, value := range products8[2:] {
+		fmt.Println("Index : ", index, " - Value: ", value)
+	}
+
+	var products9 [4]string = [4]string{"Kayak", "Lifejacket", "Paddle", "Hat"}
+	sort.Strings(products9[:])
+	for index, value := range products9 {
+		fmt.Println("Index : ", index, " - Value: ", value)
+	}
+
+	products10 := products9
+	fmt.Println("Equal : ", reflect.DeepEqual(products9, products10)) // Comparaison de tableau avec la fonction DeepEqual du package reflect
+
+	fmt.Println("Travailler avec Maps : tableau associatif clé-valeur")
+	var products11 map[string]float64 = make(map[string]float64, 10) // string représente le type de la clé et float64 le type de la valeur
+	products11["Kayak"] = 279
+	products11["Lifejacket"] = 48.95
+	fmt.Println("Map size: ", len(products11))
+	fmt.Println("Price: ", products11["Kayak"])
+	fmt.Println("Price: ", products11["Hat"])
+
+	var products12 map[string]float64 = map[string]float64{
+		"Kayak":      279,
+		"Lifejacket": 48.95,
+	}
+	fmt.Println("Map size: ", len(products12))
+	fmt.Println("Price: ", products12["Kayak"])
+	fmt.Println("Price: ", products12["Hat"])
+
+	var products13 map[string]float64 = map[string]float64{
+		"Kayak":      279,
+		"Lifejacket": 48.95,
+		"Hat":        0,
+	}
+	value, ok := products13["Hat"]
+	if ok {
+		fmt.Println("Stored value: ", value)
+	} else {
+		fmt.Println("No stored value")
+	}
+	delete(products13, "Hat") // Supprimer un élément du tableau associatif à partir de sa clé
+	if value1, ok1 := products13["Hat"]; ok1 {
+		fmt.Println("Stored value: ", value1)
+	} else {
+		fmt.Println("No stored value")
+	}
+
+	for key, value := range products13 {
+		fmt.Println("Key : ", key, " - Value: ", value)
+	}
+
+	var products14 map[string]float64 = map[string]float64{
+		"Kayak":      279,
+		"Lifejacket": 48.95,
+		"Hat":        0,
+	}
+	var keys []string = make([]string, 0, len(products14))
+	for key := range products14 {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		fmt.Println("Key : ", key, " - Valeur : ", products14[key])
+	}
+
+	var price string = "$48.95"
+	var currencyByte byte = price[0] // Byte est l'alias à uint8
+	var currencyString string = string(price[0])
+	var amountString string = price[1:]
+	amount, parseErr := strconv.ParseFloat(amountString, 64)
+
+	fmt.Println("Currency Byte : ", currencyByte)
+	fmt.Println("Currency String : ", currencyString)
+	fmt.Println("Length : ", len(price))
+	if parseErr == nil {
+		fmt.Println("Amount : ", amount)
+	} else {
+		fmt.Println("Parse Error : ", parseErr)
+	}
+
+	var price1 []rune = []rune("€48.95") // rune est l'alias à int32
+	var currency1 string = string(price1[0])
+	var amountString1 string = string(price1[1:])
+	amount1, parseErr1 := strconv.ParseFloat(amountString1, 64)
+	fmt.Println("Currency String : ", currency1)
+	fmt.Println("Length : ", len(price1))
+	if parseErr1 == nil {
+		fmt.Println("Amount : ", amount1)
+	} else {
+		fmt.Println("Parse Error : ", parseErr1)
+	}
+
+	var price2 string = "$48.95"
+	for index, char := range price2 {
+		// Value correspondance en byte et string(char) correspondance en caractère
+		fmt.Println("Index : ", index, " - value : ", char, " - value string : ", string(char))
+	}
+
+	var price3 string = "€48.95"
+	for index, char := range []byte(price3) {
+		// Le symbole € en byte c'est 3 nombres : 226, 130 et 172
+		fmt.Println("Index : ", index, " - value : ", char)
+	}
 }
