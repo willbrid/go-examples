@@ -10,6 +10,7 @@ import (
 func main() {
 	fmt.Println("Hello, Collections")
 
+	/** Travailler avec des tableaux **/
 	fmt.Println("Travailler avec des tableaux")
 	var names [3]string
 	fmt.Println(names)
@@ -67,6 +68,7 @@ func main() {
 		fmt.Println("Value : ", value)
 	}
 
+	/** Travailler avec Slices : Tableau dont on ne connait pas sa longueur en avance ou dont sa longueur est variable. **/
 	fmt.Println("Travailler avec Slices : Tableau dont on ne connait pas sa longueur en avance ou dont sa longueur est variable.")
 	var names12 []string = make([]string, 3)
 	names12[0] = "Kayak"
@@ -181,6 +183,7 @@ func main() {
 	products10 := products9
 	fmt.Println("Equal : ", reflect.DeepEqual(products9, products10)) // Comparaison de tableau avec la fonction DeepEqual du package reflect
 
+	/** Travailler avec Maps : tableau associatif clé-valeur **/
 	fmt.Println("Travailler avec Maps : tableau associatif clé-valeur")
 	var products11 map[string]float64 = make(map[string]float64, 10) // string représente le type de la clé et float64 le type de la valeur
 	products11["Kayak"] = 279
@@ -233,6 +236,8 @@ func main() {
 		fmt.Println("Key : ", key, " - Valeur : ", products14[key])
 	}
 
+	/** Comprendre la double nature des chaines de caractères **/
+	fmt.Println("Comprendre la double nature des chaines de caractères")
 	var price string = "$48.95"
 	var currencyByte byte = price[0] // Byte est l'alias à uint8
 	var currencyString string = string(price[0])
