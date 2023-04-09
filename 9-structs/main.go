@@ -14,26 +14,80 @@ func writeName(val struct {
 	fmt.Println("Name : ", val.name)
 }
 
+/** Définir et utiliser une structure **/
+type Product struct {
+	name, category string
+	price          float64
+}
+
+/**
+Les noms de champ doivent être uniques avec le type struct, ce qui signifie que nous ne pouvons définir qu'un seul
+champ imbriqué pour un type spécifique. Si nous avons besoin de définir deux champs du même type, alors nous devrons attribuer
+un nom à l'un d'entre eux. Exemple avec **Alternate**
+**/
+type StockLevel struct { // Définition d'une classe imbriquant une autre classe
+	Product   // Ce champ n'a pas de nom et fait référence à la classe Product
+	Alternate Product
+	count     int
+}
+
+/** Comprendre les structures et les pointeurs **/
+
+/** Go peut suivre les pointeurs vers les champs struct sans avoir besoin d'un astérisque pour les variables
+injectées en argument de fonction : plus besoin d'utiliser dans le corps de la fonction l'astérique pour
+accéder à la valeur de cette variable pointeur sur une autre variable.
+Cette fonctionnalité ne modifie pas le type de données du paramètre de fonction, qui est toujours : *Product,
+**/
+func calcTax(product *Product) {
+	if product.price > 100 { // Au lieu (*product).price > 100
+		product.price += product.price * 0.2 // Au lieu (*product).price += (*product).price * 0.2
+	}
+}
+
+func calcTaxWithReturn(product *Product) *Product {
+	if product.price > 100 {
+		product.price += product.price * 0.2
+	}
+
+	return product
+}
+
+/** Une fonction constructeur est responsable de la création de valeurs de classe à l'aide de valeurs reçues via des paramètres
+Les fonctions constructeur sont utilisées pour créer des valeurs de classe de manière cohérente. Les fonctions constructeur
+sont généralement nommées new ou New suivies du type de classe. Ainsi la fonction constructeur pour la création de valeurs Product
+soit nommée newProduct.
+**/
+func newProduct(name, category string, price float64) *Product {
+	return &Product{name, category, price}
+}
+
+type Article struct {
+	name, category string
+	price          float64
+	*Supplier
+}
+
+type Supplier struct {
+	name, city string
+}
+
+func newArticle(name, category string, price float64, supplier *Supplier) *Article {
+	return &Article{name, category, price - 10, supplier}
+}
+
+func copyArticle(article *Article) Article {
+	a := *article
+	s := *article.Supplier
+	a.Supplier = &s
+
+	return a
+}
+
 func main() {
 	fmt.Println("Hello, Structs")
 
-	/** Définir et utiliser une structure **/
+	/** Définir et utiliser une classe **/
 	fmt.Println("Définir et utiliser une structure")
-
-	type Product struct {
-		name, category string
-		price          float64
-	}
-	/**
-		Les noms de champ doivent être uniques avec le type struct, ce qui signifie que nous ne pouvons définir qu'un seul
-		champ imbriqué pour un type spécifique.
-		Si nous avons besoin de définir deux champs du même type, alors nous devrons attribuer un nom à l'un d'entre eux. Exemple avec **Alternate**
-	**/
-	type StockLevel struct { // Définition d'une classe imbriquant une autre classe
-		Product   // Ce champ n'a pas de nom et fait référence à la classe Product
-		Alternate Product
-		count     int
-	}
 
 	var kayak Product = Product{
 		name:     "Kayak",
@@ -112,4 +166,111 @@ func main() {
 		ProductPrice: prod1.price,
 	})
 	fmt.Println(builder.String())
+
+	var array1 [1]StockLevel = [1]StockLevel{
+		{
+			Product:   Product{"Kayak", "Watersports", 275.00},
+			Alternate: Product{"Lifejacket", "Watersports", 48.95},
+			count:     100,
+		},
+	}
+	fmt.Println("Array : ", array1[0].Product.name)
+
+	var slice1 []StockLevel = []StockLevel{
+		{
+			Product:   Product{"Kayak", "Watersports", 275.00},
+			Alternate: Product{"Lifejacket", "Watersports", 48.95},
+			count:     100,
+		},
+	}
+	fmt.Println("Slice : ", slice1[0].Product.name)
+
+	var kvp1 map[string]StockLevel = map[string]StockLevel{
+		"kayak": {
+			Product:   Product{"Kayak", "Watersports", 275.00},
+			Alternate: Product{"Lifejacket", "Watersports", 48.95},
+			count:     100,
+		},
+	}
+	fmt.Println("Map : ", kvp1["kayak"].Product.name)
+
+	/** Comprendre les structures et les pointeurs **/
+	fmt.Println("Comprendre les structures et les pointeurs")
+	var p4 Product = Product{
+		name:     "Kayak",
+		category: "Watersports",
+		price:    275,
+	}
+	var p5 *Product = &p4
+	p4.name = "Original Kayak"
+	fmt.Println("P4 : ", p4.name)
+	fmt.Println("P5 : ", (*p5).name)
+	fmt.Println("P5 : ", p5.name) // Avec les pointeurs sur les classes, on peut omettre l'astérisque pour accéder à un champ de la classe
+
+	calcTax(&p4)
+	fmt.Println("Name : ", p4.name, " - Category : ", p4.category, " - Price : ", p4.price)
+
+	// L'opérateur d'adresse est utilisé avant le type de classe
+	var p6 *Product = &Product{
+		name:     "Kayak",
+		category: "Watersports",
+		price:    275,
+	}
+	calcTax(p6)
+	fmt.Println("Name : ", p6.name, " - Category : ", p6.category, " - Price : ", p6.price)
+
+	var p7 *Product = calcTaxWithReturn(&Product{
+		name:     "Kayak",
+		category: "Watersports",
+		price:    275,
+	})
+	fmt.Println("Name : ", p7.name, " - Category : ", p7.category, " - Price : ", p7.price)
+
+	// Une fonction constructeur est responsable de la création de valeurs de classe à l'aide de valeurs reçues via des paramètres
+	// définition d'un tableaux au pointeur de Product
+	var products [2]*Product = [2]*Product{
+		newProduct("Kayak", "Watersports", 275),
+		newProduct("Hat", "Skiing", 42.50),
+	}
+	for _, p := range products {
+		fmt.Println("Name : ", p.name, " - Category : ", p.category, " - Price : ", p.price)
+	}
+
+	var acme *Supplier = &Supplier{"Acme Co", "New York"}
+	var articles [2]*Article = [2]*Article{
+		newArticle("Kayak", "Watersports", 275, acme),
+		newArticle("Hat", "Skiing", 42.50, acme),
+	}
+	for _, a := range articles {
+		fmt.Println("Name : ", a.name, " - Category : ", a.category, " - Price : ", a.price, " - Supplier : ", a.Supplier.name, a.Supplier.city)
+	}
+
+	var acme1 *Supplier = &Supplier{"Acme Co", "New York"}           // On crée un pointeur sur la classe Supplier
+	var p8 *Article = newArticle("Kayak", "Watersports", 275, acme1) // On crée un pointeur sur la classe Article
+	var p9 Article = *p8                                             // On assigne la valeur de la variable pointée par le pointeur sur la classe Artcile p8 : il s'agit d'un objet de la classe Article
+	p8.name = "Original Kayak"
+	p8.Supplier.name = "BoatCo"
+	for _, p := range []Article{*p8, p9} { // On crée un tableau slice d'article contenant deux articles : *p8 valeur de la variable pointée par le pointeur sur la classe Artcile et l'objet Article p9
+		fmt.Println("Name : ", p.name, " - Supplier : ", p.Supplier.name, p.Supplier.city)
+	}
+
+	var acme2 *Supplier = &Supplier{"Acme Co", "New York"}
+	var p10 *Article = newArticle("Kayak", "Watersports", 275, acme2)
+	var p11 Article = copyArticle(p10) // Copie entière de l'objet Article
+	p10.name = "Original Kayak"
+	p10.Supplier.name = "BoatCo"
+	for _, p := range []Article{*p10, p11} {
+		fmt.Println("Name : ", p.name, " - Supplier : ", p.Supplier.name, p.Supplier.city) // Ici les objets Supplier sont différents
+	}
+
+	// Afficher la valeur zéro des variables de type Product
+	var prod2 Product
+	var prod2Ptr *Product
+	fmt.Println("Value Product : ", prod2.name, prod2.category, prod2.price)
+	fmt.Println("Pointer Product : ", prod2Ptr)
+
+	var art Article = Article{Supplier: &Supplier{}}
+	var artPtr *Article
+	fmt.Println("Value Article : ", art.name, art.category, art.price, art.Supplier.name)
+	fmt.Println("Pointer Article : ", artPtr)
 }
