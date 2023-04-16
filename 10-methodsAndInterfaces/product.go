@@ -6,7 +6,7 @@ type Product struct {
 }
 
 /**
-Pour implémenter une interface, toutes les méthodes spécifiées par l'interface doivent être définies pour un type struct
+Pour implémenter une interface, toutes les méthodes spécifiées par l'interface doivent être définies pour un type de classe
 **/
 func (p Product) getName() string {
 	return p.name

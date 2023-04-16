@@ -9,6 +9,11 @@ type Expense interface {
 	getCost(annual bool) float64
 }
 
+type Account struct {
+	accountNumber int
+	expenses      []Expense
+}
+
 // Définition d'un type alias à []Product
 type ProductList []Product
 
@@ -34,7 +39,7 @@ func (product *Product) printDetailsWithTax() {
 
 /**
 Chaque combinaison de nom de méthode et de type de récepteur doit être unique, quels que soient les autres paramètres définis.
-Nous avons donc deux méthodes avec le même nom printDetails mais de récepteur différent.
+Nous pouvoir avoir donc deux méthodes avec le même nom mais de récepteur différent.
 **/
 func (supplier *Supplier) printDetails() {
 	fmt.Println("Supplier : ", supplier.name, " - City : ", supplier.city)
@@ -69,6 +74,47 @@ func calcTotal(expenses []Expense) (total float64) {
 	}
 
 	return
+}
+
+// Utilisation d'une interface vide en tant qu'argument
+func processItem(item interface{}) {
+	switch value := item.(type) {
+	case Product:
+		fmt.Println("Product:", value.name, "Price:", value.price)
+	case *Product:
+		fmt.Println("Product Pointer:", value.name, "Price:", value.price)
+	case Service:
+		fmt.Println("Service : ", value.description, " - Price : ", value.monthlyFee*float64(value.durationMonths))
+	case Person:
+		fmt.Println("Person:", value.name, "City:", value.city)
+	case *Person:
+		fmt.Println("Person Pointer:", value.name, "City:", value.city)
+	case string, bool, int:
+		fmt.Println("Built-in type:", value)
+	default:
+		fmt.Println("Default:", value)
+	}
+}
+
+func processItemsWithVariadicParam(items ...interface{}) {
+	for _, item := range items {
+		switch value := item.(type) {
+		case Product:
+			fmt.Println("Product:", value.name, "Price:", value.price)
+		case *Product:
+			fmt.Println("Product Pointer:", value.name, "Price:", value.price)
+		case Service:
+			fmt.Println("Service : ", value.description, " - Price : ", value.monthlyFee*float64(value.durationMonths))
+		case Person:
+			fmt.Println("Person:", value.name, "City:", value.city)
+		case *Person:
+			fmt.Println("Person Pointer:", value.name, "City:", value.city)
+		case string, bool, int:
+			fmt.Println("Built-in type:", value)
+		default:
+			fmt.Println("Default:", value)
+		}
+	}
 }
 
 func main() {
@@ -163,4 +209,120 @@ func main() {
 	**/
 	// Utilisation d'une interface dans une méthode
 	fmt.Println("Total : ", calcTotal(expenses))
+
+	// Utilisation d'une interface pour les champs de classe
+	var account Account = Account{
+		accountNumber: 12345,
+		expenses: []Expense{
+			Product{"Kayak", "Watersports", 275},
+			Service{"Boat Cover", 12, 89.50},
+		},
+	}
+	for _, expense := range account.expenses {
+		fmt.Println("Expense : ", expense.getName(), " - Cost : ", expense.getCost(true))
+	}
+	fmt.Println("Total : ", calcTotal(account.expenses))
+
+	// On peut assigner une instance d'une classe à une variable interface si et seulement si cette classe implémente cette interface.
+	var product Product = Product{"Kayak", "Watersports", 275}
+	/**
+	La valeur Product a été copiée lorsqu'elle a été affectée à la variable expense1, ce qui signifie que
+	la modification du champ price n'affecte pas le résultat de la méthode getCost.
+	**/
+	var expense1 Expense = product
+	product.price = 100
+	fmt.Println("Product field value:", product.price)
+	fmt.Println("Expense method result:", expense1.getCost(false))
+
+	/**
+	L'utilisation d'un pointeur signifie qu'une référence à la valeur Product est affectée à la variable expense2,
+	mais cela ne change pas le type de variable d'interface, qui est toujours Expense.
+	La modification du champ de prix est reflétée dans le résultat de la méthode getCost.
+	**/
+	var expense2 Expense = &product
+	product.price = 100
+	fmt.Println("Product field value:", product.price)
+	fmt.Println("Expense method result:", expense2.getCost(false))
+
+	// Comparaison des interfaces
+	/**
+	Les deux premières valeurs de Expense ne sont pas égales. En effet, le type dynamique de ces valeurs est un type pointeur et
+	les pointeurs ne sont égaux que s'ils pointent vers le même emplacement mémoire.
+	Les deux valeurs de Expense suivantes sont égales car ce sont de simples valeurs de structure avec les mêmes valeurs de champ.
+	**/
+	var e1 Expense = &Product{name: "Kayak"}
+	var e2 Expense = &Product{name: "Kayak"}
+	var e3 Expense = Service{description: "Boat Cover"}
+	var e4 Expense = Service{description: "Boat Cover"}
+	fmt.Println("e1 == e2 : ", e1 == e2)
+	fmt.Println("e3 == e4 : ", e3 == e4)
+
+	// Les contrôles d'égalité d'interface peuvent également provoquer des erreurs d'exécution si le type dynamique n'est pas comparable.
+
+	// Effectuer des assertions de type
+	// Une assertion de type est utilisée pour accéder au type dynamique d'une valeur d'interface.
+	fmt.Println("Effectuer des assertions de type")
+	var expenses1 []Expense = []Expense{
+		Service{"Boat Cover", 12, 89.50},
+		Service{"Paddle Protect", 12, 8},
+		&Product{"Kayak", "Watersports", 275},
+	}
+	for _, expense := range expenses1 {
+		if s, ok := expense.(Service); ok { // Syntaxe d'assertion de type : expense.(Service)
+			fmt.Println("Service : ", s.description, " - Price : ", s.monthlyFee*float64(s.durationMonths))
+		} else {
+			fmt.Println("Expense : ", expense.getName(), " - Cost : ", expense.getCost(true))
+		}
+	}
+	// Avec une instruction switch
+	for _, expense := range expenses1 {
+		switch value := expense.(type) { // Syntaxe d'assertion de type : expense.(type)
+		case Service:
+			fmt.Println("Service : ", value.description, " - Price : ", value.monthlyFee*float64(value.durationMonths))
+		case *Product:
+			fmt.Println("Expense : ", value.getName(), " - Cost : ", value.getCost(true))
+		default:
+			fmt.Println("Expense : ", expense.getName(), " - Cost : ", expense.getCost(true))
+		}
+	}
+
+	// Utilisation d'interface vide
+	/**
+	Go permet à l'utilisateur de l'interface vide - c'est-à-dire une interface qui ne définit aucune méthode - de représenter n'importe quel type,
+	ce qui peut être un moyen utile de regrouper des types disparates qui ne partagent aucune caractéristique commune
+	**/
+	fmt.Println("Utilisation d'interface vide")
+	var expense3 Expense = &Product{"Kayak", "Watersports", 275}
+	var data []interface{} = []interface{}{ // définition d'un tableau d'interface vide : []interface{}
+		expense3,
+		Product{"Lifejacket", "Watersports", 48.95},
+		Service{"Boat Cover", 12, 89.50},
+		Person{"Alice", "London"},
+		&Person{"Bob", "New York"},
+		"This is a string",
+		100,
+		true,
+	}
+	for _, item := range data {
+		switch value := item.(type) {
+		case Product:
+			fmt.Println("Product:", value.name, "Price:", value.price)
+		case *Product:
+			fmt.Println("Product Pointer:", value.name, "Price:", value.price)
+		case Service:
+			fmt.Println("Service : ", value.description, " - Price : ", value.monthlyFee*float64(value.durationMonths))
+		case Person:
+			fmt.Println("Person:", value.name, "City:", value.city)
+		case *Person:
+			fmt.Println("Person Pointer:", value.name, "City:", value.city)
+		case string, bool, int:
+			fmt.Println("Built-in type:", value)
+		default:
+			fmt.Println("Default:", value)
+		}
+	}
+	for _, item := range data {
+		processItem(item)
+	}
+	processItemsWithVariadicParam(data...)
 }
