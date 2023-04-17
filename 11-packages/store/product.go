@@ -2,7 +2,7 @@
 // commonly required for online sales
 package store
 
-var standardTax = newTaxRate(0.25, 20)
+var standardTax *TaxRate = newTaxRate(0.25, 20)
 
 // Product describes an item for sale
 type Product struct {
