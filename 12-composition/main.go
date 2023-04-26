@@ -59,5 +59,49 @@ func main() {
 	fmt.Println("Name : ", Name)
 	fmt.Println("Price field : ", price1)
 	fmt.Println("Price method : ", price2)
-	// Un autre problème connexe survient lorsque deux champs imbriqués utilisent le même nom de champ ou de méthode.
+	/**
+	Un autre problème connexe survient lorsque deux champs imbriqués utilisent le même nom de champ ou de méthode.
+	Le type composé est distinct et ne peut pas être utilisé lorsque les types à partir desquels il est composé sont requis.
+
+	Changer le type map pour qu'elle utilise l'interface nous permet de stocker les valeurs de Product et de Boat. Le type Product
+	se conforme directement à l'interface ItemForSale car il existe une méthode Price qui correspond à la signature spécifiée par
+	l'interface et qui a un récepteur *Product.
+	Il n'y a pas de méthode Price qui utilise un récepteur *Boat, mais Go prend en compte la méthode Price promue à partir du champ
+	intégré du type Boat, qu'elle utilise pour satisfaire aux exigences de l'interface.
+	**/
+	var products map[string]store.ItemForSale = map[string]store.ItemForSale{
+		"Kayak": store.NewBoat("Kayak", 279, 1, false),
+		"Ball":  store.NewProduct("Soccer Ball", "Soccer", 19.50),
+	}
+	for key, p := range products {
+		fmt.Println("Key : ", key, " - Price : ", p.Price(0.2))
+	}
+	for key, p := range products {
+		switch item := p.(type) {
+		case *store.Product:
+			fmt.Println("Name : ", item.Name, " - Category : ", item.Category, " - Price : ", item.Price(0.2))
+		case *store.Boat:
+			fmt.Println("Name : ", item.Name, " - Category : ", item.Category, " - Price : ", item.Price(0.2))
+		default:
+			fmt.Println("Key:", key, "Price:", p.Price(0.2))
+		}
+	}
+
+	/**
+	Composition d'interface :Une interface peut en enfermer une autre, avec pour effet que les types doivent implémenter
+	toutes les méthodes définies par les interfaces englobantes et enfermées. Les interfaces sont plus simples que les structures,
+	et il n'y a pas de champs ou de méthode à promouvoir. Le résultat de la composition des interfaces est une union de la méthode
+	définie par les types englobant et clos.
+	**/
+	for key, p := range products {
+		switch item := p.(type) {
+		case store.Describable:
+			// Plus nécessaire de passer par ItemForSale car il est déjà une interface composite de Describable
+			fmt.Println("Name : ", item.GetName(), " - Category : ", item.GetCategory(), " - Price : ", item.(store.ItemForSale).Price(0.2))
+			fmt.Println("Name : ", item.GetName(), " - Category : ", item.GetCategory(), " - Price : ", item.Price(0.2))
+		default:
+			fmt.Println("Key:", key, "Price:", p.Price(0.2))
+		}
+	}
+
 }
