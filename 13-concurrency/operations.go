@@ -21,7 +21,8 @@ func CalcStoreTotal(data ProductData) {
 		fmt.Println("-- channel read pending")
 		value = <-channel
 		fmt.Println("-- channel read complete", value)
-		storeTotal += value // La flèche est placée devant le canal pour en recevoir une valeur provenant de ce canal.
+		// storeTotal += <-channel // La flèche est placée devant le canal pour en recevoir une valeur provenant de ce canal.
+		storeTotal += value
 		time.Sleep(time.Second)
 	}
 	fmt.Println("Total:", ToCurrency(storeTotal))
