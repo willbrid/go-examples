@@ -6,6 +6,19 @@ import (
 )
 
 /**
+Fonction permettant de recevoir les valeurs depuis un canal
+**/
+func receiveDispatches(channel <-chan DispatchNotification1) {
+	var details DispatchNotification1
+
+	for details = range channel {
+		fmt.Println("Dispatch to ", details.Customer, " : ", details.Quantity, " x ", details.Product.Name)
+	}
+	fmt.Println("Channel has been closed")
+
+}
+
+/**
 Le bloc de construction clé pour l'exécution d'un programme Go est la goroutine, qui est un thread léger créé par le runtime Go.
 Tous les programmes Go utilisent au moins une goroutine car c'est ainsi que Go exécute le code dans la fonction main.
 Lorsque le code Go compilé est exécuté, le runtime crée une goroutine qui commence à exécuter les instructions dans le point d'entrée,
@@ -64,6 +77,22 @@ func main() {
 		fmt.Println("Dispatch to ", details.Customer, " : ", details.Quantity, " x ", details.Product.Name)
 	}
 	fmt.Println("Channel has been closed")
+
+	// Forcer la direction d'un canal : le canal dispatchChannel1 est utilisé pour envoyer des valeurs
+	var dispatchChannel1 chan DispatchNotification1 = make(chan DispatchNotification1)
+	var details1 DispatchNotification1
+
+	go DispatchOrders1(dispatchChannel1)
+	for details1 = range dispatchChannel1 {
+		fmt.Println("Dispatch to ", details1.Customer, " : ", details1.Quantity, " x ", details1.Product.Name)
+	}
+	fmt.Println("Channel has been closed")
+
+	var dispatchChannel2 chan DispatchNotification1 = make(chan DispatchNotification1, 100)
+	var sendOnlyChannel chan<- DispatchNotification1 = dispatchChannel2
+	var receiveOnlyChannel <-chan DispatchNotification1 = dispatchChannel2
+	go DispatchOrders1(sendOnlyChannel)
+	receiveDispatches(receiveOnlyChannel)
 
 	fmt.Println("main function complete")
 }
