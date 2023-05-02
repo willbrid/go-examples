@@ -18,6 +18,45 @@ func receiveDispatches(channel <-chan DispatchNotification1) {
 
 }
 
+func enumerateProducts(channel chan<- *Product) {
+	for _, p := range ProductList[:3] {
+		channel <- p
+		time.Sleep(time.Millisecond * 800)
+	}
+	close(channel)
+}
+
+// Envoyé dans un canal sans blocage
+func enumerateProducts1(channel chan<- *Product) {
+	for _, p := range ProductList[:3] {
+		select {
+		case channel <- p:
+			fmt.Println("Sent product:", p.Name)
+		default:
+			fmt.Println("Discarding product:", p.Name)
+			time.Sleep(time.Second)
+		}
+	}
+	close(channel)
+}
+
+// Envoyé vers plusieurs canaux sans blocage
+func enumerateProducts2(channel1, channel2 chan<- *Product) {
+	for _, p := range ProductList[:3] {
+		select {
+		case channel1 <- p:
+			fmt.Println("Send via channel 1 : ", p.Name)
+		case channel2 <- p:
+			fmt.Println("Send via channel 2 : ", p.Name)
+		default:
+			fmt.Println("Discarding product:", p.Name)
+			time.Sleep(time.Second)
+		}
+	}
+	close(channel1)
+	close(channel2)
+}
+
 /**
 Le bloc de construction clé pour l'exécution d'un programme Go est la goroutine, qui est un thread léger créé par le runtime Go.
 Tous les programmes Go utilisent au moins une goroutine car c'est ainsi que Go exécute le code dans la fonction main.
@@ -93,6 +132,86 @@ func main() {
 	var receiveOnlyChannel <-chan DispatchNotification1 = dispatchChannel2
 	go DispatchOrders1(sendOnlyChannel)
 	receiveDispatches(receiveOnlyChannel)
+
+	// Utilisation de l'instruction select
+	/**
+	L'utilisation la plus simple des instructions select est de recevoir d'un canal sans bloquer,
+	garantissant qu'une goroutine n'aura pas à attendre lorsque le canal est vide.
+	Une instruction select a une structure similaire à une instruction switch, sauf que les instructions case sont des opérations de canal.
+	Lorsque l'instruction select est exécutée, chaque opération de canal est évaluée jusqu'à ce qu'une opération pouvant être effectuée sans
+	blocage soit atteinte. L'opération de canal est effectuée et les instructions incluses dans l'instruction case sont exécutées.
+
+	l'instruction select est utilisée pour recevoir des valeurs de deux canaux, l'un qui porte les valeurs DispatchNofitication2 et l'autre qui
+	porte les valeurs Product. Chaque fois que l'instruction select est exécutée, elle se fraye un chemin à travers les instructions case,
+	constituant une liste de celles à partir desquelles une valeur peut être lue sans blocage. L'une des déclarations de cas est sélectionnée au hasard
+	dans la liste et exécutée. Si aucune des instructions case ne peut être exécutée, la clause par défaut est exécutée. Des précautions doivent être
+	prises pour gérer les canaux fermés car ils fourniront une valeur nulle pour chaque opération de réception qui se produit après la fermeture du canal,
+	en s'appuyant sur l'indicateur fermé pour montrer que le canal est fermé. Malheureusement, cela signifie que les instructions case pour les canaux
+	fermés seront toujours choisies par les instructions select car elles sont toujours prêtes à fournir une valeur sans blocage, même si cette valeur
+	n'est pas utile.
+	**/
+	var dispatchChannel3 chan DispatchNotification2 = make(chan DispatchNotification2, 100)
+	var productChannel chan *Product = make(chan *Product)
+	go DispatchOrders2(dispatchChannel3)
+	go enumerateProducts(productChannel)
+	var openChannels int = 2
+
+	for {
+		select {
+		case details2, ok := <-dispatchChannel3:
+			if ok {
+				fmt.Println("Dispatch to ", details2.Customer, ":", details2.Quantity, "x", details2.Product.Name)
+			} else {
+				fmt.Println("Channel has been closed")
+				dispatchChannel3 = nil
+				openChannels--
+			}
+		case product, ok := <-productChannel:
+			if ok {
+				fmt.Println("Product : ", product.Name)
+			} else {
+				fmt.Println("Product channel has been closed")
+				productChannel = nil
+				openChannels--
+			}
+		default:
+			if openChannels == 0 {
+				goto alldone
+			}
+			fmt.Println("-- No message ready to be received")
+			time.Sleep(time.Millisecond * 500)
+		}
+	alldone:
+		fmt.Println("All values received")
+		break
+	}
+
+	/**
+	Envoyé dans un canal sans blocage avec l'instruction select.
+	la fonction enumerateProducts peut envoyer des valeurs via le canal sans bloquer jusqu'à ce que la mémoire tampon soit pleine.
+	La clause par défaut de l'instruction select ignore les valeurs qui ne peuvent pas être envoyées.
+	**/
+	var productChannel1 chan *Product = make(chan *Product, 5)
+	go enumerateProducts1(productChannel1)
+	time.Sleep(time.Second)
+	for p := range productChannel1 {
+		fmt.Println("Received product : ", p.Name)
+	}
+
+	/**
+	Envoyé vers plusieurs canaux sans blocage
+	S'il y a plusieurs canaux disponibles, une instruction select peut être utilisée pour trouver un canal pour lequel l'envoi ne bloquera pas.
+	**/
+	var c1 chan *Product = make(chan *Product, 2)
+	var c2 chan *Product = make(chan *Product, 2)
+	go enumerateProducts2(c1, c2)
+	time.Sleep(time.Second)
+	for p := range c1 {
+		fmt.Println("Channel 1 received product : ", p.Name)
+	}
+	for p := range c2 {
+		fmt.Println("Channel 2 received product : ", p.Name)
+	}
 
 	fmt.Println("main function complete")
 }
