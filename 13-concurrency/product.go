@@ -29,10 +29,6 @@ func ToCurrency(val float64) string {
 
 func init() {
 	for _, p := range ProductList {
-		if _, ok := Products[p.Category]; ok {
-			Products[p.Category] = append(Products[p.Category], p)
-		} else {
-			Products[p.Category] = ProductGroup{p}
-		}
+		Products[p.Category] = append(Products[p.Category], p)
 	}
 }
