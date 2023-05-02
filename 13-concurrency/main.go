@@ -22,6 +22,10 @@ func main() {
 	fmt.Println("Méthode CalcStoreTotal3")
 	CalcStoreTotal3(Products)
 
+	// Appel à la méthode CalcStoreTotal3 sans temporisation
+	fmt.Println("Méthode CalcStoreTotal4")
+	CalcStoreTotal4(Products)
+
 	fmt.Println("main function complete")
 	/**
 		Le bloc de construction clé pour l'exécution d'un programme Go est la goroutine, qui est un thread léger créé par le runtime Go.
