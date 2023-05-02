@@ -8,8 +8,20 @@ import (
 func main() {
 	fmt.Println("main function started")
 	fmt.Println("Day : ", time.Now().Day(), "-", time.Now().Month(), "-", time.Now().Year())
-	CalcStoreTotal(Products)
-	// time.Sleep(time.Second * 5) // On retarde la goroutine principale pour permettre aux autres goroutines de terminer leur exécution
+
+	// Appel à la méthode CalcStoreTotal1 sans temporisation
+	fmt.Println("Méthode CalcStoreTotal1")
+	CalcStoreTotal1(Products)
+
+	// Appel à la méthode CalcStoreTotal2 avec temporisation
+	fmt.Println("Méthode CalcStoreTotal2")
+	CalcStoreTotal2(Products)
+	time.Sleep(time.Second * 5) // On retarde la goroutine principale pour permettre aux autres goroutines de terminer leur exécution
+
+	// Appel à la méthode CalcStoreTotal3 sans temporisation
+	fmt.Println("Méthode CalcStoreTotal3")
+	CalcStoreTotal3(Products)
+
 	fmt.Println("main function complete")
 	/**
 		Le bloc de construction clé pour l'exécution d'un programme Go est la goroutine, qui est un thread léger créé par le runtime Go.
