@@ -6,6 +6,15 @@ import (
 )
 
 // Utilisation d'un canal avec l'action d'envoie et de reception de valeur depuis ce canal
+/**
+Renvoi des résultats des goroutines
+Go fournit des canaux, qui sont des conduits par lesquels les données peuvent être envoyées et reçues.
+Les canaux sont fortement typés, ce qui signifie qu'ils transporteront des valeurs d'un type ou d'une interface spécifiés.
+Le type d'un canal est le mot-clé chan, suivi du type que le canal portera.
+Pour envoyer une valeur dans un canel, le canal est spécifié, suivi d'une flèche de direction exprimée par les caractères < et - puis par la valeur.
+La flèche est placée devant le canal pour en recevoir une valeur.
+Lorsqu'une valeur est envoyée via un canal, l'expéditeur n'a pas besoin de savoir comment la valeur sera reçue et utilisée.
+**/
 
 func CalcStoreTotal3(data ProductData) {
 	var storeTotal float64
