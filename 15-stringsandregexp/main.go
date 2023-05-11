@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"strings"
+	"unicode"
 )
 
 func main() {
@@ -45,4 +46,36 @@ func main() {
 	fmt.Println("Upper : ", upperChar, []byte(upperChar))
 	titleChar := strings.ToTitle(specialChar)
 	fmt.Println("Title : ", titleChar, []byte(titleChar))
+
+	/**
+	le type rune est un alias pour le type int32. Il représente un point de code Unicode unique et peut être utilisé pour représenter
+	des caractères Unicode dans une chaîne ou un flux de caractères.
+	**/
+	product1 := "Kayak"
+	for _, char := range product1 {
+		fmt.Println(string(char), " Upper case : ", unicode.IsUpper(char)) // Renvoie si le caractère rune est en majuscule
+		fmt.Println(string(char), " Lower case : ", unicode.IsLower(char)) // Renvoie si le caractère rune est en minuscule
+		fmt.Println(string(char), " Title case : ", unicode.IsTitle(char)) // Renvoie si le caractère rune est la casse du titre
+	}
+
+	description1 := "A boat for sailing"
+	//Permet de compter le nombre de fois la sous chaine "o" apparaît dans la chaine description1
+	fmt.Println("Count : ", strings.Count(description1, "o"))
+	// Permet de renvoyer l'index de la première occurrence de la sous chaine "o" dans la chaine description1 ou -1 s'il y'a aucune occurrence
+	fmt.Println("Index : ", strings.Index(description1, "o"))
+	// Permet de renvoyer l'index de la dernière occurrence de la sous chaine "o" dans la chaine description1 ou -1 s'il y'a aucune occurrence
+	fmt.Println("LastIndex:", strings.LastIndex(description1, "o"))
+	// Permet de renvoyer l'index de la première occurrence de n'importe quel caractère de la chaîne description1, ou -1 s'il n'y a pas d'occurrence.
+	fmt.Println("IndexAny:", strings.IndexAny(description1, "abcd"))
+	// Permet de renvoyer l'index de la dernière occurrence de n'importe quel caractère de la chaîne description1, ou -1 s'il n'y a pas d'occurrence.
+	fmt.Println("LastIndexAny:", strings.LastIndexAny(description1, "abcd"))
+	fmt.Println("LastIndexAny:", strings.LastIndexAny(description1, "o"))
+
+	isLetterB := func(r rune) bool {
+		return r == 'B' || r == 'b'
+	}
+	// Permet de renvoyer l'index de la première occurrence du caractère dans la chaîne description1 pour laquelle la fonction spécifiée renvoie true.
+	fmt.Println("IndexFunc:", strings.IndexFunc(description1, isLetterB))
+	// Permet de renvoyer l'index de la dernière occurrence du caractère dans la chaîne description1 pour laquelle la fonction spécifiée renvoie true.
+	fmt.Println("LastIndexFunc:", strings.LastIndexFunc(description1, isLetterB))
 }
