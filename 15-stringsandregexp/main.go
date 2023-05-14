@@ -105,4 +105,33 @@ func main() {
 	}
 	fieldsFuncResult := strings.FieldsFunc(description3, splitter)
 	fmt.Println("FieldsFunc : ", fieldsFuncResult, " - Longueur : ", len(fieldsFuncResult))
+
+	username := " Alice"
+	// Cette fonction permet de supprimer tous les caractères d'espacement de début ou de fin.
+	trimSpaceResult := strings.TrimSpace(username)
+	fmt.Println("Trimmed : ", ">>"+trimSpaceResult+"<<")
+	description4 := "A boat for one person"
+	// Cette fonction renvoie une chaîne à partir de laquelle tous les caractères de début ou de fin contenus dans la
+	// chaîne "Asno " sont supprimés de la chaîne description4
+	trimResult := strings.Trim(description4, "Asno ")
+	// Ici la suppression commence à partir de la gauche
+	trimLeftResult := strings.TrimLeft(description4, "Asno ")
+	// Ici la suppression commence à partir de la droite
+	trimRightResult := strings.TrimRight(description4, "Asno ")
+	fmt.Println("Trim : ", trimResult)
+	fmt.Println("TrimLeft : ", trimLeftResult)
+	fmt.Println("TrimRight : ", trimRightResult)
+	// Cette fonction supprime la sous-chaine "A boat " au début de la chaine description4 et renvoie le reste de la chaine
+	trimPrefixResult := strings.TrimPrefix(description4, "A boat ")
+	// Cette fonction supprime la sous-chaine "son" à la fin de la chaine description4 et renvoie le reste de la chaine
+	trimSuffixResult := strings.TrimSuffix(description4, "son")
+	fmt.Println("TrimPrefix : ", trimPrefixResult)
+	fmt.Println("TrimSuffix : ", trimSuffixResult)
+	// La fonction personnalisée est appelée pour les caractères au début et à la fin de la chaîne,
+	// et les caractères seront coupés jusqu'à ce que la fonction renvoie false.
+	trimmer := func(r rune) bool {
+		return r == 'A' || r == 'n'
+	}
+	trimFuncResult := strings.TrimFunc(description4, trimmer)
+	fmt.Println("TrimFunc : ", trimFuncResult)
 }
