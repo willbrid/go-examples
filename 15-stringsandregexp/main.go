@@ -134,4 +134,59 @@ func main() {
 	}
 	trimFuncResult := strings.TrimFunc(description4, trimmer)
 	fmt.Println("TrimFunc : ", trimFuncResult)
+
+	text := "It was a boat. A small boat."
+	// Cette fonction modifie la chaîne text en remplaçant les occurrences de la chaîne "boat" par la chaîne "canoe".
+	// Le nombre maximum d'occurrences qui seront remplacées est 1.
+	replaceResult := strings.Replace(text, "boat", "canoe", 1)
+	// // Cette fonction modifie la chaîne text en remplaçant toute les occurrences de la chaîne "boat" par la chaîne "truck".
+	replaceAllResult := strings.ReplaceAll(text, "boat", "truck")
+	fmt.Println("Replace : ", replaceResult)
+	fmt.Println("ReplaceAll : ", replaceAllResult)
+	mapper := func(r rune) rune {
+		if r == 'b' {
+			return 'c'
+		}
+
+		return r
+	}
+	// Cette fonction se base sur la fonction personalisée mapper pour remplacer toutes les caractères 'b' par 'c'
+	mapResult := strings.Map(mapper, text)
+	fmt.Println("Map : ", mapResult)
+
+	text1 := "It was a boat. A small boat."
+	// Le contructeur strings.NewReplacer permet de définir des pairs d'arguments donc l'élément gauche de la pair sera remplacé par l'élément droit
+	// dans notre cas : "boat" remplacé par "kayak" et "small" remplacé par "huge"
+	replacer := strings.NewReplacer("boat", "kayak", "small", "huge")
+	// Cette méthode retourne une chaîne pour laquelle tous les remplacements spécifiés avec le constructeur ont été effectués sur la chaîne text1.
+	replaced := replacer.Replace(text1)
+	fmt.Println("Replaced : ", replaced)
+	// Cette instruction retourn un slice basé sur le séparateur d'espace
+	elements := strings.Fields(text1)
+	// Cette fonction combine les éléments dans le slice de chaîne spécifiée, avec la chaîne de séparation spécifiée placée entre les éléments.
+	joinResult := strings.Join(elements, "--")
+	fmt.Println("Join : ", joinResult)
+	// Cette fonction repète la chaine "good" 3 fois et retourne une chaine concatenée de ces 3 occurrences de la chaine "good"
+	repeatResult := strings.Repeat("good", 3)
+	fmt.Println("Repeat : ", repeatResult)
+
+	text2 := "It was a boat. A small boat."
+	var builder strings.Builder
+	for _, sub := range strings.Fields(text2) {
+		if sub == "small" {
+			builder.WriteString("very ")
+		}
+		// Cette méthode builder.WriteString ajoute la chaîne sub à la chaîne en cours de construction.
+		builder.WriteString(sub)
+		// Cette méthode builder.WriteString ajoute le caractère ' ' à la chaîne en cours de construction.
+		builder.WriteRune(' ')
+	}
+	fmt.Println("Builder accumulated string result : ", builder.String())
+	// Cette méthode renvoie le nombre d'octets utilisés pour stocker la chaîne créée par le générateur.
+	fmt.Println("Builder String Len : ", builder.Len())
+	// Cette méthode renvoie le nombre d'octets qui ont été alloués par le générateur.
+	fmt.Println("Builder String Cap : ", builder.Cap())
+	// Cette méthode réinitialise la chaîne créée par le générateur.
+	builder.Reset()
+	fmt.Println("Builder accumulated string result : ", builder.String())
 }
