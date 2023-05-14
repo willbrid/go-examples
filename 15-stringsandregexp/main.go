@@ -78,4 +78,31 @@ func main() {
 	fmt.Println("IndexFunc:", strings.IndexFunc(description1, isLetterB))
 	// Permet de renvoyer l'index de la dernière occurrence du caractère dans la chaîne description1 pour laquelle la fonction spécifiée renvoie true.
 	fmt.Println("LastIndexFunc:", strings.LastIndexFunc(description1, isLetterB))
+
+	description2 := "A boat for sailing"
+	// Cette fonction Fields divise une chaîne sur les caractères d'espacement et renvoie un slice contenant les éléments non blanches de la chaîne description2
+	fieldsResult := strings.Fields(description2)
+	fmt.Println("Fields : ", fieldsResult, " - Longueur : ", len(fieldsResult))
+	// Cette fonction Split divise la chaîne description2 sur une sous-chaine "a" et renvoie un slice contenant les éléments ne contenant pas la sous-chaine
+	splitResult := strings.Split(description2, "a")
+	fmt.Println("Split : ", splitResult, " - Longueur : ", len(splitResult))
+	// Cette fonction Split divise la chaîne description2 sur une sous-chaine "a" et renvoie un slice contenant un nombre maximal de 2 éléments.
+	// Le dernier élément peut contenir la sous-chaine "a" : dans ce cas il est non splité
+	splitNResult := strings.SplitN(description2, "a", 2)
+	fmt.Println("SplitN : ", splitNResult, " - Longueur : ", len(splitNResult))
+	splitAfterResult := strings.SplitAfter(description2, "i")
+	// Cette fonction Split divise la chaîne description2 sur une sous-chaine "i" et renvoie un slice contenant les éléments contenant la sous-chaine "i"
+	fmt.Println("SplitAfter : ", splitAfterResult, " - Longueur : ", len(splitAfterResult))
+	splitAfterNResult := strings.SplitAfterN(description2, "i", 2)
+	fmt.Println("SplitAfterN : ", splitAfterNResult, " - Longueur : ", len(splitAfterNResult))
+
+	description3 := "This  is double  spaced"
+	// La fonction Fields ne prend pas en charge une limite sur le nombre de résultats mais gère correctement les doubles espaces.
+	splitResult1 := strings.Fields(description3)
+	fmt.Println("Split : ", splitResult1, " - Longueur : ", len(splitResult1))
+	splitter := func(r rune) bool {
+		return r == ' '
+	}
+	fieldsFuncResult := strings.FieldsFunc(description3, splitter)
+	fmt.Println("FieldsFunc : ", fieldsFuncResult, " - Longueur : ", len(fieldsFuncResult))
 }
