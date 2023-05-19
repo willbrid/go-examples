@@ -3,9 +3,14 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"regexp"
 	"strings"
 	"unicode"
 )
+
+func getSubstring(s string, indices []int) string {
+	return string(s[indices[0]:indices[1]])
+}
 
 func main() {
 	/** Comparaison des chaines de caractères **/
@@ -189,4 +194,118 @@ func main() {
 	// Cette méthode réinitialise la chaîne créée par le générateur.
 	builder.Reset()
 	fmt.Println("Builder accumulated string result : ", builder.String())
+
+	description5 := "A boat for one person"
+	/**
+	La fonction MatchString accepte un modèle d'expression régulière et la chaîne à rechercher. Les résultats de la fonction MatchString
+	sont une valeur booléenne, qui est vraie s'il y a une correspondance et une erreur, qui sera nulle s'il n'y a eu aucun problème lors de
+	l'exécution de la correspondance. Les erreurs avec les expressions régulières surviennent généralement si le modèle ne peut pas être traité.
+	**/
+	match, err := regexp.MatchString("[A-z]oat", description5)
+	if err == nil {
+		fmt.Println("Match : ", match)
+	} else {
+		fmt.Println("Error : ", err)
+	}
+
+	/**
+	Ceci est plus efficace car le modèle ne doit être compilé qu'une seule fois. Le résultat de la fonction Compile est une instance du type RegExp,
+	qui définit la fonction MatchString. Donc Cette fonction renvoie une RegExp qui peut être utilisée pour effectuer une correspondance de
+	pattern répété avec le pattern spécifié.
+	**/
+	pattern, compileErr := regexp.Compile("[A-z]oat")
+	question := "Is that a goat?"
+	preference := "I like oats"
+	if compileErr == nil {
+		fmt.Println("Description : ", pattern.MatchString(description5))
+		fmt.Println("Question : ", pattern.MatchString(question))
+		fmt.Println("Preference : ", pattern.MatchString(preference))
+	} else {
+		fmt.Println("Error : ", compileErr)
+	}
+
+	/**
+	Cette fonction fournit la même fonctionnalité que Compile mais panique.
+	**/
+	pattern1 := regexp.MustCompile("K[a-z]{4}|[A-z]oat")
+	description6 := "Kayak. A boat for one person."
+	/**
+	Cette méthode FindStringIndex renvoie un slice de int contenant l'emplacement de la correspondance la plus à gauche faite par le pattern compilé
+	dans la chaîne description6. Un résultat nul indique qu'aucune correspondance n'a été établie.
+	**/
+	firstIndex := pattern1.FindStringIndex(description6)
+	/**
+	Cette méthode FindAllStringIndex renvoie un slice de slices de int contenant l'emplacement de toutes les correspondances effectuées par le
+	pattern compilé dans la chaîne description6. Un résultat nul indique qu'aucune correspondance n'a été établie.
+	**/
+	allIndices := pattern1.FindAllStringIndex(description6, -1)
+	fmt.Println("First index : ", firstIndex[0], " - ", firstIndex[1], " = ", getSubstring(description6, firstIndex))
+	for i, idx := range allIndices {
+		fmt.Println("Index : ", i, " = ", idx[0], " - ", idx[1], " = ", getSubstring(description6, idx))
+	}
+
+	/**
+	Cette méthode FindString renvoie une chaîne contenant la correspondance la plus à gauche faite par le pattern compilé dans la chaîne description6.
+	Une chaîne vide sera retournée si aucune correspondance n'est faite.
+	**/
+	firstMatch := pattern1.FindString(description6)
+	/**
+	Cette méthode FindAllString renvoie un slice de chaîne contenant les correspondances faites par le pattern compilé dans la chaîne description6.
+	L'argument int max spécifie le nombre maximum de correspondances, avec -1 spécifiant aucune limite. Un résultat nul est renvoyé
+	s'il n'y a pas de correspondance.
+	**/
+	allMatches := pattern1.FindAllString(description6, -1)
+	fmt.Println("First match:", firstMatch)
+	for i, m := range allMatches {
+		fmt.Println("Match : ", i, " = ", m)
+	}
+
+	pattern2 := regexp.MustCompile(" |boat|one")
+	/**
+	Cette méthode Split divise la chaîne description7 en utilisant les correspondances du pattern compilé comme séparateurs et renvoie un slice
+	contenant les sous-chaînes divisées.
+	**/
+	split := pattern2.Split(description6, -1)
+	for _, s := range split {
+		if s != "" {
+			fmt.Println("Substring : ", s)
+		}
+	}
+
+	pattern3 := regexp.MustCompile("A [A-z]* for [A-z]* person")
+	description7 := "Kayak. A boat for one person."
+	str := pattern3.FindString(description7)
+	fmt.Println("Match:", str)
+	/**
+	Cette méthode FindStringSubmatch renvoie un slice contenant la première correspondance établie par le pattern et le texte
+	des sous-expressions définies par le pattern.
+	**/
+	subs := pattern3.FindStringSubmatch(description7)
+	for _, s := range subs {
+		fmt.Println("Match subs : ", s)
+	}
+
+	pattern4 := regexp.MustCompile("A (?P<type>[A-z]*) for (?P<capacity>[A-z]*) person")
+	description8 := "Kayak. A boat for one person."
+	subs1 := pattern4.FindStringSubmatch(description8)
+	for _, name := range []string{"type", "capacity"} {
+		/**
+		Cette méthode SubexpIndex renvoie l'index de la sous-expression avec la chaine name spécifiée ou -1 s'il n'y a pas une telle sous-expression.
+		**/
+		fmt.Println("Index de la sous-expression : ", pattern4.SubexpIndex(name))
+		fmt.Println(name, " = ", subs1[pattern4.SubexpIndex(name)])
+	}
+	/**
+	Cette méthode ReplaceAllStringFunc remplace la partie correspondante de la chaîne description8 par le résultat produit par la fonction spécifiée.
+	**/
+	replaced1 := pattern4.ReplaceAllStringFunc(description8, func(s string) string {
+		return "This is the replacement content"
+	})
+	fmt.Println(replaced1)
+	/**
+	Cette méthode ReplaceAllString remplace la partie correspondante de la chaîne description8 par le pattern spécifié, qui est développé avant d'être
+	inclus dans le résultat pour incorporer des sous-expressions.
+	**/
+	replaced2 := pattern4.ReplaceAllString(description8, "Good")
+	fmt.Println(replaced2)
 }
