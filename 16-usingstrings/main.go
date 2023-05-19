@@ -113,4 +113,66 @@ func main() {
 	Printfln("Bool2 : %t", len(name1) > 100)
 	// Ce verbe %p affiche une représentation hexadécimale de l'emplacement de stockage du pointeur.
 	Printfln("Pointer : %p", &name1)
+
+	var name2, category string
+	var price float64
+	fmt.Print("Enter text to scan : ")
+	/**
+	Cette fonction lit le texte de l'entrée standard et stocke les valeurs séparées par des espaces dans des arguments spécifiés.
+	Les retours à la ligne sont traités comme des espaces et la fonction lit jusqu'à ce qu'elle ait reçu des valeurs pour tous ses arguments.
+	Le résultat est le nombre de valeurs qui ont été lues et une erreur qui décrit tout problème.
+	**/
+	n, err := fmt.Scan(&name2, &category, &price)
+	if err == nil {
+		Printfln("Scanned %v values", n)
+		Printfln("Name: %v, Category: %v, Price: %.2f", name2, category, price)
+	} else {
+		Printfln("Error: %v", err.Error())
+	}
+
+	vals := make([]string, 3)
+	ivals := make([]interface{}, 3)
+	for i := 0; i < len(vals); i++ {
+		ivals[i] = &vals[i]
+	}
+	fmt.Print("Enter text to scan : ")
+	fmt.Scan(ivals...)
+	Printfln("Name: %v", vals)
+
+	/*
+		var name3, category1 string
+		var price1 float64
+		fmt.Print("Enter text to scan : ")
+		n1, err1 := fmt.Scanln(&name3, &category1, &price1)
+		if err1 == nil {
+			Printfln("Scanned %v values", n1)
+			Printfln("Name: %v, Category: %v, Price: %.2f", name3, category1, price1)
+		} else {
+			Printfln("Error: %v", err1.Error())
+		} */
+
+	var name4, category2 string
+	var price2 float64
+	source := "Lifejacket Watersports 48.95"
+	// Le premier argument de la fonction Sscan est la chaîne à analyser, mais à tous autres égards, le processus d'analyse est le même.
+	n2, err2 := fmt.Sscan(source, &name4, &category2, &price2)
+	if err2 == nil {
+		Printfln("Scanned %v values", n2)
+		Printfln("Name: %v, Category: %v, Price: %.2f", name4, category2, price2)
+	} else {
+		Printfln("Error: %v", err2.Error())
+	}
+
+	var name5, category3 string
+	var price3 float64
+	source1 := "Product Lifejacket Watersports 48.95"
+	template := "Product %s %s %f"
+	// Le premier argument de la fonction Sscanf est la chaîne à analyser et le deuxième argument est le template à utiliser pour scanner.
+	n3, err3 := fmt.Sscanf(source1, template, &name5, &category3, &price3)
+	if err3 == nil {
+		Printfln("Scanned %v values", n3)
+		Printfln("Name: %v, Category: %v, Price: %.2f", name5, category3, price3)
+	} else {
+		Printfln("Error: %v", err3.Error())
+	}
 }
