@@ -33,7 +33,7 @@ export PATH=$PATH:/usr/local/go/bin
 source $HOME/.profile
 ```
 
-- Vérifions que nous avez installé Go en ouvrant une invite de commande et en saisissant la commande suivante
+- Vérifions que nous avons installé Go en ouvrant une invite de commande et en saisissant la commande suivante
 
 ```
 go version
