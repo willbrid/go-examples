@@ -124,4 +124,88 @@ func main() {
 	} else {
 		Printfln(lonerr.Error(), douerr.Error(), nycerr.Error())
 	}
+
+	// Cette fonction time.FixedZone renvoie un pointeur *Location qui utilise toujours le nom spécifié et le décalage par rapport à UTC.
+	london1 := time.FixedZone("BST", 1*60*60)
+	newyork1 := time.FixedZone("EDT", -4*60*60)
+	local1 := time.FixedZone("Local", 0)
+	londonTime1, _ := time.ParseInLocation(layout1, date1, london1)
+	newyorkTime1, _ := time.ParseInLocation(layout1, date1, newyork1)
+	localTime1, _ := time.ParseInLocation(layout1, date1, local1)
+	PrintTime2("London : ", &londonTime1)
+	PrintTime2("New York : ", &newyorkTime1)
+	PrintTime2("Local : ", &localTime1)
+
+	t, err := time.Parse(time.RFC822, "09 Jun 95 04:59 BST")
+	if err == nil {
+		// Cette méthode t.After renvoie true si l'heure à laquelle la méthode a été appelée se produit après l'heure fournie en argument.
+		Printfln("After : %v", t.After(time.Now()))
+		// Cette méthode t.Before renvoie true si l'heure à laquelle la méthode a été appelée se produit avant l'heure fournie en argument.
+		Printfln("Before : %v", t.Before(time.Now()))
+		// Cette méthode t.Round arrondit le temps à l'intervalle le plus proche représenté par une valeur de durée.
+		Printfln("Round : %v", t.Round(time.Hour))
+		// Cette méthode t.Truncate arrondit le temps à l'intervalle inférieur le plus proche représenté par une valeur de durée.
+		Printfln("Truncate : %v", t.Truncate(time.Hour))
+	} else {
+		Printfln("Error : %v", err.Error())
+	}
+
+	t1, _ := time.Parse(time.RFC822Z, "09 Jun 95 04:59 +0100")
+	t2, _ := time.Parse(time.RFC822Z, "08 Jun 95 23:59 -0400")
+	// Cette méthode Equal renvoie true si l'heure à laquelle la méthode a été appelée est égale à l'heure fournie en argument.
+	Printfln("Equal Method: %v", t1.Equal(t2))
+	Printfln("Equality Operator: %v", t1 == t2)
+	/**
+	  Cette méthode t1.IsZero renvoie true si l'heure à laquelle la méthode a été appelée représente l'instant zéro,
+	  qui est le 1er janvier, année 1, 00:00:00 UTC.
+	**/
+	Printfln("Is zero : %v", t1.IsZero())
+	// Cette méthode t2.Location renvoie l'emplacement qui est associé à l'heure, permettant ainsi d'exprimer une heure dans un fuseau horaire différent.
+	Printfln("Location : %v", t2.Location().String())
+
+	var d time.Duration = time.Hour + (30 * time.Minute)
+	// Cette méthode d.Hours renvoie un float64 qui représente la durée en heures.
+	Printfln("Hours : %v", d.Hours())
+	// Cette méthode d.Minutes renvoie un float64 qui représente la durée en minutes.
+	Printfln("Mins : %v", d.Minutes())
+	// Cette méthode d.Seconds renvoie un float64 qui représente la durée en secondes.
+	Printfln("Seconds : %v", d.Seconds())
+	// Cette méthode d.Milliseconds renvoie un int64 qui représente la durée en millisecondes.
+	Printfln("Millseconds : %v", d.Milliseconds())
+	// Cette méthode d.Round renvoie une durée, qui est arrondie au multiple le plus proche de la durée spécifiée.
+	rounded := d.Round(time.Hour)
+	Printfln("Rounded Hours: %v", rounded.Hours())
+	Printfln("Rounded Mins: %v", rounded.Minutes())
+	// Cette méthode d.Truncate renvoie une durée, qui est arrondie au multiple inférieur le plus proche de la durée spécifiée.
+	trunc := d.Truncate(time.Hour)
+	Printfln("Truncated Hours: %v", trunc.Hours())
+	Printfln("Rounded Mins: %v", trunc.Minutes())
+
+	toYears := func(d time.Duration) int {
+		return int(d.Hours() / (24 * 365))
+	}
+	future := time.Date(2051, 0, 0, 0, 0, 0, 0, time.Local)
+	past := time.Date(1965, 0, 0, 0, 0, 0, 0, time.Local)
+	// Cette fonction time.Until renvoie une durée exprimant le temps écoulé jusqu'à la valeur de temps spécifiée.
+	Printfln("Futur : %v", toYears(time.Until(future)))
+	// Cette fonction time.Since renvoie une durée exprimant le temps écoulé depuis la valeur de temps spécifiée.
+	Printfln("Past : %v", toYears(time.Since(past)))
+
+	/**
+		h : Cette unité désigne les heures.
+		m : Cette unité désigne les minutes.
+		s : Cette unité désigne les secondes.
+		ms : Cette unité désigne les millisecondes.
+		us ou μs : Cette unité désigne les microsecondes.
+		ns : Cette unité désigne les nanosecondes.
+	**/
+	d1, err := time.ParseDuration("1h30m")
+	if err == nil {
+		Printfln("Hours: %v", d1.Hours())
+		Printfln("Mins: %v", d1.Minutes())
+		Printfln("Seconds: %v", d1.Seconds())
+		Printfln("Millseconds: %v", d1.Milliseconds())
+	} else {
+		Printfln("Error : %v", err.Error())
+	}
 }
