@@ -28,6 +28,152 @@ func PrintTime2(label string, t *time.Time) {
 	Printfln("2- %v : %v", label, t.Format(time.RFC822Z))
 }
 
+/*
+*
+
+	La durée spécifiée par la fonction Sleep est la durée minimale pendant laquelle la goroutine sera mise en pause, et nous ne devons pas
+	nous fier à des périodes de temps exactes, en particulier pour des durées plus courtes. Gardons à l'esprit que la fonction Sleep met en pause
+	la goroutine dans laquelle elle est appelée, ce qui signifie qu'elle mettra également en pause la goroutine principale, ce qui peut donner
+	l'impression de bloquer l'application.
+
+*
+*/
+func writeToChannel(channel chan<- string) {
+	names := []string{"Alice", "Bob", "Charlie", "Dora"}
+
+	for _, name := range names {
+		channel <- name
+		time.Sleep(time.Second * 1)
+	}
+	close(channel)
+}
+
+func writeToChannel1(channel chan<- string) {
+	names := []string{"Alice", "Bob", "Charlie", "Dora"}
+
+	for _, name := range names {
+		channel <- name
+	}
+	close(channel)
+}
+
+func writeToChannel2(channel chan<- string) {
+	Printfln("Waiting for initial duration...")
+	/**
+	Le résultat de la fonction time.After est un canal qui transporte des valeurs de temps. Le canal se bloque pendant la durée spécifiée,
+	lorsqu'une valeur de temps est envoyée, indiquant que la durée s'est écoulée.
+	**/
+	<-time.After(time.Second * 2)
+	Printfln("Initial duration elapsed.")
+
+	names := []string{"Alice", "Bob", "Charlie", "Dora"}
+
+	for _, name := range names {
+		channel <- name
+		time.Sleep(time.Second * 1)
+	}
+	close(channel)
+}
+
+func writeToChannel3(channel chan<- string) {
+	Printfln("Waiting for initial duration...")
+	/**
+	Le résultat de la fonction time.After est un canal qui transporte des valeurs de temps. Le canal se bloque pendant la durée spécifiée,
+	lorsqu'une valeur de temps est envoyée, indiquant que la durée s'est écoulée.
+	La fonction timeAfter peut être utilisée avec des instructions select pour fournir un délai d'attente.
+	**/
+	<-time.After(time.Second * 2)
+	Printfln("Initial duration elapsed.")
+
+	names := []string{"Alice", "Bob", "Charlie", "Dora"}
+
+	for _, name := range names {
+		channel <- name
+		time.Sleep(time.Second * 3)
+	}
+	close(channel)
+}
+
+/*
+*
+La minuterie dans cet exemple est créée avec une durée de dix minutes. Une goroutine dort pendant deux secondes, puis réinitialise le chronomètre
+pour que sa durée soit de deux secondes.
+*
+*/
+func writeToChannel4(channel chan<- string) {
+	// Cette fonction time.NewTimer renvoie un *Timer avec la période spécifiée.
+	timer := time.NewTimer(time.Minute * 10)
+
+	go func() {
+		time.Sleep(time.Second * 2)
+		Printfln("Resetting timer")
+		// Cette méthode timer.Reset arrête un minuteur et le réinitialise afin que son intervalle corresponde à la durée spécifiée.
+		timer.Reset(time.Second)
+	}()
+
+	Printfln("Waiting for initial duration...")
+	// Ce champ .C renvoie le canal sur lequel le Time (timer) enverra sa valeur Time.
+	<-timer.C
+	Printfln("Initial duration elapsed.")
+
+	names := []string{"Alice", "Bob", "Charlie", "Dora"}
+
+	for _, name := range names {
+		channel <- name
+	}
+	close(channel)
+}
+
+/*
+*
+L'utilité du canal créé par la fonction time.Tick n'est pas les valeurs de temps envoyées dessus, mais la périodicité à
+laquelle elles sont envoyées. Dans cet exemple, la fonction Tick est utilisée pour créer un canal sur lequel les valeurs seront envoyées
+toutes les secondes. Le canal se bloque lorsqu'il n'y a pas de valeur à lire, ce qui permet aux canaux créés avec la fonction time.Tick de contrôler
+la vitesse à laquelle la fonction writeToChannel5 génère des valeurs. La fonction time.Tick est utile lorsqu'une séquence indéfinie de signaux est requise.
+*
+*/
+func writeToChannel5(channel chan<- string) {
+	names := []string{"Alice", "Bob", "Charlie", "Dora"}
+
+	// La fonction time.Tick renvoie un canal sur lequel les valeurs de temps sont envoyées à un intervalle spécifié.
+	tickChannel := time.Tick(time.Second)
+	index := 0
+
+	for {
+		<-tickChannel
+		channel <- names[index]
+		index++
+		if index == len(names) {
+			index = 0
+		}
+	}
+}
+
+/*
+*
+Le résultat de la fonction time.NewTicker est un pointeur vers une structure Ticker, qui définit le champ et les méthodes.
+*
+*/
+func writeToChannel6(channel chan<- string) {
+	names := []string{"Alice", "Bob", "Charlie", "Dora"}
+
+	ticker := time.NewTicker(time.Second / 10)
+	index := 0
+
+	for {
+		// Ce champ ticker.C renvoie le canal sur lequel le Ticker enverra ses valeurs de temps.
+		<-ticker.C
+		channel <- names[index]
+		index++
+		if index == len(names) {
+			// Cette méthode ticker.Stop arrête le ticker (mais ne ferme pas le canal renvoyé par le champ C).
+			ticker.Stop()
+			close(channel)
+			break
+		}
+	}
+}
+
 func main() {
 	Printfln("Hello, Dates and Times")
 
@@ -207,5 +353,70 @@ func main() {
 		Printfln("Millseconds: %v", d1.Milliseconds())
 	} else {
 		Printfln("Error : %v", err.Error())
+	}
+
+	var nameChannel chan string = make(chan string)
+	go writeToChannel(nameChannel)
+	for name := range nameChannel {
+		Printfln("Read name from channel : %v", name)
+	}
+
+	var nameChannel1 chan string = make(chan string)
+	/**
+	Cette fonction time.AfterFunc exécute la fonction spécifiée dans sa propre goroutine après la durée spécifiée. Le résultat est un *Timer,
+	dont la méthode Stop peut être utilisée pour annuler l'exécution de la fonction avant que la durée ne soit écoulée.
+	**/
+	time.AfterFunc(time.Second*5, func() {
+		writeToChannel1(nameChannel1)
+	})
+	for name := range nameChannel1 {
+		Printfln("Read name from channel 1 : %v", name)
+	}
+
+	var nameChannel2 chan string = make(chan string)
+	go writeToChannel2(nameChannel2)
+	for name := range nameChannel2 {
+		Printfln("Read name from channel 2 : %v", name)
+	}
+
+	var nameChannel3 chan string = make(chan string)
+	go writeToChannel3(nameChannel3)
+	channelOpen := true
+	for channelOpen {
+		Printfln("Starting channel read")
+		/**
+		L'instruction select bloquera jusqu'à ce que l'un des canaux soit prêt ou jusqu'à ce que la minuterie expire. Cela fonctionne parce que
+		l'instruction select bloquera jusqu'à ce que l'un de ses canaux soit prêt et parce que la fonction time.After crée un canal qui se bloque pendant
+		une période spécifiée.
+		**/
+		select {
+		case name, ok := <-nameChannel3:
+			if !ok {
+				channelOpen = false
+				break
+			} else {
+				Printfln("Read name from channel 3 : %v", name)
+			}
+		case <-time.After(time.Second * 2):
+			Printfln("Timeout")
+		}
+	}
+
+	var nameChannel4 chan string = make(chan string)
+	go writeToChannel4(nameChannel4)
+	for name := range nameChannel4 {
+		Printfln("Read name from channel 4 : %v", name)
+	}
+
+	var nameChannel5 chan string = make(chan string)
+	go writeToChannel5(nameChannel5)
+	for name := range nameChannel5 {
+		Printfln("Read name from channel 5 : %v", name)
+	}
+
+	var nameChannel6 chan string = make(chan string)
+	go writeToChannel6(nameChannel6)
+	for name := range nameChannel6 {
+		Printfln("Read name from channel 6 : %v", name)
 	}
 }
