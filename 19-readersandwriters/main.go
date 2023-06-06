@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"io"
 	"strings"
 )
@@ -202,4 +203,57 @@ func main() {
 	**/
 	limited := io.LimitReader(concatReader2, 5)
 	ConsumeData(limited)
+
+	/**
+		C'est la taille de la tranche d'octet transmise à la fonction Read qui détermine la façon dont les données sont consommées.
+		Dans ce cas, la taille de la tranche est de 5, ce qui signifie qu'un maximum de 5 octets est lu pour chaque appel à la fonction Read.
+		Deux lectures n'ont pas obtenu 5 octets de données. L'avant-dernière lecture a produit 3 octets car les données source ne sont pas parfaitement
+		divisibles par cinq et il restait trois octets de données. La lecture finale a renvoyé 0 octet mais a reçu l'erreur EOF, indiquant que
+		la fin des données avait été atteinte. Au total, la lecture de 28 octets a nécessité 7 lectures.
+
+		La lecture de petites quantités de données peut être problématique lorsqu'il y a une grande quantité de surcharge associée à chaque opération.
+		Ce n'est pas un problème lors de la lecture d'une chaîne stockée en mémoire, mais la lecture de données à partir d'autres sources de données,
+		telles que des fichiers, peut être plus coûteuse et il peut être préférable d'effectuer un plus petit nombre de lectures plus importantes.
+		Cela se fait en introduisant un tampon dans lequel une grande quantité de données est lue pour répondre à plusieurs demandes de données plus petites.
+	**/
+	text := "It was a boat. A small boat."
+	var reader io.Reader = NewCustomReader(strings.NewReader(text))
+	var writer2 strings.Builder
+	slice := make([]byte, 5)
+	for {
+		count, err := reader.Read(slice)
+		if count > 0 {
+			writer2.Write(slice[0:count])
+		}
+		if err != nil {
+			break
+		}
+	}
+	Printfln("Read data: %v", writer2.String())
+
+	/**
+	La fonction NewReader utilisée, qui crée un reader avec la taille de tampon par défaut. Le reader mis en mémoire tampon remplit
+	sa mémoire tampon et utilise les données qu'il contient pour répondre aux appels à la méthode Read.
+
+	La taille de la mémoire tampon par défaut est de 4 096 octets, ce qui signifie que le reader mis en mémoire tampon a pu lire toutes les données
+	en une seule opération de lecture, plus une lecture supplémentaire pour produire le résultat EOF.
+	L'introduction de la mémoire tampon réduit la surcharge associée aux opérations de lecture, mais au détriment de la mémoire utilisée
+	pour mettre les données en mémoire tampon.
+	**/
+	text1 := "It was a boat. A small boat."
+	var reader1 io.Reader = NewCustomReader(strings.NewReader(text1))
+	var writer3 strings.Builder
+	slice1 := make([]byte, 5)
+	// Cette fonction bufio.NewReader renvoie un reader tamponné avec la taille de tampon par défaut (qui est de 4 096 octets au moment de l'écriture).
+	reader1 = bufio.NewReader(reader1)
+	for {
+		count1, err1 := reader1.Read(slice1)
+		if count1 > 0 {
+			writer3.Write(slice1[0:count1])
+		}
+		if err1 != nil {
+			break
+		}
+	}
+	Printfln("Read data: %v", writer3.String())
 }
