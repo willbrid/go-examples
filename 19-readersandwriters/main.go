@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"strings"
 )
@@ -94,6 +95,42 @@ func processData4(reader io.Reader, writer io.Writer) {
 	} else {
 		Printfln("Error : %v", err.Error())
 	}
+}
+
+func scanFromReader(reader io.Reader, template string, vals ...interface{}) (int, error) {
+	/**
+	La méthode fmt.Fscanf analyse le texte lu à partir du reader, stockant les valeurs successives séparées par des espaces dans des arguments
+	successifs déterminés par le format. Il renvoie le nombre d'éléments analysés avec succès. Les retours à la ligne dans l'entrée doivent
+	correspondre aux retours à la ligne dans le format.
+	**/
+	return fmt.Fscanf(reader, template, vals...)
+}
+
+func scanSingle(reader io.Reader, val interface{}) (int, error) {
+	/**
+	La méthode fmt.Fscan analyse le texte lu à partir du reader, stockant les valeurs successives séparées par des espaces dans des arguments successifs.
+	Les retours à la ligne comptent comme un espace. Il renvoie le nombre d'éléments analysés avec succès.
+	Si c'est moins que le nombre d'arguments, err indiquera pourquoi.
+	**/
+	return fmt.Fscan(reader, val)
+}
+
+func writeFormatted(writer io.Writer, template string, vals ...interface{}) {
+	// La méthode fmt.Fprintf formate selon un spécificateur de format (template) et écrit dans writer.
+	// Il renvoie le nombre d'octets écrits et toute erreur d'écriture rencontrée.
+	fmt.Fprintf(writer, template, vals...)
+}
+
+/*
+*
+La classe strings.Replacer peut être utilisée pour effectuer des remplacements sur une chaîne et envoyer le résultat modifié à un Writer.
+La méthode WriteString effectue ses substitutions et écrit la chaîne modifiée.
+*
+*/
+func writeReplaced(writer io.Writer, str string, subs ...string) {
+	replacer := strings.NewReplacer(subs...)
+	// La méthode WriteString écrit la chaine str dans le writer avec tous les remplacements effectués.
+	replacer.WriteString(writer, str)
 }
 
 func main() {
@@ -308,7 +345,7 @@ func main() {
 	text4 := "It was a boat. A small boat."
 	var builder6 strings.Builder
 	// Cette fonction bufio.NewWriterSize renvoie un Writer mis en mémoire tampon avec la taille de mémoire tampon spécifiée.
-	var writer6 = bufio.NewWriterSize(NewCustomWriter(&builder6), 20)
+	var writer6 *bufio.Writer = bufio.NewWriterSize(NewCustomWriter(&builder6), 20)
 	for i := 0; true; {
 		end := i + 5
 		if end >= len(text4) {
@@ -321,4 +358,52 @@ func main() {
 		i = end
 	}
 	Printfln("Written data: %v", builder6.String())
+
+	/**
+	Le processus d'analyse lit les octets du reader et utilise le template de scan pour analyser les données reçues.
+	Le template de scan contient deux chaînes et une valeur float64.
+	**/
+	var (
+		reader3        io.Reader = strings.NewReader("Kayak Watersports $279.00")
+		name, category string
+		price          float64
+		scanTemplate   string = "%s %s $%f"
+	)
+	_, err := scanFromReader(reader3, scanTemplate, &name, &category, &price)
+	if err != nil {
+		Printfln("Error: %v", err.Error())
+	} else {
+		Printfln("Name: %v", name)
+		Printfln("Category: %v", category)
+		Printfln("Price: %.2f", price)
+	}
+
+	/**
+	La boucle for appelle la fonction scanSingle, qui utilise la fonction Fscan pour lire une chaîne à partir du Reader.
+	Les valeurs sont lues jusqu'à ce que EOF soit retourné, moment auquel la boucle est terminée.
+	**/
+	var reader4 io.Reader = strings.NewReader("Kayak Watersports $279.00")
+	for {
+		var str string
+		_, err := scanSingle(reader4, &str)
+		if err != nil {
+			if err != io.EOF {
+				Printfln("Error : %v", err.Error())
+			}
+			break
+		}
+		Printfln("Value : %v", str)
+	}
+
+	// La fonction writeFormatted utilise la fonction fmt.Fprintf pour écrire une chaîne formatée avec un template dans un Writer.
+	var writer7 strings.Builder
+	template := "Name : %s, Category : %s, Price : $%.2f"
+	writeFormatted(&writer7, template, "Kayak", "Watersports", float64(279))
+	Printfln("Value from writer : %v", writer7.String())
+
+	text5 := "It was a boat. A small boat."
+	subs := []string{"boat", "kayak", "small", "huge"}
+	var writer8 strings.Builder
+	writeReplaced(&writer8, text5, subs...)
+	Printfln("Value from replacer : %v", writer8.String())
 }
