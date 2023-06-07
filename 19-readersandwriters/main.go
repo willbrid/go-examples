@@ -239,6 +239,9 @@ func main() {
 	en une seule opération de lecture, plus une lecture supplémentaire pour produire le résultat EOF.
 	L'introduction de la mémoire tampon réduit la surcharge associée aux opérations de lecture, mais au détriment de la mémoire utilisée
 	pour mettre les données en mémoire tampon.
+
+	Les fonctions NewReader et NewReaderSize renvoient des valeurs bufio.Reader, qui implémentent l'interface io.Reader et
+	qui peuvent être utilisées comme wrappers pour d'autres types de méthodes Reader.
 	**/
 	text1 := "It was a boat. A small boat."
 	var reader1 io.Reader = NewCustomReader(strings.NewReader(text1))
@@ -256,4 +259,66 @@ func main() {
 		}
 	}
 	Printfln("Read data: %v", writer3.String())
+
+	text2 := "It was a boat. A small boat."
+	var reader2 io.Reader = NewCustomReader(strings.NewReader(text2))
+	var writer4 strings.Builder
+	slice2 := make([]byte, 5)
+	buffered := bufio.NewReader(reader2)
+	for {
+		count2, err2 := buffered.Read(slice2)
+		if count2 > 0 {
+			/**
+			Cette méthode buffered.Buffered renvoie un entier qui indique le nombre d'octets pouvant être lus à partir du tampon.
+			Cette méthode buffered.Size renvoie la taille du tampon, exprimée en entier.
+			Cette méthode buffered.Discard(count) ignore le nombre d'octets spécifié.
+			Cette méthode Peek(count) renvoie le nombre d'octets spécifié sans les supprimer de la mémoire tampon, ce qui signifie qu'ils seront renvoyés par
+			les appels ultérieurs à la méthode Read.
+			Cette méthode Reset(reader) supprime les données dans la mémoire tampon et effectue les lectures suivantes à partir du Reader spécifié.
+			**/
+			Printfln("Buffer size : %v, buffered : %v", buffered.Size(), buffered.Buffered())
+			writer4.Write(slice2[0:count2])
+		}
+		if err2 != nil {
+			break
+		}
+	}
+	Printfln("Read data: %v", writer4.String())
+
+	text3 := "It was a boat. A small boat."
+	var builder5 strings.Builder
+	var writer5 = NewCustomWriter(&builder5)
+	for i := 0; true; {
+		end := i + 5
+		if end >= len(text3) {
+			writer5.Write([]byte(text3[i:]))
+			break
+		}
+		writer5.Write([]byte(text3[i:end]))
+		i = end
+	}
+	Printfln("Written data: %v", builder5.String())
+
+	/**
+	Le Writer mis en mémoire tampon conserve les données dans un tampon et les transmet au Writer sous-jacent uniquement
+	lorsque le tampon est plein ou lorsque la méthode Flush est appelée.
+	La transition vers un Writer tamponné n'est pas entièrement transparente car il est important d'appeler la méthode Flush
+	pour s'assurer que toutes les données sont écrites.
+	**/
+	text4 := "It was a boat. A small boat."
+	var builder6 strings.Builder
+	// Cette fonction bufio.NewWriterSize renvoie un Writer mis en mémoire tampon avec la taille de mémoire tampon spécifiée.
+	var writer6 = bufio.NewWriterSize(NewCustomWriter(&builder6), 20)
+	for i := 0; true; {
+		end := i + 5
+		if end >= len(text4) {
+			writer6.Write([]byte(text4[i:]))
+			// Cette méthode writer.Flush() écrit le contenu du tampon dans le Writer sous-jacent.
+			writer6.Flush()
+			break
+		}
+		writer6.Write([]byte(text4[i:end]))
+		i = end
+	}
+	Printfln("Written data: %v", builder6.String())
 }
