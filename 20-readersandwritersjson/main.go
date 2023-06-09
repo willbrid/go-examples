@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"strings"
 )
 
@@ -179,5 +180,233 @@ func main() {
 	dp8Json, err := dp8.MarshalJSON()
 	if err == nil {
 		Printfln("Write 13 : %v", dp8Json)
+	}
+
+	// La fonction constructeur NewDecoder crée un décodeur, qui peut être utilisé pour décoder les données JSON obtenues à partir d'un reader.
+	/**
+	Un lecteur est créé, qui produira des données à partir d'une chaîne contenant une séquence de valeurs, séparées par des espaces
+	(la spécification JSON permet de séparer les valeurs par des espaces ou des caractères de saut de ligne).
+	La première étape du décodage des données consiste à créer le décodeur, qui accepte un reader. L'on veut décoder plusieurs valeurs,
+	nous appelons donc la méthode Decode dans une boucle for. Le décodeur est capable de sélectionner le type de données Go approprié pour les valeurs JSON,
+	et cela est réalisé en fournissant un pointeur vers une interface vide comme argument de la méthode Decode.
+	La méthode Decode renvoie une erreur, qui indique des problèmes de décodage mais est également utilisée pour signaler la fin des données
+	à l'aide de l'erreur io.EOF. Une boucle for décode à plusieurs reprises les valeurs jusqu'à EOF, puis nous utilisons une autre boucle for
+	pour écrire chaque type et valeur décodés à l'aide des verbes de formatage.
+	**/
+	reader1 := strings.NewReader(`true "Hello" 99.99 200`)
+	val1s := []interface{}{}
+	decoder1 := json.NewDecoder(reader1)
+	for {
+		var decodedVal interface{}
+		/**
+		Cette méthode decoder1.Decode lit et décode les données, qui sont utilisées pour créer la valeur spécifiée. La méthode renvoie une erreur qui indique
+		des problèmes de décodage des données vers le type requis ou EOF.
+		Decode lit la prochaine valeur encodée en JSON à partir de son entrée et la stocke dans la valeur pointée par decodedVal.
+		**/
+		err := decoder1.Decode(&decodedVal)
+		if err != nil {
+			if err != io.EOF {
+				Printfln("Error : %v", err.Error())
+			}
+			break
+		}
+		val1s = append(val1s, decodedVal)
+	}
+	/**
+	Cette syntaxe val.(json.Number) est utilisée en Go pour convertir une valeur de type interface{} en un type plus spécifique.
+	Dans ce cas, la valeur est convertie en json.Number.
+	En Go, l'interface{} est un type générique qui peut contenir des valeurs de n'importe quel type.
+	**/
+	for _, val := range val1s {
+		if num, ok := val.(json.Number); ok {
+			// Cette méthode num.Int64 renvoie la valeur décodée sous la forme d'un int64 et une erreur qui indique si la valeur ne peut pas être convertie.
+			if ival, err := num.Int64(); err == nil {
+				Printfln("Decoded Integer: %v", ival)
+				// Cette méthode num.Float64 renvoie la valeur décodée sous la forme d'un float64 et une erreur qui indique si la valeur ne peut pas être convertie.
+			} else if fpval, err := num.Float64(); err == nil {
+				Printfln("Decoded Floating Point: %v", fpval)
+			} else {
+				// Cette méthode num.String renvoie la chaîne non convertie à partir des données JSON.
+				Printfln("Decoded String: %v", num.String())
+			}
+		}
+		Printfln("Decoded (%T): %v", val, val)
+	}
+
+	/**
+	Le décodeur renverra une erreur s'il ne peut pas décoder une valeur JSON dans un type spécifié.
+	Cette technique doit être utilisée uniquement lorsque nous sommes sûr de comprendre les données JSON qui seront décodées.
+	**/
+	reader2 := strings.NewReader(`true "Hello" 99.99 200`)
+	var (
+		bval2  bool
+		sval2  string
+		fpval2 float64
+		ival2  int
+	)
+	val2s := []interface{}{&bval2, &sval2, &fpval2, &ival2}
+	decoder2 := json.NewDecoder(reader2)
+	for i := 0; i < len(val2s); i++ {
+		// Decode lit la prochaine valeur encodée en JSON à partir de son entrée et la stocke dans la valeur pointée par val2s[i] (qui est un pointeur).
+		err := decoder2.Decode(val2s[i])
+		if err != nil {
+			Printfln("Error : %v", err.Error())
+			break
+		}
+	}
+	Printfln("Decoded (%T): %v", bval2, bval2)
+	Printfln("Decoded (%T): %v", sval2, sval2)
+	Printfln("Decoded (%T): %v", fpval2, fpval2)
+	Printfln("Decoded (%T): %v", ival2, ival2)
+
+	/**
+	Les données JSON source contiennent deux tableaux, dont l'un ne contient que des nombres et l'autre mélange des nombres et des chaînes.
+	Le décodeur n'essaie pas de déterminer si un tableau JSON peut être représenté à l'aide d'un seul type Go et décode chaque tableau en
+	une tranche d'interface vide.
+	**/
+	reader3 := strings.NewReader(`[10,20,30]["Kayak","Lifejacket",279]`)
+	val3s := []interface{}{}
+	decoder3 := json.NewDecoder(reader3)
+	for {
+		var decodedVal interface{}
+		err := decoder3.Decode(&decodedVal)
+		if err != nil {
+			if err != io.EOF {
+				Printfln("Error: %v", err.Error())
+			}
+			break
+		}
+		val3s = append(val3s, decodedVal)
+	}
+	for _, val := range val3s {
+		Printfln("Decoded (%T): %v", val, val)
+	}
+
+	/**
+	Dans l'exemple ci-dessus, chaque valeur est typée en fonction de la valeur JSON, mais le type de la tranche est l'interface vide.
+	Si nous connaissons à l'avance la structure des données JSON et que nous décodons un tableau contenant un seul type de données JSON,
+	nous pouvons alors passer une tranche Go du type souhaité à la méthode Decode.
+	**/
+	reader4 := strings.NewReader(`[10,20,30]["Kayak","Lifejacket",279]`)
+	ints := []int{}
+	mixed := []interface{}{}
+	val4s := []interface{}{&ints, &mixed}
+	decoder4 := json.NewDecoder(reader4)
+	for i := 0; i < len(val4s); i++ {
+		// Decode lit la prochaine valeur encodée en JSON à partir de son entrée et la stocke dans la valeur pointée par val2s[i] (qui est un pointeur).
+		err := decoder4.Decode(val4s[i])
+		if err != nil {
+			Printfln("Error : %v", err.Error())
+			break
+		}
+	}
+	Printfln("Decoded (%T): %v", ints, ints)
+	Printfln("Decoded (%T): %v", mixed, mixed)
+
+	/**
+	Les objets JavaScript sont exprimés sous forme de paires clé-valeur, ce qui facilite leur décodage en cartes Go.
+	L'approche la plus sûre consiste à définir une map avec des clés de chaîne et des valeurs d'interface vides,
+	ce qui garantit que toutes les paires clé-valeur dans les données JSON peuvent être décodées dans la map.
+	**/
+	reader5 := strings.NewReader(`{"Kayak" : 279, "Lifejacket" : 49.95}`)
+	m5 := map[string]interface{}{}
+	decoder5 := json.NewDecoder(reader5)
+	err5 := decoder5.Decode(&m5)
+	if err5 != nil {
+		Printfln("Error: %v", err5.Error())
+	} else {
+		Printfln("Map: %T, %v", m5, m5)
+		for k, v := range m5 {
+			Printfln("Key: %v, Value: %v", k, v)
+		}
+	}
+
+	/**
+	Un seul objet JSON peut être utilisé pour plusieurs types de données en tant que valeurs, mais si nous savons à l'avance que
+	nous allons décoder un objet JSON qui a un seul type de valeur, nous pouvons être plus précis lors de la définition de la map
+	dans laquelle les données seront être décodé
+	**/
+	reader6 := strings.NewReader(`{"Kayak" : 279, "Lifejacket" : 49.95}`)
+	m6 := map[string]float64{}
+	decoder6 := json.NewDecoder(reader6)
+	err6 := decoder6.Decode(&m6)
+	if err6 != nil {
+		Printfln("Error: %v", err6.Error())
+	} else {
+		Printfln("Map: %T, %v", m6, m6)
+		for k, v := range m6 {
+			Printfln("Key: %v, Value: %v", k, v)
+		}
+	}
+
+	/**
+	Le décodeur décode l'objet JSON et utilise les clés pour définir les valeurs des champs de structure exportés. La capitalisation des champs et
+	des clés JSON ne doit pas nécessairement correspondre, et le décodeur ignorera toute clé JSON pour laquelle il n'y a pas de champ struct et ignorera
+	tout champ struct pour lequel il n'y a pas de clé JSON. Les objets JSON contiennent des majuscules différentes et ont plus ou moins de clés
+	que la structure Product des champs.
+	**/
+	reader7 := strings.NewReader(`
+		{"Name":"Kayak","Category":"Watersports","Price":279}
+		{"Name":"Lifejacket","Category":"Watersports"}
+		{"name":"Canoe","category":"Watersports", "price": 100, "inStock": true}
+	`)
+	decoder7 := json.NewDecoder(reader7)
+	for {
+		var val Product
+		err := decoder7.Decode(&val)
+		if err != nil {
+			if err != io.EOF {
+				Printfln("Error : %v", err.Error())
+			}
+			break
+		} else {
+			Printfln("Name : %v, Category : %v, Price : %v", val.Name, val.Category, val.Price)
+		}
+	}
+
+	/**
+	Par défaut, le décodeur ignorera les clés JSON pour lesquelles il n'y a pas de champ de structure correspondant.
+	Ce comportement peut être modifié en appelant la méthode DisallowUnknownFields, qui déclenche une erreur lorsqu'une telle clé est rencontrée.
+	**/
+	reader8 := strings.NewReader(`
+		{"Name":"Kayak","Category":"Watersports","Price":279}
+		{"Name":"Lifejacket","Category":"Watersports"}
+		{"name":"Canoe","category":"Watersports", "price": 100, "inStock": true}
+	`)
+	decoder8 := json.NewDecoder(reader8)
+	// DisallowUnknownFields fait que Decoder renvoie une erreur lorsque la destination est une structure et que l'entrée contient des
+	// clés d'objet qui ne correspondent à aucun champ exporté non ignoré dans la destination.
+	decoder8.DisallowUnknownFields()
+	for {
+		var val Product
+		err := decoder8.Decode(&val)
+		if err != nil {
+			if err != io.EOF {
+				Printfln("Error : %v", err.Error())
+			}
+			break
+		} else {
+			Printfln("Name : %v, Category : %v, Price : %v", val.Name, val.Category, val.Price)
+		}
+	}
+
+	/**
+	La balise appliquée au champ Discount indique au décodeur que la valeur de ce champ doit être obtenue à partir de la
+	clé JSON nommée offer et que la valeur sera analysée à partir d'une chaîne, au lieu du numéro JSON qui serait généralement
+	attendu pour un Go float64 valeur.
+	**/
+	reader9 := strings.NewReader(`{"Name":"Kayak","Category":"Watersports","Price":279, "Offer": "10"}`)
+	decoder9 := json.NewDecoder(reader9)
+	for {
+		var val DiscountedProduct6
+		err := decoder9.Decode(&val)
+		if err != nil {
+			if err != io.EOF {
+				Printfln("Error : %v", err.Error())
+			}
+			break
+		} else {
+			Printfln("Name : %v, Category : %v, Price : %v, Discount: %v", val.Name, val.Category, val.Price, val.Discount)
+		}
 	}
 }

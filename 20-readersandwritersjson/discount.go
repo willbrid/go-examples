@@ -1,6 +1,9 @@
 package main
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"strconv"
+)
 
 type DiscountedProduct struct {
 	*Product
@@ -49,7 +52,23 @@ type DiscountedProduct5 struct {
 
 /*
 *
-Création d'encodages JSON entièrement personnalisés
+Les clés utilisées dans un objet JSON ne correspondent pas toujours aux champs définis par les classes dans un projet Go.
+Lorsque cela se produit, les balises struct peuvent être utilisées pour mapper entre les données JSON et la classe
+*
+*/
+type DiscountedProduct6 struct {
+	*Product `json:",omitempty"`
+	Discount float64 `json:"offer,string"` // mappage entre les données JSON et la classe et le type string sera utilisé
+}
+
+type DiscountedProduct7 struct {
+	*Product `json:"product,omitempty"`
+	Discount float64 `json:"offer,string"` // mappage entre les données JSON et la classe et le type string sera utilisé
+}
+
+/*
+*
+Création d'encodage JSON entièrement personnalisé
 
 Cette fonction json.Marshal encode la valeur spécifiée au format JSON. Les résultats sont le contenu JSON exprimé dans une tranche d'octet et
 une erreur, qui indique tout problème d'encodage.
@@ -62,6 +81,47 @@ func (dp *DiscountedProduct5) MarshalJSON() (jsn []byte, err error) {
 			"cost":    dp.Price - dp.Discount,
 		}
 		jsn, err = json.Marshal(m)
+	}
+	return
+}
+
+/*
+*
+Création de décodage JSON entièrement personnalisé
+
+Unmarshal(data []byte, v)
+Unmarshal analyse les données encodées en JSON et stocke le résultat dans la valeur pointée par v. Si v est nil ou n'est pas un pointeur,
+Unmarshal renvoie une InvalidUnmarshalError.
+Unmarshal utilise l'inverse des encodages utilisés par Marshal, allouant des maps, des tranches et des pointeurs selon les besoins,
+avec les règles supplémentaires suivantes : pour démarshaler JSON dans un pointeur, Unmarshal gère d'abord le cas où le JSON est le littéral JSON nul.
+Dans ce cas, Unmarshal définit le pointeur sur nil. Sinon, Unmarshal démarshale le JSON dans la valeur pointée par le pointeur. Si le pointeur est nil,
+Unmarshal lui alloue une nouvelle valeur vers laquelle pointer.
+*
+*/
+func (dp *DiscountedProduct7) UnmarshalJSON(data []byte) (err error) {
+	mdata := map[string]interface{}{}
+	err = json.Unmarshal(data, &mdata)
+
+	if dp.Product == nil {
+		dp.Product = &Product{}
+	}
+
+	if err == nil {
+		if name, ok := mdata["Name"].(string); ok {
+			dp.Name = name
+		}
+		if category, ok := mdata["Category"].(string); ok {
+			dp.Category = category
+		}
+		if price, ok := mdata["Price"].(float64); ok {
+			dp.Price = price
+		}
+		if discount, ok := mdata["Offer"].(string); ok {
+			fpval, fperr := strconv.ParseFloat(discount, 64)
+			if fperr == nil {
+				dp.Discount = fpval
+			}
+		}
 	}
 	return
 }
