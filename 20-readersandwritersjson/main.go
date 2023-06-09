@@ -172,7 +172,7 @@ func main() {
 	encoder12.Encode(namedItems)
 	Printfln("Write 12 : %v", writer12.String())
 
-	// Création d'encodages JSON entièrement personnalisés
+	// Création d'encodage JSON entièrement personnalisé
 	dp8 := DiscountedProduct5{
 		Product:  &kayak,
 		Discount: 10.50,
@@ -180,6 +180,7 @@ func main() {
 	dp8Json, err := dp8.MarshalJSON()
 	if err == nil {
 		Printfln("Write 13 : %v", dp8Json)
+		Printfln("Write 13 : %v", string(dp8Json)) // Conversion du byte en string
 	}
 
 	// La fonction constructeur NewDecoder crée un décodeur, qui peut être utilisé pour décoder les données JSON obtenues à partir d'un reader.
@@ -408,5 +409,13 @@ func main() {
 		} else {
 			Printfln("Name : %v, Category : %v, Price : %v, Discount: %v", val.Name, val.Category, val.Price, val.Discount)
 		}
+	}
+
+	// Création de décodage JSON entièrement personnalisé
+	data10 := []byte(`{"Name":"Kayak","Category":"Watersports","Price":279, "Offer": "10"}`)
+	var dp10 DiscountedProduct7
+	dp10.UnmarshalJSON(data10)
+	if err == nil {
+		Printfln("Name : %v, Category : %v, Price : %v, Discount: %v", dp10.Name, dp10.Category, dp10.Price, dp10.Discount)
 	}
 }
