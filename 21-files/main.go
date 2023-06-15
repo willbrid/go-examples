@@ -8,6 +8,12 @@ import (
 	"time"
 )
 
+func callback(path string, dir os.DirEntry, dirErr error) (err error) {
+	info, _ := dir.Info()
+	Printfln("Path filepath.WalkDir callback : %v, Size: %v", path, info.Size())
+	return
+}
+
 func main() {
 	for _, p := range Products {
 		Printfln("Product : %v, Category : %v, Price : $%.2f", p.Name, p.Category, p.Price)
@@ -185,5 +191,114 @@ func main() {
 		}
 	} else {
 		Printfln("Error: %v", err7.Error())
+	}
+
+	/**
+	Getwd renvoie un nom de chemin racine correspondant au répertoire courant. Si le répertoire courant peut être atteint via plusieurs chemins
+	(en raison de liens symboliques), Getwd peut renvoyer n'importe lequel d'entre eux.
+	**/
+	path2, err9 := os.Getwd()
+	if err9 == nil {
+		// Cette fonction os.ReadDir lit le répertoire spécifié et renvoie une tranche DirEntry, chacune décrivant un élément du répertoire.
+		dirEntries, err10 := os.ReadDir(path2)
+		if err10 == nil {
+			for _, dentry := range dirEntries {
+				/**
+				Cette méthode dentry.Name renvoie le nom du fichier ou du répertoire décrit par la valeur DirEntry.
+				Cette méthode dentry.IsDir renvoie true si la valeur DirEntry représente un répertoire.
+				**/
+				Printfln("Entry name: %v, IsDir: %v", dentry.Name(), dentry.IsDir())
+				/**
+				Cette méthode dentry.Type renvoie une valeur FileMode, qui est un alias de uint32, qui décrit davantage le fichier et
+				les autorisations du fichier ou du répertoire représenté par la valeur DirEntry.
+				**/
+				fileMode := dentry.Type()
+				Printfln("FileMode -> IsDir : %v, IsRegular : %v", fileMode.IsDir(), fileMode.IsRegular())
+				/**
+				Cette méthode dentry.Info renvoie une valeur FileInfo qui fournit des détails supplémentaires sur le fichier ou le répertoire représenté
+				par la valeur DirEntry.
+				**/
+				fileinfo, err := dentry.Info()
+				if err == nil {
+					/**
+					Cette méthode fileinfo.Name renvoie une chaîne contenant le nom du fichier ou du répertoire.
+					Cette méthode fileinfo.Size renvoie la taille du fichier, exprimée sous la forme d'une valeur int64.
+					Cette méthode fileinfo.Mode renvoie le mode de fichier et les paramètres d'autorisation pour le fichier ou le répertoire.
+					Cette méthode fileinfo.ModTime renvoie l'heure de la dernière modification du fichier ou du répertoire.
+					**/
+					Printfln("FileInfo -> Name : %v, Size : %v, Mode : %v, ModTime : %v", fileinfo.Name(), fileinfo.Size(), fileinfo.Mode(), fileinfo.ModTime())
+				}
+			}
+		}
+
+		/**
+		Cette fonction os.Stat accepte une chaîne de chemin. Il renvoie une valeur FileInfo qui décrit le fichier et une erreur, qui indique
+		des problèmes lors de l'inspection du fichier.
+		**/
+		pathFileinfo, err11 := os.Stat(path2)
+		if err11 == nil {
+			Printfln("Path FileInfo -> Name : %v, Size : %v, Mode : %v, ModTime : %v", pathFileinfo.Name(), pathFileinfo.Size(), pathFileinfo.Mode(), pathFileinfo.ModTime())
+		}
+	} else {
+		Printfln("Error: %v", err9.Error())
+	}
+
+	targetFiles := []string{"no_such_file.txt", "config.json"}
+	for _, name := range targetFiles {
+		info, err := os.Stat(name)
+		/**
+		Le package os définit une fonction nommée IsNotExist, accepte une erreur et renvoie true s'il indique que
+		l'erreur indique qu'un fichier n'existe pas
+		**/
+		if os.IsNotExist(err) {
+			Printfln("File does not exist: %v", name)
+		} else if err != nil {
+			Printfln("Other error: %v", err.Error())
+		} else {
+			Printfln("File %v, Size: %v", info.Name(), info.Size())
+		}
+	}
+
+	path3, err12 := os.Getwd()
+	if err12 == nil {
+		configFile := filepath.Join(path3, "config.json")
+		/**
+		Cette fonction filepath.Match fait correspondre un seul chemin à un modèle. Les résultats sont un booléen, qui indique s'il y a une correspondance,
+		et une erreur, qui indique des problèmes avec le modèle ou avec l'exécution de la correspondance.
+		**/
+		isMatchConfigFile, err13 := filepath.Match("^/*/*/*/*/*/*.json", configFile)
+		if err13 == nil {
+			Printfln("Config file : %v - Is it Match config file : %v", configFile, isMatchConfigFile)
+		} else {
+			Printfln("Error: %v", err13.Error())
+		}
+
+		/**
+		Cette fonction filepath.Glob trouve tous les fichiers qui correspondent au modèle spécifié. Les résultats sont une tranche de chaîne
+		contenant les chemins correspondants et une erreur indiquant des problèmes lors de l'exécution de la recherche.
+		- * : Ce terme correspond à n'importe quelle séquence de caractères, à l'exception du séparateur de chemin.
+		- * : Ce terme correspond à n'importe quel caractère unique, à l'exception du séparateur de chemin.
+		- [a-Z] : Ce terme correspond à n'importe quel caractère dans la plage spécifiée.
+		**/
+		matches, err14 := filepath.Glob(filepath.Join(path3, "*.json"))
+		if err14 == nil {
+			for _, m := range matches {
+				Printfln("Match: %v", m)
+			}
+		}
+	} else {
+		Printfln("Error: %v", err12.Error())
+	}
+
+	path4, err15 := os.Getwd()
+	if err15 == nil {
+		// Cette fonction filepath.WalkDir appelle la fonction spécifiée pour chaque fichier et répertoire dans le répertoire spécifié.
+		// callback(path string, dir os.DirEntry, dirErr error) (err error)
+		err16 := filepath.WalkDir(path4, callback)
+		if err16 != nil {
+			Printfln("Error err 16 : %v", err16.Error())
+		}
+	} else {
+		Printfln("Error: %v", err15.Error())
 	}
 }
