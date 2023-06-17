@@ -1,0 +1,27 @@
+{{ define "mainTemplate" -}}
+    <!--
+        Les actions peuvent définir des variables dans leurs expressions, qui sont accessibles dans le contenu du modèle intégré.
+        Les noms de variable de modèle sont précédés du caractère $ et sont créés avec la syntaxe de déclaration de variable courte. 
+        La première action crée une variable nommée $length, qui est utilisée dans l'action suivante.
+    -->
+    {{ $length := len . }}
+    <h1>There are {{ $length }} {{ lower "PRODUCTS" }} in the source data.</h1>
+    <!--
+        Définition des variables de modèle :
+        Les actions peuvent définir des variables dans leurs expressions, accessibles dans le contenu du modèle intégré.
+        Dans cet exemple, l'action if utilise les fonctions slice et lower pour obtenir le premier caractère de la catégorie actuelle et 
+        l'affecte à une variable nommée $char avant d'utiliser le caractère pour une expression if. La variable $char est accessible dans 
+        le contenu du template imbriqué, ce qui évite d'avoir à dupliquer l'utilisation des fonctions slice et lower.
+    -->
+    {{- range getCats . -}}
+        {{ if ne ($char := slice (lower .) 0 1) "s" }}
+            <h1>{{$char}}: {{.}}</h1>
+        {{- end }}
+    {{ end }}
+    {{ range getCatsHtml .  -}}
+        <!--
+            Le nouveau mappage donne accès à la fonction ToLower, qui transforme les chaînes en minuscules
+        -->
+        <h1>Category: {{ . }}</h1>
+    {{ end }}
+{{- end }}

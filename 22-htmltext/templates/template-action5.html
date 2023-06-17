@@ -1,0 +1,26 @@
+<h1>There are {{ len . }} products in the source data.</h1>
+<h1>First product: {{ index . 0 }}</h1>
+{{ range . -}}
+<!--
+    Le mot-clé if est suivi d'une expression qui détermine si le contenu du modèle imbriqué est exécuté. Pour faciliter l'écriture des 
+    expressions de ces actions, les modèles prennent en charge les fonctions.
+    L'action if peut être utilisée avec les mots clés optionnels else et else if.
+
+    eq arg1 arg2 : cette fonction renvoie vrai si arg1 == arg2.
+    ne arg1 arg2 : cette fonction renvoie vrai si arg1 != arg2.
+    lt arg1 arg2 : cette fonction renvoie vrai si arg1 < arg2.
+    le arg1 arg2 : cette fonction renvoie vrai si arg1 <= arg2.
+    gt arg1 arg2 : cette fonction renvoie true si arg1 > arg2.
+    ge arg1 arg2 : cette fonction renvoie vrai si arg1 >= arg2.
+    and arg1 arg2 : cette fonction renvoie vrai si arg1 et arg2 sont vrais.
+    not arg1 : cette fonction renvoie vrai si arg1 est faux, et faux si c'est vrai.
+-->
+    {{ if lt .Price 100.00 -}}
+        <h1>Name: {{ .Name }}, Category: {{ .Category }}, Price:{{ " " }}
+            {{- printf "$%.2f" .Price }}</h1>
+    {{ else if gt .Price 1500.00 -}}
+        <h1>Expensive Product {{ .Name }} ({{ printf "$%.2f" .Price}})</h1>
+    {{ else }}
+        <h1>Midrange Product: {{ .Name }} ({{ printf "$%.2f" .Price}})</h1>        
+    {{ end -}}
+{{ end }}        

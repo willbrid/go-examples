@@ -1,0 +1,9 @@
+<!--
+    Les variables peuvent également être utilisées avec l'action range, qui permet d'utiliser des cartes dans des modèles.
+    Les clés et les valeurs de la map peuvent être utilisées dans le modèle.
+-->
+{{ define "mainTemplate" -}}
+    {{ range $key, $value := . -}}
+        <h1>{{ $key }}: {{ printf "$%.2f" $value.Price }}</h1>
+    {{ end }}
+{{ end }}

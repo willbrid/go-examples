@@ -1,0 +1,32 @@
+<!--
+    Le mot clé define est suivi du nom du modèle entre guillemets et le modèle se termine par le mot clé end.
+-->
+{{ define "currency" }}{{ printf "$%.2f" . }}{{ end }}
+
+{{ define "basicProduct" -}}
+    Name: {{ .Name }}, Category: {{ .Category }}, Price:{{ " " }}
+    <!--
+        Le mot-clé template est utilisé pour exécuter un modèle nommé, en spécifiant le nom du modèle et une valeur de données.
+        Cette action exécute le modèle nommé currency et utilise la valeur du champ Prix comme valeur de données, accessible dans le modèle nommé à 
+        l'aide du point. Un modèle nommé peut appeler d'autres modèles nommés, les modèles basicProduct et chersProduct exécutant le modèle currency.
+    -->
+        {{- template "currency" .Price }}
+{{- end }}
+
+{{ define "expensiveProduct" -}}
+    Expensive Product {{ .Name }} ({{ template "currency" .Price }})
+{{- end }}
+
+{{ define "mainTemplate" -}}
+    <h1>There are {{ len . }} products in the source data.</h1>
+    <h1>First product: {{ index . 0 }}</h1>
+    {{ range . -}}
+        {{ if lt .Price 100.00 -}}
+            <h1>{{ template "basicProduct" . }}</h1>
+        {{ else if gt .Price 1500.00 -}}
+            <h1>{{ template "expensiveProduct" . }}</h1>
+        {{ else -}}
+            <h1>Midrange Product: {{ .Name }} ({{ printf "$%.2f" .Price}})</h1>
+        {{ end -}}
+    {{ end }}
+{{ end }}
