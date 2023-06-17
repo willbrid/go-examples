@@ -1,0 +1,8 @@
+<!--
+    Les actions de modèle peuvent être utilisées pour générer du contenu pour les tranches.
+    Placer le signe moins (-) à la fin de l'expression de plage supprime tous les espaces blancs de tête du contenu imbriqué.
+-->
+{{ range . -}}
+    <h1>Name: {{ .Name }}, Category: {{ .Category }}, Price:{{ " " }}
+        {{- printf "$%.2f" .Price }}</h1>
+{{ end }}

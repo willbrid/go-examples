@@ -9,6 +9,10 @@ func Exec(t *template.Template) error {
 	return t.Execute(os.Stdout, &Kayak)
 }
 
+func Exec1(t *template.Template) error {
+	return t.Execute(os.Stdout, Products)
+}
+
 func main() {
 	for _, p := range Products {
 		Printfln("Product: %v, Category: %v, Price: $%.2f", p.Name, p.Category, p.Price)
@@ -78,11 +82,58 @@ func main() {
 	allt3, allErr3 := template.ParseGlob("templates/*.html")
 	if allErr3 == nil {
 		// Cette fonction allt3.Lookup renvoie un *Template pour le modèle chargé spécifié.
-		selectedTemplated := allt3.Lookup("template.html")
-		err4 := Exec(selectedTemplated)
+		selectedTemplated1 := allt3.Lookup("template.html")
+		err4 := Exec(selectedTemplated1)
 		os.Stdout.WriteString("\n")
 		if err4 != nil {
 			Printfln("Error: %v", err4.Error())
+		}
+	}
+
+	allt4, allErr4 := template.ParseGlob("templates/*.html")
+	if allErr4 == nil {
+		// Cette fonction allt3.Lookup renvoie un *Template pour le modèle chargé spécifié.
+		selectedTemplated2 := allt4.Lookup("template-action1.html")
+		err5 := Exec(selectedTemplated2)
+		os.Stdout.WriteString("\n")
+		if err5 != nil {
+			Printfln("Error: %v", err5.Error())
+		}
+	}
+
+	// Action trimming space
+	allt5, allErr5 := template.ParseGlob("templates/*.html")
+	if allErr5 == nil {
+		// Cette fonction allt3.Lookup renvoie un *Template pour le modèle chargé spécifié.
+		selectedTemplated3 := allt5.Lookup("template-action2.html")
+		err6 := Exec(selectedTemplated3)
+		os.Stdout.WriteString("\n")
+		if err6 != nil {
+			Printfln("Error: %v", err6.Error())
+		}
+	}
+
+	// Action range
+	allt6, allErr6 := template.ParseGlob("templates/*.html")
+	if allErr6 == nil {
+		// Cette fonction allt3.Lookup renvoie un *Template pour le modèle chargé spécifié.
+		selectedTemplated4 := allt6.Lookup("template-action3.html")
+		err7 := Exec1(selectedTemplated4)
+		os.Stdout.WriteString("\n")
+		if err7 != nil {
+			Printfln("Error: %v", err7.Error())
+		}
+	}
+
+	// Utilisation des fonctions intégrées
+	allt7, allErr7 := template.ParseGlob("templates/*.html")
+	if allErr7 == nil {
+		// Cette fonction allt3.Lookup renvoie un *Template pour le modèle chargé spécifié.
+		selectedTemplated5 := allt7.Lookup("template-action4.html")
+		err8 := Exec1(selectedTemplated5)
+		os.Stdout.WriteString("\n")
+		if err8 != nil {
+			Printfln("Error: %v", err8.Error())
 		}
 	}
 }

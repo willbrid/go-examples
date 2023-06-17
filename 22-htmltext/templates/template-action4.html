@@ -1,0 +1,15 @@
+<!--
+    len : cette fonction renvoie la longueur de la tranche spécifiée.
+-->
+<h1>There are {{ len . }} products in the source data.</h1>
+<!--
+    index  : cette fonction renvoie l'élément à l'index spécifié.
+-->
+<h1>First product: {{ index . 0 }}</h1>
+<!--
+    slice : cette fonction crée une nouvelle tranche. Ses arguments sont la tranche d'origine, l'index de début et l'index de fin.
+-->
+{{ range slice . 3 5 -}}
+    <h1>Name: {{ .Name }}, Category: {{ .Category }}, Price:{{ " " }}
+        {{- printf "$%.2f" .Price }}</h1>
+{{ end }}

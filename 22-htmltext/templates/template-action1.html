@@ -1,0 +1,36 @@
+<!--
+     . : cette expression insère la valeur transmise à la méthode Execute ou ExecuteTemplate dans la sortie du modèle.
+-->
+<h1>Template Value: {{ . }}</h1>
+<!-- 
+    .Field : cette expression insère la valeur du champ spécifié dans la sortie du modèle.
+-->
+<h1>Name: {{ .Name }}</h1>
+<h1>Category: {{ .Category }}</h1>
+<h1>Price: {{ printf "$%.2f" .Price }}</h1>
+<!-- 
+    .Method : cette expression appelle la méthode spécifiée sans arguments et insère le résultat dans la sortie du modèle.
+    Formatage des valeurs de données:
+    - print : il s'agit d'un alias de la fonction fmt.Sprint
+    - printf : ceci est un alias de la fonction fmt.Sprintf
+    - println : il s'agit d'un alias de la fonction fmt.Sprintln
+    - html : cette fonction code une valeur pour une inclusion sûre dans un document HTML
+    - js : cette fonction encode une valeur pour une inclusion sûre dans un document JavaScript.
+    - urlquery : Cette fonction encode une valeur à utiliser dans une chaîne de requête d'URL
+-->
+<h1>Tax: {{ printf "$%.2f" .AddTax }}</h1>
+<!--
+    .Method arg : cette expression appelle la méthode spécifiée avec l'argument spécifié et insère le résultat dans la sortie du modèle.
+-->
+<h1>Discount Price: {{ .ApplyDiscount 10 }}</h1>
+<!--
+    Le chaînage d'expressions crée un pipeline (|) pour les valeurs, ce qui permet d'utiliser la sortie d'une méthode ou d'une fonction 
+    comme entrée pour une autre. Le chaînage ne peut être utilisé que pour le dernier argument fourni à une fonction.
+-->
+<h1>Discount Price formated: {{ .ApplyDiscount 10 | printf "$%.2f" }}</h1>
+<!--
+    Une approche alternative et qui peut être utilisée 
+    pour définir d'autres arguments de fonction consiste à utiliser des parenthèses.
+    La méthode ApplyDiscount est appelée et le résultat est utilisé comme argument de la fonction printf.
+-->
+<h1>Discount Price: {{ printf "$%.2f" (.ApplyDiscount 10) }}</h1>

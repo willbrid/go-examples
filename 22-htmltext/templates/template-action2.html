@@ -1,0 +1,19 @@
+<!--
+    Par défaut, le contenu du modèle est rendu exactement tel qu'il est défini dans le fichier, y compris tout espace blanc entre les actions. 
+    HTML n'est pas sensible aux espaces entre les éléments, mais les espaces blancs peuvent toujours causer des problèmes pour le contenu du texte 
+    et les valeurs d'attribut, en particulier lorsque nous souhaitons structurer le contenu d'un modèle pour le rendre facile à lire.
+-->
+<h1>
+    Name: {{ .Name }}, Category: {{ .Category }}, Price:{{ " " }}
+        {{ printf "$%.2f" .Price }}
+</h1>
+<!--
+    Le signe moins (-) peut être utilisé pour couper les espaces blancs, appliqués immédiatement après ou avant 
+    les accolades qui ouvrent ou ferment une action.
+    Le signe moins (-) doit être séparé du reste de l'expression de l'action par un espace. 
+    L'effet est de supprimer tous les espaces avant ou après l'action.
+-->
+<h1>
+    {{- "" -}} Name: {{ .Name }}, Category: {{ .Category }}, Price:{{ " " }}
+        {{- printf "$%.2f" .Price -}}
+</h1>
