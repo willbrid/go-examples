@@ -186,9 +186,20 @@ func main() {
 	http.Handle("/favicon.ico", http.NotFoundHandler())
 	http.Handle("/", http.RedirectHandler("/message", http.StatusTemporaryRedirect))
 
+	/**
+	La fonction FileServer crée un gestionnaire qui servira les fichiers et le répertoire est spécifié à l'aide de la fonction Dir.
+	(Il est possible de servir des fichiers directement, mais la prudence s'impose car il est facile d'autoriser les requêtes à sélectionner
+	des fichiers en dehors du dossier cible. L'option la plus sûre consiste à utiliser la fonction Dir
+
+	Nous servons le contenu dans le dossier statique avec des chemins d'URL qui commencent par des fichiers afin qu'une requête pour /files/store.html,
+	par exemple, soit traitée à l'aide du fichier static/store.html. Pour ce faire, nous utilisons la fonction StripPrefix, qui crée un gestionnaire
+	qui supprime un préfixe de chemin et transmet la requête à un autre gestionnaire de service.
+	**/
+	fsHandler := http.FileServer(http.Dir("./static"))
+	http.Handle("/files/", http.StripPrefix("/files", fsHandler))
+
 	// La fonction ListenAndServeTLS est utilisée pour activer HTTPS, où les arguments supplémentaires spécifient les fichiers de certificat
 	// et de clé privée, qui sont nommés certificate.cer et certificate.key
-
 	go func() {
 		errHttps := http.ListenAndServeTLS(":5500", "certificate.cer", "certificate.key", nil)
 		if errHttps != nil {
