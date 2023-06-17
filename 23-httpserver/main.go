@@ -3,6 +3,7 @@ package main
 import (
 	"io"
 	"net/http"
+	"strings"
 )
 
 type StringHandler struct {
@@ -122,6 +123,15 @@ func (sh StringHandler) ServeHTTP(writer http.ResponseWriter, request *http.Requ
 	io.WriteString(writer, sh.message)
 }
 
+func HTTPSRedirect(writer http.ResponseWriter, request *http.Request) {
+	host := strings.Split(request.Host, ":")[0]
+	target := "https://" + host + ":5500" + request.URL.Path
+	if len(request.URL.RawQuery) > 0 {
+		target += "?" + request.URL.RawQuery
+	}
+	http.Redirect(writer, request, target, http.StatusTemporaryRedirect)
+}
+
 func main() {
 	for _, p := range Products {
 		Printfln("Product: %v, Category: %v, Price: $%.2f", p.Name, p.Category, p.Price)
@@ -175,8 +185,36 @@ func main() {
 	http.Handle("/message", StringHandler{message: "Hello, world !"})
 	http.Handle("/favicon.ico", http.NotFoundHandler())
 	http.Handle("/", http.RedirectHandler("/message", http.StatusTemporaryRedirect))
+
+	// La fonction ListenAndServeTLS est utilisée pour activer HTTPS, où les arguments supplémentaires spécifient les fichiers de certificat
+	// et de clé privée, qui sont nommés certificate.cer et certificate.key
+
+	go func() {
+		errHttps := http.ListenAndServeTLS(":5500", "certificate.cer", "certificate.key", nil)
+		if errHttps != nil {
+			Printfln("HTTPS Error : %v", errHttps.Error())
+		}
+	}()
+
 	// La clé de cette fonctionnalité est d'utiliser nil comme argument de la fonction ListenAndServe
+	/**
+		Le bloc de fonctions ListenAndServeTLS et ListenAndServe : une goroutine est utilisé pour prendre en charge
+		les requêtes HTTP et HTTPS, avec HTTP géré sur le port 5000 et HTTPS sur le port 5500. Les fonctions ListenAndServeTLS et ListenAndServe
+		ont été invoquées avec nil comme gestionnaire, ce qui signifie que les requêtes HTTP et HTTPS seront traitées à l'aide du même ensemble de routes.
+	**/
+	/**
 	err := http.ListenAndServe(":5000", nil)
+	if err != nil {
+		Printfln("Error : %v", err.Error())
+	}
+	**/
+	/**
+	 	Cette fonction http.HandlerFunc crée une règle qui appelle la fonction spécifiée pour les requêtes qui correspondent au modèle.
+		La fonction est appelée avec les arguments ResponseWriter et Request.
+		Le gestionnaire http.HandlerFunc(HTTPSRedirect) pour HTTP redirige le client vers l'URL HTTPS
+
+	 **/
+	err := http.ListenAndServe(":5000", http.HandlerFunc(HTTPSRedirect))
 	if err != nil {
 		Printfln("Error : %v", err.Error())
 	}
