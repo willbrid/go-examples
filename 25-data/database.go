@@ -19,3 +19,13 @@ func openDatabase() (db *sql.DB, err error) {
 	}
 	return
 }
+
+func InsertNewCategoryPrepare(db *sql.DB) (query *sql.Stmt) {
+	query, _ = db.Prepare("INSERT INTO Categories (Name) VALUES (?)")
+	return query
+}
+
+func ChangeProductCategoryPrepare(db *sql.DB) (query *sql.Stmt) {
+	query, _ = db.Prepare("UPDATE Products SET Category = ? WHERE Id = ?")
+	return query
+}

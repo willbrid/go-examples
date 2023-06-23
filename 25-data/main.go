@@ -1,5 +1,7 @@
 package main
 
+import "database/sql"
+
 /**
 Accédons à https://www.sqlite.org/download.html, recherchons la section des fichiers binaires précompilés pour notre système d'exploitation et
 téléchargeons le package d'outils. Décompressons l'archive zip et copions le fichier sqlite3 dans le dossier data.
@@ -27,16 +29,296 @@ Bien que ce soit une bonne idée d'appeler la méthode db.Close, nous n'avons be
 la base de données. Une seule base de données peut être utilisée pour effectuer des requêtes répétées sur la même base de données,
 et les connexions à la base de données seront gérées automatiquement en arrière-plan. Il n'est pas nécessaire d'appeler la méthode sql.Open
 pour obtenir une nouvelle base de données pour chaque requête, puis d'utiliser db.Close pour la fermer une fois la requête terminée.
+
+Les méthodes de la classe sql.Rows :
+- Next() : cette méthode passe à la ligne de résultat suivante. Le résultat est un booléen, qui est vrai lorsqu'il y a des données à lire et
+           faux lorsque la fin des données a été atteinte, à quel point la méthode Close est automatiquement appelée.
+- NextResultSet() : cette méthode passe au jeu de résultats suivant lorsqu'il existe plusieurs jeux de résultats dans la même réponse de base de données.
+                    La méthode renvoie true s'il existe un autre ensemble de lignes à traiter.
+- Scan(...targets) : cette méthode affecte les valeurs SQL de la ligne actuelle aux variables spécifiées. Les valeurs sont attribuées via des pointeurs et
+                     la méthode renvoie une erreur qui indique quand les valeurs ne peuvent pas être analysées.
+- Close() : cette méthode empêche une énumération supplémentaire des résultats et est utilisée lorsque toutes les données ne sont pas requises.
+            Il n'est pas nécessaire d'appeler cette méthode si la méthode Next est utilisée pour avancer jusqu'à ce qu'elle renvoie false.
+
+Les méthodes de la classe sql.Row :
+- Scan(...targets) : cette méthode affecte les valeurs SQL de la ligne actuelle aux variables spécifiées.
+  Les valeurs sont attribuées via des pointeurs et la méthode renvoie une erreur qui indique quand les valeurs ne peuvent pas être analysées
+  ou s'il n'y a pas de lignes dans le résultat. S'il y a plusieurs lignes dans la réponse, toutes sauf la première ligne seront ignorées.
+- Err() : cette méthode renvoie une erreur qui indique des problèmes d'exécution de la requête.
+
+La méthode Exec(query, ...args) est utilisée pour exécuter des instructions qui ne produisent pas de lignes. Le résultat de la méthode Exec
+est une valeur Result, qui définit une erreur qui indique des problèmes d'exécution de l'instruction et les méthodes suivantes :
+- RowsAffected() : cette méthode renvoie le nombre de lignes qui ont été affectées par l'instruction, exprimée sous la forme d'un int64.
+                   Cette méthode renvoie également une erreur, qui est utilisée lorsqu'il y a des problèmes d'analyse de la réponse ou
+				   lorsque la base de données ne prend pas en charge cette fonctionnalité.
+- LastInsertId() : cette méthode renvoie un int64 qui représente la valeur générée par la base de données lors de l'exécution de l'instruction,
+                   qui est généralement une clé générée automatiquement. Cette méthode renvoie également une erreur, qui est utilisée lorsque
+				   la valeur renvoyée par la base de données ne peut pas être analysée dans un Go int.
+
+Prepare(query) : cette méthode de la classe db crée une instruction préparée pour la requête spécifiée.
+                 Les résultats sont une structure Stmt et une erreur indiquant des problèmes lors de la préparation de l'instruction.
+Les méthodes de la classe Stmt :
+- Query(...vals) : cette méthode exécute l'instruction préparée, avec les valeurs facultatives.
+                   Les résultats sont une classe sql.Rows et une erreur. Cette méthode est équivalente à la méthode DB.Query.
+- QueryRow(...vals) : cette méthode exécute l'instruction préparée, avec les valeurs facultatives.
+                      Les résultats sont une classe sql.Row et une erreur. Cette méthode est équivalente à la méthode DB.QueryRow.
+- Exec(...vals) : cette méthode exécute l'instruction préparée, avec les valeurs facultatives.
+                  Les résultats sont un résultat et une erreur. Cette méthode est équivalente à la méthode DB.Exec.
+- Close() : cette méthode ferme l'instruction. Les instructions ne peuvent pas être exécutées après leur fermeture.
+
+Begin() : cette méthode de la classe db démarre une nouvelle transaction. Les résultats sont un pointeur vers une valeur Tx et une erreur indiquant
+des problèmes lors de la création de la transaction.
+-> Les méthodes de la classe sql.Tx :
+- Query(query, ...args) : cette méthode est équivalente à la méthode DB.Query, mais la requête est exécutée dans le cadre de la transaction.
+- QueryRow(query, ...args) : cette méthode est équivalente à la méthode DB.QueryRow, mais la requête est exécutée dans le cadre de la transaction.
+- Exec(query, ...args) : cette méthode est équivalente à la méthode DB.Exec, mais la requête/instruction est exécutée dans le cadre de la transaction.
+- Prepare(query) : cette méthode est équivalente à la méthode DB.Query, mais l'instruction préparée qu'elle crée est exécutée dans le cadre de la transaction.
+- Stmt(statement) : cette méthode accepte une instruction préparée créée en dehors de la portée de la transaction et en renvoie une qui est exécutée
+                    dans la portée de la transaction.
 **/
+
+type Product0 struct {
+	Id       int
+	Name     string
+	Category string
+	Price    float64
+}
+
+type Category struct {
+	Id   int
+	Name string
+}
+
+type Product struct {
+	Id   int
+	Name string
+	Category
+	Price float64
+}
+
+func queryDatabase(db *sql.DB) {
+	/**
+	Cette méthode db.Query(query, ...args) exécute la requête spécifiée, en utilisant les arguments facultatifs.
+	Les résultats sont une classe sql.Rows, qui contient les résultats de la requête, et une erreur qui indique des problèmes d'exécution de la requête.
+	**/
+	rows, err := db.Query("SELECT * from Products")
+	if err == nil {
+		for rows.Next() {
+			var id, category int
+			var name string
+			var price float64
+			scanErr := rows.Scan(&id, &name, &category, &price)
+			if scanErr == nil {
+				Printfln("Row: %v %v %v %v", id, name, category, price)
+			} else {
+				Printfln("Scan error: %v", scanErr)
+				break
+			}
+		}
+	} else {
+		Printfln("Error : %v", err.Error())
+	}
+}
+
+func queryDatabase1(db *sql.DB) []Product0 {
+	products := []Product0{}
+	rows, err := db.Query("SELECT * from Products")
+	if err == nil {
+		p := Product0{}
+		for rows.Next() {
+			scanErr := rows.Scan(&p.Id, &p.Name, &p.Category, &p.Price)
+			if scanErr == nil {
+				products = append(products, p)
+			} else {
+				Printfln("Scan error: %v", scanErr)
+				break
+			}
+		}
+	} else {
+		Printfln("Error : %v", err.Error())
+	}
+
+	return products
+}
+
+func queryDatabase2(db *sql.DB) []Product {
+	products := []Product{}
+	rows, err := db.Query(`
+		SELECT Products.Id, Products.Name, Products.Price,
+		Categories.Id as Cat_Id, Categories.Name as CatName
+		FROM Products, Categories WHERE Products.Category = Categories.Id
+	`)
+	if err == nil {
+		p := Product{}
+		for rows.Next() {
+			scanErr := rows.Scan(&p.Id, &p.Name, &p.Price, &p.Category.Id, &p.Category.Name)
+			if scanErr == nil {
+				products = append(products, p)
+			} else {
+				Printfln("Scan error: %v", scanErr)
+				break
+			}
+		}
+	} else {
+		Printfln("Error : %v", err.Error())
+	}
+
+	return products
+}
+
+func queryDatabase3(db *sql.DB, categoryName string) []Product {
+	products := []Product{}
+	/**
+		Les arguments facultatifs de la méthode Query sont des valeurs pour les espaces réservés dans la chaîne de requête,
+		ce qui permet d'utiliser une seule chaîne pour différentes requêtes.
+	    **/
+	rows, err := db.Query(`
+		SELECT Products.Id, Products.Name, Products.Price,
+		Categories.Id as Cat_Id, Categories.Name as CatName
+		FROM Products, Categories WHERE Products.Category = Categories.Id
+		AND Categories.Name = ?`, categoryName)
+	if err == nil {
+		p := Product{}
+		for rows.Next() {
+			scanErr := rows.Scan(&p.Id, &p.Name, &p.Price, &p.Category.Id, &p.Category.Name)
+			if scanErr == nil {
+				products = append(products, p)
+			} else {
+				Printfln("Scan error: %v", scanErr)
+				break
+			}
+		}
+	} else {
+		Printfln("Error : %v", err.Error())
+	}
+
+	return products
+}
+
+func queryDatabase4(db *sql.DB, id int) (p Product) {
+	// La méthode QueryRow(query, ...args) exécute une requête censée renvoyer une seule ligne (classe sql.Row), ce qui évite d'avoir à énumérer les résultats
+	row := db.QueryRow(`
+		SELECT Products.Id, Products.Name, Products.Price,
+		Categories.Id as Cat_Id, Categories.Name as CatName
+		FROM Products, Categories WHERE Products.Category = Categories.Id
+		AND Products.Id = ?`, id)
+	if row.Err() == nil {
+		scanErr := row.Scan(&p.Id, &p.Name, &p.Price, &p.Category.Id, &p.Category.Name)
+		if scanErr != nil {
+			Printfln("Scan error: %v", scanErr)
+		}
+	} else {
+		Printfln("Row error: %v", row.Err().Error())
+	}
+
+	return
+}
+
+func insertRow(db *sql.DB, p *Product) (id int64) {
+	res, err := db.Exec(`INSERT INTO Products (Name, Category, Price) VALUES(?,?,?)`, p.Name, p.Category.Id, p.Price)
+	if err == nil {
+		id, err = res.LastInsertId()
+		if err != nil {
+			Printfln("Result error: %v", err.Error())
+		} else {
+			Printfln("Last insert ID : %v", id)
+		}
+	} else {
+		Printfln("Exec error: %v", err.Error())
+	}
+
+	return
+}
+
+func insertAndUseCategory(db *sql.DB, name string, productIDs ...int) {
+	result, err := InsertNewCategoryPrepare(db).Exec(name)
+	if err == nil {
+		newID, _ := result.LastInsertId()
+		for _, id := range productIDs {
+			ChangeProductCategoryPrepare(db).Exec(int(newID), id)
+		}
+	} else {
+		Printfln("Prepared statement error: %v", err)
+	}
+}
 
 func main() {
 	Printfln("-------Data-------")
-	listDrivers()
+	// listDrivers()
 	db, err := openDatabase()
 	if err == nil {
+		queryDatabase(db)
 		// db.Close() : cette fonction ferme la base de données et empêche d'effectuer d'autres opérations.
 		db.Close()
 	} else {
 		panic(err)
+	}
+
+	db1, err1 := openDatabase()
+	if err1 == nil {
+		products := queryDatabase1(db1)
+		for _, p := range products {
+			Printfln("#%v: %v", p.Id, p)
+		}
+		db1.Close()
+	} else {
+		panic(err1)
+	}
+
+	db2, err2 := openDatabase()
+	if err2 == nil {
+		products := queryDatabase2(db2)
+		for _, p := range products {
+			Printfln("#%v: %v", p.Id, p)
+		}
+		db2.Close()
+	} else {
+		panic(err2)
+	}
+
+	db3, err3 := openDatabase()
+	if err3 == nil {
+		for _, cat := range []string{"Soccer", "Watersports"} {
+			Printfln("--- %v Results ---", cat)
+			products := queryDatabase3(db3, cat)
+			for i, p := range products {
+				Printfln("#%v: %v %v %v", i, p.Name, p.Category.Name, p.Price)
+			}
+		}
+		db3.Close()
+	} else {
+		panic(err3)
+	}
+
+	db4, err4 := openDatabase()
+	if err4 == nil {
+		for _, id := range []int{1, 3, 10} {
+			p := queryDatabase4(db4, id)
+			Printfln("Product: %v", p)
+		}
+		db4.Close()
+	} else {
+		panic(err4)
+	}
+
+	db5, err5 := openDatabase()
+	if err5 == nil {
+		newProduct := Product{Name: "Stadium", Category: Category{Id: 2}, Price: 79500}
+		newId := insertRow(db5, &newProduct)
+		p := queryDatabase4(db5, int(newId))
+		Printfln("New Product: %v", p)
+		db5.Close()
+	} else {
+		panic(err5)
+	}
+
+	db6, err6 := openDatabase()
+	if err6 == nil {
+		insertAndUseCategory(db6, "Misc Products", 2)
+		p := queryDatabase4(db6, 2)
+		Printfln("Product: %v", p)
+		db6.Close()
+	} else {
+		panic(err6)
 	}
 }
