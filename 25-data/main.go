@@ -75,6 +75,28 @@ des problèmes lors de la création de la transaction.
 - Prepare(query) : cette méthode est équivalente à la méthode DB.Query, mais l'instruction préparée qu'elle crée est exécutée dans le cadre de la transaction.
 - Stmt(statement) : cette méthode accepte une instruction préparée créée en dehors de la portée de la transaction et en renvoie une qui est exécutée
                     dans la portée de la transaction.
+- Commit() : cette méthode valide les modifications en attente dans la base de données, renvoyant une erreur qui indique des problèmes
+             d'application des modifications.
+- Rollback() : cette méthode interrompt les transactions afin que les modifications en attente soient ignorées.
+               Cette méthode renvoie une erreur qui indique des problèmes lors de l'abandon de la transaction.
+
+La réflexion est une fonctionnalité qui permet d'inspecter et d'utiliser les types et les valeurs lors de l'exécution.
+Il existe des méthodes définies par la classe sql.Rows qui sont utiles lors de l'utilisation de la réflexion pour traiter une réponse de base de données :
+- Columns() : cette méthode renvoie une tranche de chaînes contenant les noms des colonnes de résultats et une erreur,
+              qui est utilisée lorsque les résultats ont été fermés.
+- ColumnTypes() : cette méthode renvoie une tranche *ColumnType, qui décrit les types de données des colonnes de résultats.
+                  Cette méthode renvoie également une erreur, qui est utilisée lorsque les résultats ont été fermés.
+				  La méthode ColumnTypes renvoie une tranche de pointeurs vers la classe ColumnType, qui définit les méthodes :
+	- Name() : cette méthode renvoie le nom de la colonne tel qu'il est spécifié dans les résultats, exprimé sous forme de chaîne.
+	- DatabaseTypeName() : cette méthode renvoie le nom du type de colonne dans la base de données, exprimé sous forme de chaîne.
+	- Nullable() : cette méthode renvoie deux résultats booléens. Le premier résultat est vrai si le type de base de données peut être nul.
+	               Le deuxième résultat est vrai si le pilote prend en charge les valeurs nullables.
+	- DecimalSize() : cette méthode renvoie des détails sur la taille des valeurs décimales. Les résultats sont un int64 qui spécifie la précision,
+	                  un int64 qui spécifie l'échelle et un booléen qui est vrai pour les types décimaux et faux pour les autres types.
+	- Length() : cette méthode renvoie la longueur des types de base de données qui peuvent avoir des longueurs variables. Les résultats sont un
+	             int64 qui spécifie la longueur et un booléen qui est vrai pour les types qui définissent une longueur et faux pour les autres types.
+	- ScanType() : cette méthode renvoie un reflect.Type qui indique le type Go qui sera utilisé lors de l'analyse de cette colonne avec
+	               la méthode Rows.Scan.
 **/
 
 type Product0 struct {
@@ -214,6 +236,24 @@ func queryDatabase4(db *sql.DB, id int) (p Product) {
 	return
 }
 
+func queryDatabase5(db *sql.DB) (products []Product, err error) {
+	rows, err := db.Query(`SELECT Products.Id, Products.Name, Products.Price,
+			Categories.Id as "Category.Id", Categories.Name as "Category.Name"
+			FROM Products, Categories
+			WHERE Products.Category = Categories.Id`)
+	if err != nil {
+		return
+	} else {
+		results, err := scanIntoStruct(rows, &Product{})
+		if err == nil {
+			products = (results).([]Product)
+		} else {
+			Printfln("Scanning error: %v", err)
+		}
+	}
+	return
+}
+
 func insertRow(db *sql.DB, p *Product) (id int64) {
 	res, err := db.Exec(`INSERT INTO Products (Name, Category, Price) VALUES(?,?,?)`, p.Name, p.Category.Id, p.Price)
 	if err == nil {
@@ -242,9 +282,39 @@ func insertAndUseCategory(db *sql.DB, name string, productIDs ...int) {
 	}
 }
 
+func insertAndUseCategoryWithTransaction(db *sql.DB, name string, productIDs ...int) (err error) {
+	tx, err := db.Begin()
+	updatedFailed := false
+	if err == nil {
+		catResult, err := tx.Stmt(InsertNewCategoryPrepare(db)).Exec(name)
+		if err == nil {
+			newID, _ := catResult.LastInsertId()
+			preparedStatement := tx.Stmt(ChangeProductCategoryPrepare(db))
+			for _, id := range productIDs {
+				changeResult, err := preparedStatement.Exec(newID, id)
+				if err == nil {
+					changes, _ := changeResult.RowsAffected()
+					if changes == 0 {
+						updatedFailed = true
+						break
+					}
+				}
+			}
+		}
+	}
+	if err != nil || updatedFailed {
+		Printfln("Aborting transaction %v", err)
+		tx.Rollback()
+	} else {
+		tx.Commit()
+	}
+
+	return
+}
+
 func main() {
 	Printfln("-------Data-------")
-	// listDrivers()
+	listDrivers()
 	db, err := openDatabase()
 	if err == nil {
 		queryDatabase(db)
@@ -320,5 +390,27 @@ func main() {
 		db6.Close()
 	} else {
 		panic(err6)
+	}
+
+	db7, err7 := openDatabase()
+	if err7 == nil {
+		insertAndUseCategoryWithTransaction(db7, "Category_1", 2)
+		p := queryDatabase4(db7, 2)
+		Printfln("Product: %v", p)
+		insertAndUseCategoryWithTransaction(db7, "Category_2", 100)
+		db7.Close()
+	} else {
+		panic(err7)
+	}
+
+	db8, err8 := openDatabase()
+	if err8 == nil {
+		products, _ := queryDatabase5(db8)
+		for _, p := range products {
+			Printfln("Product: %v", p)
+		}
+		db8.Close()
+	} else {
+		panic(err8)
 	}
 }
