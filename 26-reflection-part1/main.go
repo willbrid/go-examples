@@ -75,6 +75,14 @@ Les méthodes de la classe reflect.Value :
 - Interface() : cette méthode renvoie la valeur sous-jacente à l'aide de l'interface vide. Cette méthode paniquera si elle est utilisée
                 sur des champs de structure non exportés.
 - CanInterface() : cette méthode retourne true si la méthode Interface peut être utilisée sans paniquer.
+- CanSet() : cette méthode renvoie true si la valeur peut être définie et false sinon.
+- SetBool(val) : cette méthode définit la valeur sous-jacente sur le booléen spécifié.
+- SetBytes(slice) : cette méthode définit la valeur sous-jacente sur la tranche d'octets spécifiée.
+- SetFloat(val) : cette méthode définit la valeur sous-jacente sur le float64 spécifié.
+- SetInt(val) : cette méthode définit la valeur sous-jacente sur l'int64 spécifié.
+- SetUint(val) : cette méthode définit la valeur sous-jacente sur l'uint64 spécifié.
+- SetString(val) : cette méthode définit la valeur sous-jacente sur la chaîne spécifiée.
+- Set(val) : cette méthode définit la valeur sous-jacente sur la valeur sous-jacente de la valeur spécifiée.
 **/
 
 type Payment struct {
@@ -260,6 +268,63 @@ func selectValue(data interface{}, index int) (result interface{}) {
 	return
 }
 
+func incrementOrUpper(values ...interface{}) {
+	for _, elem := range values {
+		elemValue := reflect.ValueOf(elem)
+		if elemValue.CanSet() {
+			switch elemValue.Kind() {
+			case reflect.Int:
+				elemValue.SetInt(elemValue.Int() + 1)
+			case reflect.String:
+				elemValue.SetString(strings.ToUpper(elemValue.String()))
+			}
+			Printfln("Modified Value: %v", elemValue)
+		} else {
+			Printfln("Cannot set %v: %v", elemValue.Kind(), elemValue)
+		}
+	}
+}
+
+func incrementOrUpperWithPointer(values ...interface{}) {
+	for _, elem := range values {
+		elemValue := reflect.ValueOf(elem)
+		if elemValue.Kind() == reflect.Ptr {
+			// Utilisation de la méthode reflect.Value.Elem() pour suivre le pointeur jusqu'à sa valeur
+			elemValue = elemValue.Elem()
+		}
+		if elemValue.CanSet() {
+			switch elemValue.Kind() {
+			case reflect.Int:
+				elemValue.SetInt(elemValue.Int() + 1)
+			case reflect.String:
+				elemValue.SetString(strings.ToUpper(elemValue.String()))
+			}
+			Printfln("Modified Value: %v", elemValue)
+		} else {
+			Printfln("Cannot set %v: %v", elemValue.Kind(), elemValue)
+		}
+	}
+}
+
+/*
+*
+La fonction setAll utilise une boucle for pour traiter son paramètre variadique et recherche des valeurs qui sont des pointeurs vers des valeurs
+du même type que le paramètre src. Lorsqu'un pointeur correspondant est trouvé, la valeur à laquelle il fait référence est modifiée avec la méthode Set.
+La majeure partie du code de la fonction setAll est chargée de vérifier que les valeurs sont compatibles et peuvent être définies, mais le résultat est
+que l'utilisation d'une chaîne comme premier argument définit tous les arguments de chaîne suivants et l'utilisation d'un int définit toutes
+les valeurs int suivantes.
+*
+*/
+func setAll(src interface{}, targets ...interface{}) {
+	srcVal := reflect.ValueOf(src)
+	for _, target := range targets {
+		targetVal := reflect.ValueOf(target)
+		if targetVal.Kind() == reflect.Ptr && targetVal.Elem().Type() == srcVal.Type() && targetVal.Elem().CanSet() {
+			targetVal.Elem().Set(srcVal)
+		}
+	}
+}
+
 func main() {
 	product1 := Product{
 		Name: "Kayak", Category: "Watersports", Price: 279,
@@ -315,4 +380,39 @@ func main() {
 	// Conversion du résultat en string
 	val := selectValue(names, 1).(string)
 	Printfln("Selected: %v", val)
+
+	/**
+	Le résultat montrera qu'aucune des valeurs reçues par la fonction incrementOrUpper ne peut être définie.
+	La méthode CanSet est source de confusion, mais n'oublions pas que les valeurs sont copiées lorsqu'elles sont utilisées comme arguments de fonctions
+	et de méthodes. Lorsque les valeurs sont transmises à l'incrémentOrUpper, elles sont copiées.
+	**/
+	name1 := "Alice"
+	price1 := 279
+	city1 := "London"
+	incrementOrUpper(name1, price1, city1)
+	for _, val := range []interface{}{name1, price1, city1} {
+		Printfln("Value: %v", val)
+	}
+
+	/**
+	la réflexion ne peut modifier une valeur que si le stockage d'origine est accessible. Ici les pointeurs sont utilisés pour appeler la
+	fonction incrementOrUpper, ce qui nécessite une modification du code de réflexion pour détecter les pointeurs et, lorsqu'il en trouve un,
+	utiliser la méthode Elem pour suivre le pointeur jusqu'à sa valeur.
+	**/
+	name2 := "Alice"
+	price2 := 279
+	city2 := "London"
+	incrementOrUpperWithPointer(&name2, &price2, &city2)
+	for _, val := range []interface{}{name2, price2, city2} {
+		Printfln("Value: %v", val)
+	}
+
+	name3 := "Alice"
+	price3 := 279
+	city3 := "London"
+	setAll("New String", &name3, &price3, &city3)
+	setAll(10, &name3, &price3, &city3)
+	for _, val := range []interface{}{name3, price3, city3} {
+		Printfln("Value: %v", val)
+	}
 }
