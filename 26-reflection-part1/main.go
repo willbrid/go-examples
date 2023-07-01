@@ -101,6 +101,17 @@ La fonction DeepEqual ne panique pas et effectue des comparaisons supplémentair
 Mais en général, la fonction DeepEqual effectue une comparaison en inspectant de manière récursive tous les champs ou éléments d'une valeur.
 L'un des aspects les plus utiles de ce type de comparaison est que les tranches sont égales si toutes leurs valeurs sont égales, ce qui répond à l'une
 des limitations les plus couramment rencontrées de l'opérateur de comparaison standard ==.
+
+Les fonctions de création de nouvelles valeurs (reflect.Value) via le package reflect :
+- New(type) : cette fonction crée une valeur qui pointe vers une valeur du type spécifié, initialisée à la valeur zéro du type.
+              Il faut être prudent avec la fonction New car elle renvoie un pointeur vers une nouvelle valeur du type spécifié,
+			  ce qui signifie qu'il est facile de créer un pointeur vers un pointeur.
+- Zero(type) : cette fonction crée une valeur qui représente la valeur zéro du type spécifié.
+- MakeMap(type) : cette fonction crée une nouvelle map
+- MakeMapWithSize(type, size) : cette fonction crée une nouvelle map avec la taille spécifiée
+- MakeSlice(type, capacity) : cette fonction crée une nouvelle tranche.
+- MakeFunc(type, args, results) : cette fonction crée une nouvelle fonction avec les arguments et les résultats spécifiés.
+- MakeChan(type, buffer) : cette fonction crée un nouveau canal avec la taille de buffer spécifiée.
 **/
 
 type Payment struct {
@@ -452,6 +463,22 @@ func convertImproved(src, target interface{}) (result interface{}, assigned bool
 	return
 }
 
+/*
+*
+Le Type passé à la fonction reflect.New est obtenu à partir du résultat reflect.Type.Elem pour l'une des valeurs de paramètre,
+ce qui évite de créer un pointeur sur un pointeur. La méthode Set est utilisée pour définir la valeur temporaire et effectuer le swap.
+*
+*/
+func swap(first interface{}, second interface{}) {
+	firstValue, secondValue := reflect.ValueOf(first), reflect.ValueOf(second)
+	if firstValue.Type() == secondValue.Type() && firstValue.Kind() == reflect.Ptr && firstValue.Elem().CanSet() && secondValue.Elem().CanSet() {
+		temp := reflect.New(firstValue.Elem().Type())
+		temp.Elem().Set(firstValue.Elem())
+		firstValue.Elem().Set(secondValue.Elem())
+		secondValue.Elem().Set(temp.Elem())
+	}
+}
+
 func main() {
 	product1 := Product{
 		Name: "Kayak", Category: "Watersports", Price: 279,
@@ -567,6 +594,15 @@ func main() {
 	L'appel à la fonction convertImproved tente de convertir la valeur 5000 en un int8, ce qui provoquerait un débordement.
 	La méthode OverflowInt renvoie true et la conversion n'est donc pas effectuée.
 	**/
-	newVal, ok = convertImproved(5000, int8(100))
+	price6 := 5000
+	newVal, ok = convertImproved(price6, int8(100))
 	Printfln("Converted %v : %v, %T", ok, newVal, newVal)
+
+	name7 := "Alice"
+	price7 := 279
+	city7 := "London"
+	swap(&name7, &city7)
+	for _, val := range []interface{}{name7, price7, city7} {
+		Printfln("Value : %v", val)
+	}
 }
