@@ -34,6 +34,7 @@ L'interface reflect.Type fournit des détails de base sur un type à travers les
 - String() : cette méthode renvoie une représentation sous forme de chaîne du nom du type, y compris le nom du package.
 - Comparable() : cette méthode renvoie true si les valeurs de ce type peuvent être comparées à l'aide de l'opérateur de comparaison standard.
 - AssignableTo(type) : cette méthode renvoie true si des valeurs de ce type peuvent être affectées à des variables ou à des champs du type reflété spécifié.
+- ConvertibleTo(type) : cette méthode renvoie true si le Type sur lequel la méthode est appelée peut être converti en Type spécifié.
 
 Les constantes liées à la méthode reflect.Type.kind() :
 - Bool : cette valeur correspond à un booléen.
@@ -83,6 +84,16 @@ Les méthodes de la classe reflect.Value :
 - SetUint(val) : cette méthode définit la valeur sous-jacente sur l'uint64 spécifié.
 - SetString(val) : cette méthode définit la valeur sous-jacente sur la chaîne spécifiée.
 - Set(val) : cette méthode définit la valeur sous-jacente sur la valeur sous-jacente de la valeur spécifiée.
+- Convert(type) : cette méthode effectue une conversion de type et renvoie une valeur (reflect.Value) avec le nouveau type et la valeur d'origine.
+- OverflowFloat(val) : cette méthode renvoie true si la valeur float64 spécifiée provoquerait un débordement si elle était convertie dans
+                       le type de la valeur sur laquelle la méthode est appelée. Cette méthode paniquera à moins que la méthode Value.Kind
+					   ne renvoie Float32 ou Float64.
+- OverflowInt(val) : cette méthode renvoie true si la valeur int64 spécifiée provoquerait un débordement si elle était convertie dans
+                     le type de la valeur sur laquelle la méthode est appelée. Cette méthode paniquera à moins que la méthode Value.Kind
+					 ne renvoie l'un des types d'entiers signés.
+- OverflowUint(val) : cette méthode renvoie true si la valeur uint64 spécifiée provoquerait un débordement si elle était convertie dans le type
+                      de la valeur sur laquelle la méthode est appelée. Cette méthode paniquera à moins que la méthode Value.Kind ne renvoie
+					  l'un des types d'entiers non signés.
 
 La fonction de package reflect pour comparer les valeurs :
 - DeepEqual(val, val) : cette fonction compare deux valeurs et renvoie true si elles sont identiques.
@@ -386,6 +397,61 @@ func containsWithDeepEqual(slice interface{}, target interface{}) (found bool) {
 	return
 }
 
+func convert(src, target interface{}) (result interface{}, assigned bool) {
+	srcVal := reflect.ValueOf(src)
+	targetVal := reflect.ValueOf(target)
+	if srcVal.Type().ConvertibleTo(targetVal.Type()) {
+		result = srcVal.Convert(targetVal.Type()).Interface()
+		assigned = true
+	} else {
+		result = src
+	}
+
+	return
+}
+
+func IsInt(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return true
+	}
+	return false
+}
+
+func IsFloat(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.Float32, reflect.Float64:
+		return true
+	}
+	return false
+}
+
+/*
+*
+Cette fonction ajoute une protection contre les débordements lors de la conversion d'un type entier à un autre et
+d'une valeur à virgule flottante à une autre.
+*
+*/
+func convertImproved(src, target interface{}) (result interface{}, assigned bool) {
+	srcVal := reflect.ValueOf(src)
+	targetVal := reflect.ValueOf(target)
+	if srcVal.Type().ConvertibleTo(targetVal.Type()) {
+		if IsInt(targetVal) && IsInt(srcVal) && targetVal.OverflowInt(srcVal.Int()) {
+			Printfln("Int overflow")
+			return src, false
+		} else if IsFloat(targetVal) && IsFloat(srcVal) && targetVal.OverflowFloat(srcVal.Float()) {
+			Printfln("Float overflow")
+			return src, false
+		}
+		result = srcVal.Convert(targetVal.Type()).Interface()
+		assigned = true
+	} else {
+		result = src
+	}
+
+	return
+}
+
 func main() {
 	product1 := Product{
 		Name: "Kayak", Category: "Watersports", Price: 279,
@@ -486,4 +552,21 @@ func main() {
 	Printfln("Found #3: %v", containsWithoutPanic(sliceOfSlices4, citiesSlice4))
 	Printfln("Found #4: %v", containsWithDeepEqual(citiesSlice4, city4))
 	Printfln("Found #5: %v", containsWithDeepEqual(sliceOfSlices4, citiesSlice4))
+
+	/**
+	Le premier appel à la fonction convert tente de convertir une valeur int en float64, ce qui réussit, et le deuxième appel tente de
+	convertir une chaîne en float64, ce qui échoue.
+	**/
+	name5 := "Alice"
+	price5 := 279
+	newVal, ok := convert(price5, 100.00)
+	Printfln("Converted %v : %v, %T", ok, newVal, newVal)
+	newVal, ok = convert(name5, 100.00)
+	Printfln("Converted %v : %v, %T", ok, newVal, newVal)
+	/**
+	L'appel à la fonction convertImproved tente de convertir la valeur 5000 en un int8, ce qui provoquerait un débordement.
+	La méthode OverflowInt renvoie true et la conversion n'est donc pas effectuée.
+	**/
+	newVal, ok = convertImproved(5000, int8(100))
+	Printfln("Converted %v : %v, %T", ok, newVal, newVal)
 }
