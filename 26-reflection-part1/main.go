@@ -83,6 +83,13 @@ Les méthodes de la classe reflect.Value :
 - SetUint(val) : cette méthode définit la valeur sous-jacente sur l'uint64 spécifié.
 - SetString(val) : cette méthode définit la valeur sous-jacente sur la chaîne spécifiée.
 - Set(val) : cette méthode définit la valeur sous-jacente sur la valeur sous-jacente de la valeur spécifiée.
+
+La fonction de package reflect pour comparer les valeurs :
+- DeepEqual(val, val) : cette fonction compare deux valeurs et renvoie true si elles sont identiques.
+La fonction DeepEqual ne panique pas et effectue des comparaisons supplémentaires qui ne sont pas possibles avec l'opérateur ==.
+Mais en général, la fonction DeepEqual effectue une comparaison en inspectant de manière récursive tous les champs ou éléments d'une valeur.
+L'un des aspects les plus utiles de ce type de comparaison est que les tranches sont égales si toutes leurs valeurs sont égales, ce qui répond à l'une
+des limitations les plus couramment rencontrées de l'opérateur de comparaison standard ==.
 **/
 
 type Payment struct {
@@ -325,6 +332,60 @@ func setAll(src interface{}, targets ...interface{}) {
 	}
 }
 
+/*
+*
+La fonction containsWithPanic accepte une tranche et renvoie true si elle contient une valeur spécifiée. La tranche est énumérée à
+l'aide des méthodes Len et Index.
+Cette instruction applique l'opérateur de comparaison à la valeur à un index spécifique dans la tranche et à la valeur cible.
+Mais, puisque la fonction containsWithPanic accepte tous les types, l'application paniquera si la fonction reçoit des types qui ne peuvent pas être comparés.
+*
+*/
+func containsWithPanic(slice interface{}, target interface{}) (found bool) {
+	sliceVal := reflect.ValueOf(slice)
+	if sliceVal.Kind() == reflect.Slice {
+		for i := 0; i < sliceVal.Len(); i++ {
+			if sliceVal.Index(i).Interface() == target {
+				found = true
+			}
+		}
+	}
+	return
+}
+
+/*
+*
+La fonction containsWithoutPanic accepte une tranche et renvoie true si elle contient une valeur spécifiée. La tranche est énumérée à
+l'aide des méthodes Len et Index. Une condition est ajoutée permettant à l'opérateur de comparaison de s'appliquer uniquement aux valeurs
+dont les types sont comparables.
+*
+*/
+func containsWithoutPanic(slice interface{}, target interface{}) (found bool) {
+	sliceVal := reflect.ValueOf(slice)
+	targetType := reflect.TypeOf(target)
+	Printfln("Slice is it comparable ? %v", sliceVal.Type().Elem().Comparable())
+	Printfln("Target is it comparable ? %v", targetType.Comparable())
+	if sliceVal.Kind() == reflect.Slice && sliceVal.Type().Elem().Comparable() && targetType.Comparable() {
+		for i := 0; i < sliceVal.Len(); i++ {
+			if sliceVal.Index(i).Interface() == target {
+				found = true
+			}
+		}
+	}
+	return
+}
+
+func containsWithDeepEqual(slice interface{}, target interface{}) (found bool) {
+	sliceVal := reflect.ValueOf(slice)
+	if sliceVal.Kind() == reflect.Slice {
+		for i := 0; i < sliceVal.Len(); i++ {
+			if reflect.DeepEqual(sliceVal.Index(i).Interface(), target) {
+				found = true
+			}
+		}
+	}
+	return
+}
+
 func main() {
 	product1 := Product{
 		Name: "Kayak", Category: "Watersports", Price: 279,
@@ -415,4 +476,14 @@ func main() {
 	for _, val := range []interface{}{name3, price3, city3} {
 		Printfln("Value: %v", val)
 	}
+
+	city4 := "London"
+	citiesSlice4 := []string{"Paris", "Rome", "London"}
+	sliceOfSlices4 := [][]string{citiesSlice4, {"First", "Second", "Third"}}
+	Printfln("Found #1: %v", containsWithPanic(citiesSlice4, city4))
+	//Printfln("Found #2: %v", containsWithPanic(sliceOfSlices4, citiesSlice4))
+	Printfln("Found #2: %v", containsWithoutPanic(citiesSlice4, city4))
+	Printfln("Found #3: %v", containsWithoutPanic(sliceOfSlices4, citiesSlice4))
+	Printfln("Found #4: %v", containsWithDeepEqual(citiesSlice4, city4))
+	Printfln("Found #5: %v", containsWithDeepEqual(sliceOfSlices4, citiesSlice4))
 }
