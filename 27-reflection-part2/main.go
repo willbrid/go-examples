@@ -6,7 +6,7 @@ import (
 )
 
 /**
-La fonction et la méthode du package reflect pour les pointeurs ou les maps :
+Les fonctions et les méthodes du package reflect pour les pointeurs ou les maps :
 - PtrTo(type) : cette fonction renvoie un Type (reflect.Type) qui est un pointeur vers le Type reçu en argument.
 - Elem() : --- cette méthode, qui est appelée sur un type pointeur (reflect.Type), renvoie le Type sous-jacent.
            Cette méthode panique lorsqu'elle est utilisée sur des types non pointeurs.
@@ -16,6 +16,11 @@ La fonction et la méthode du package reflect pour les pointeurs ou les maps :
 - ArrayOf(len, type) : cette fonction renvoie un Type qui décrit un tableau avec la taille et le type d'élément spécifiés.
 - SliceOf(type) : cette fonction renvoie un Type qui décrit un tableau avec le type d'élément spécifié.
 - Key() : cette méthode renvoie le Type (reflect.Type) des clés de la map.
+- MapOf(keyType, valueType) : pour les maps, cette fonction renvoie un nouveau reflect.Type qui reflète le type de mappage avec
+							  les types de clé et de valeur spécifiés, tous deux décrits à l'aide d'un reflect.Type.
+- MakeMap(type) : pour les maps, cette fonction renvoie un reflect.Value qui reflète une map créée avec le type spécifié.
+- MakeMapWithSize(type, size) : pour les maps, cette fonction renvoie un reflect.Value qui reflète une map créée avec le type et la taille spécifiés.
+
 
 Les méthodes de reflect.Value pour travailler avec des types de pointeur, des types array ou slice, des types map :
 - Addr() : cette méthode renvoie une valeur qui est un pointeur vers la valeur sur laquelle elle est appelée.
@@ -37,6 +42,7 @@ Les méthodes de reflect.Value pour travailler avec des types de pointeur, des t
 - MapRange() : cette méthode renvoie un *MapIter, qui permet d'itérer le contenu de la map.
 - SetMapIndex(key, val) : cette méthode définit la clé et la valeur spécifiées, toutes deux exprimées à l'aide de l'interface reflect.Value.
 
+
 Fonctions d'ajout d'éléments aux tranches du package reflect -> ces fonctions acceptent les arguments reflect.Type ou reflect.Value :
 - MakeSlice(type, len, cap) : cette fonction crée un reflect.Value qui reflète une nouvelle tranche, en utilisant un reflect.Type pour désigner
                               le type d'élément et avec la longueur et la capacité spécifiées.
@@ -49,9 +55,6 @@ Fonctions d'ajout d'éléments aux tranches du package reflect -> ces fonctions 
                    par la valeur dst. Les éléments sont copiés jusqu'à ce que la tranche de destination soit pleine ou que tous
 				   les éléments source aient été copiés. La source et la destination doivent avoir le même type d'élément.
 
-La fonction reflect pour créer des types de map :
-- MapOf(keyType, valueType) : cette fonction renvoie un nouveau reflect.Type qui reflète le type de mappage avec les types de clé et de valeur spécifiés,
-                               tous deux décrits à l'aide d'un reflect.Type.
 
 Les méthodes définies par la classe reflect.MapIter :
 - Next() : cette méthode passe à la paire clé-valeur suivante dans la map. Le résultat de cette méthode est un booléen indiquant
@@ -216,6 +219,51 @@ func printMapContentsWithMapIter(m interface{}) {
 	}
 }
 
+func setMap(m interface{}, key interface{}, val interface{}) {
+	mapValue := reflect.ValueOf(m)
+	keyValue := reflect.ValueOf(key)
+	valValue := reflect.ValueOf(val)
+	if mapValue.Kind() == reflect.Map && mapValue.Type().Key() == keyValue.Type() && mapValue.Type().Elem() == valValue.Type() {
+		mapValue.SetMapIndex(keyValue, valValue)
+	} else {
+		Printfln("Not a map")
+	}
+}
+
+func removeFromMap(m interface{}, key interface{}) {
+	mapValue := reflect.ValueOf(m)
+	keyValue := reflect.ValueOf(key)
+	if mapValue.Kind() == reflect.Map && mapValue.Type().Key() == keyValue.Type() {
+		/**
+		La méthode SetMapIndex supprimera une clé de la map si l'argument de valeur est la valeur zéro pour le type de valeur de map.
+		C'est un problème lorsqu'il s'agit de types intégrés, tels que int et float64, où la valeur zéro est une entrée de map valide.
+		Pour empêcher SetMapIndex de définir des valeurs sur zéro, la fonction removeFromMap crée une instance de la classe reflect.Value.
+		**/
+		mapValue.SetMapIndex(keyValue, reflect.Value{})
+	}
+}
+
+/*
+*
+La fonction createMap accepte une tranche de valeurs et une fonction. La tranche est énumérée et la fonction est appelée sur chaque élément,
+avec les valeurs d'origine et transformées utilisées pour remplir une map, qui est renvoyée comme résultat de la fonction.
+*
+*/
+func createMap(slice interface{}, op func(interface{}) interface{}) interface{} {
+	sliceVal := reflect.ValueOf(slice)
+	if sliceVal.Kind() == reflect.Slice {
+		mapType := reflect.MapOf(sliceVal.Type().Elem(), sliceVal.Type().Elem())
+		mapVal := reflect.MakeMap(mapType)
+		for i := 0; i < sliceVal.Len(); i++ {
+			elemVal := sliceVal.Index(i)
+			mapVal.SetMapIndex(elemVal, reflect.ValueOf(op(elemVal.Interface())))
+		}
+		return mapVal.Interface()
+	}
+
+	return nil
+}
+
 func main() {
 	name1 := "Alice"
 	t := reflect.TypeOf(name1)
@@ -276,4 +324,22 @@ func main() {
 	describeMap(pricesMap)
 	printMapContents(pricesMap)
 	printMapContentsWithMapIter(pricesMap)
+	setMap(pricesMap, "Kayak", 100.00)
+	setMap(pricesMap, "Hat", 10.00)
+	removeFromMap(pricesMap, "Lifejacket")
+	for k, v := range pricesMap {
+		Printfln("Key: %v, Value: %v", k, v)
+	}
+
+	names := []string{"Alice", "Bob", "Charlie"}
+	reverse := func(val interface{}) interface{} {
+		if str, ok := val.(string); ok {
+			return strings.ToUpper(str)
+		}
+		return val
+	}
+	namesMap := createMap(names, reverse).(map[string]string)
+	for k, v := range namesMap {
+		Printfln("Key : %v, Value : %v", k, v)
+	}
 }
