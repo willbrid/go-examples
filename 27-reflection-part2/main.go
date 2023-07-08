@@ -49,7 +49,7 @@ Les méthodes définies par le type reflect.StructTag :
                 et un booléen qui est vrai si la valeur a été définie et faux sinon.
 
 
-Les méthodes de reflect.Value pour travailler avec des types de pointeur, des types array ou slice, des types map :
+Les méthodes de reflect.Value pour travailler avec des types de pointeur, des types array ou slice, des types map, les structs :
 - Addr() : cette méthode renvoie une valeur qui est un pointeur vers la valeur sur laquelle elle est appelée.
            Cette méthode panique si la méthode CanAddr renvoie false.
 - CanAddr() : cette méthode renvoie vrai si la valeur peut être utilisée avec la méthode Addr.
@@ -68,7 +68,13 @@ Les méthodes de reflect.Value pour travailler avec des types de pointeur, des t
 				  en appelant la méthode IsValid, qui renverra false.
 - MapRange() : cette méthode renvoie un *MapIter, qui permet d'itérer le contenu de la map.
 - SetMapIndex(key, val) : cette méthode définit la clé et la valeur spécifiées, toutes deux exprimées à l'aide de l'interface reflect.Value.
-
+- NumField() : pour les structs, cette méthode renvoie le nombre de champs définis par le type de la valeur de la classe.
+- Field(index) : pour les structs, cette méthode renvoie une valeur (reflect.Value) qui reflète le champ à l'index spécifié.
+- FieldByIndex(indices) : pour les structs, cette méthode renvoie une valeur (reflect.Value) qui reflète le champ imbriqué aux indices spécifiés.
+- FieldByName(name) : pour les structs, cette méthode renvoie une valeur (reflect.Value) qui reflète le premier champ localisé avec le nom spécifié.
+- FieldByNameFunc(func) : pour les structs, cette méthode transmet le nom de chaque champ inclus des champs imbriqués à la fonction spécifiée
+                          et renvoie une valeur (reflect.Value) qui reflète le premier champ pour lequel la fonction renvoie true,
+						  et un booléen qui indique si une correspondance a été trouvée.
 
 Fonctions d'ajout d'éléments aux tranches du package reflect -> ces fonctions acceptent les arguments reflect.Type ou reflect.Value :
 - MakeSlice(type, len, cap) : cette fonction crée un reflect.Value qui reflète une nouvelle tranche, en utilisant un reflect.Type pour désigner
@@ -391,6 +397,47 @@ func inspectTags(s interface{}, tagName string) {
 	}
 }
 
+/*
+*
+La fonction getFieldValues énumère les champs définis par une classe et écrit les détails du type et de la valeur du champ.
+*
+*/
+func getFieldValues(s interface{}) {
+	structValue := reflect.ValueOf(s)
+	if structValue.Kind() == reflect.Struct {
+		for i := 0; i < structValue.NumField(); i++ {
+			fieldType := structValue.Type().Field(i)
+			fieldVal := structValue.Field(i)
+			Printfln("Name : %v, Type : %v, Value : %v", fieldType.Name, fieldType.Type, fieldVal)
+		}
+	} else {
+		Printfln("Not a struct")
+	}
+}
+
+func setFieldValue(s interface{}, newVals map[string]interface{}) {
+	structValue := reflect.ValueOf(s)
+	if structValue.Kind() == reflect.Ptr && structValue.Elem().Kind() == reflect.Struct {
+		for name, newValue := range newVals {
+			fieldVal := structValue.Elem().FieldByName(name)
+			if fieldVal.CanSet() {
+				fieldVal.Set(reflect.ValueOf(newValue))
+			} else if fieldVal.CanAddr() {
+				ptr := fieldVal.Addr()
+				if ptr.CanSet() {
+					ptr.Set(reflect.ValueOf(newValue))
+				} else {
+					Printfln("Cannot set field via pointer")
+				}
+			} else {
+				Printfln("Cannot set field")
+			}
+		}
+	} else {
+		Printfln("Not a pointer to a struct")
+	}
+}
+
 func main() {
 	name1 := "Alice"
 	t := reflect.TypeOf(name1)
@@ -490,4 +537,12 @@ func main() {
 		{Name: "Country", Type: stringType},
 	})
 	inspectTags(reflect.New(structType), "alias")
+
+	// travailler avec reflect.Value pour les struct
+	product := Product{Name: "Kayak", Category: "Watersports", Price: 279}
+	customer := Customer{Name: "Acme", City: "Chicago"}
+	purchase := Purchase{Customer: customer, Product: product, Total: 279, taxRate: 10}
+	getFieldValues(purchase)
+	setFieldValue(&purchase, map[string]interface{}{"City": "London", "Category": "Boats", "Total": 100.50})
+	getFieldValues(purchase)
 }
