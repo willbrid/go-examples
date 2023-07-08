@@ -20,6 +20,33 @@ Les fonctions et les méthodes du package reflect pour les pointeurs ou les maps
 							  les types de clé et de valeur spécifiés, tous deux décrits à l'aide d'un reflect.Type.
 - MakeMap(type) : pour les maps, cette fonction renvoie un reflect.Value qui reflète une map créée avec le type spécifié.
 - MakeMapWithSize(type, size) : pour les maps, cette fonction renvoie un reflect.Value qui reflète une map créée avec le type et la taille spécifiés.
+- StructOf(fields) : pour les classes (struct), cette fonction crée un nouveau type de struct, en utilisant la tranche reflect.StructField spécifiée
+					 pour définir les champs. Seuls les champs exportés peuvent être spécifiés.
+
+Les méthodes de reflect.Type pour travailler avec les classes (struct) :
+- NumField() : cette méthode renvoie le nombre de champs définis par le type struct.
+- Field(index) : cette méthode renvoie le champ à l'index spécifié, représenté par un reflect.StructField.
+- FieldByIndex(indices) : cette méthode accepte une tranche int, qu'elle utilise pour localiser un champ imbriqué, qui est représenté par un reflect.StructField.
+- FieldByName(name) : cette méthode renvoie le champ avec le nom spécifié, qui est représenté par un reflect.StructField.
+                      Les résultats sont un reflect.StructField qui représente le champ et un bool qui indique si une correspondance a été trouvée.
+- FieldByNameFunc(func) : cette méthode transmet le nom de chaque champ inclus des champs imbriqués à la fonction spécifiée et
+                          renvoie le premier champ pour lequel la fonction renvoie true. Les résultats sont un StructField qui représente le champ
+						  et un bool qui indique si une correspondance a été trouvée.
+
+Les attributs de la classe reflect.StructField :
+--- Name : ce champ stocke le nom du champ reflété.
+--- PkgPath : ce champ renvoie le nom du package, qui est utilisé pour déterminer si un champ a été exporté.
+              Pour les champs reflétés qui sont exportés, ce champ renvoie la chaîne vide. Pour les champs reflétés qui n'ont pas été exportés,
+			  ce champ renvoie le nom du package, qui est le seul package dans lequel le champ peut être utilisé.
+--- Type : ce champ renvoie le type reflété du champ reflété, décrit à l'aide d'un Type.
+--- Tag : ce champ renvoie le tag struct associée au champ reflété.
+--- Index : ce champ renvoie une tranche int, qui indique l'index du champ utilisé par la méthode FieldByIndex.
+--- Anonyme : ce champ renvoie true si le champ reflété est intégré et false sinon.
+
+Les méthodes définies par le type reflect.StructTag :
+-- Get(key) : cette méthode renvoie une chaîne contenant la valeur de la clé spécifiée ou la chaîne vide si aucune valeur n'a été définie.
+-- Lookup(key) : cette méthode renvoie une chaîne contenant la valeur de la clé spécifiée ou la chaîne vide si aucune valeur n'a été définie,
+                et un booléen qui est vrai si la valeur a été définie et faux sinon.
 
 
 Les méthodes de reflect.Value pour travailler avec des types de pointeur, des types array ou slice, des types map :
@@ -264,6 +291,106 @@ func createMap(slice interface{}, op func(interface{}) interface{}) interface{} 
 	return nil
 }
 
+/*
+*
+La fonction inspectStructs définit un paramètre variadique à travers lequel elle reçoit des valeurs.
+La fonction TypeOf est utilisée pour obtenir le type reflété et la méthode Kind est utilisée pour confirmer que chaque type est une structure.
+Le Type reflété est transmis à la fonction inspectStructType, dans laquelle la méthode NumField est utilisée dans une boucle for,
+ce qui permet d'énumérer les champs structs à l'aide de la méthode Field.
+
+La même approche peut être utilisée pour inspecter les champs qui sont des pointeurs vers des types struct, avec l'utilisation de la méthode Type.Elem
+pour obtenir le type auquel le pointeur fait référence.
+*
+*/
+func inspectStructs(structs ...interface{}) {
+	for _, s := range structs {
+		structType := reflect.TypeOf(s)
+		if structType.Kind() == reflect.Struct {
+			inspectStructType(structType)
+		}
+	}
+}
+
+func inspectStructType(structType reflect.Type) {
+	Printfln("--- Struct Type : %v", structType)
+	for i := 0; i < structType.NumField(); i++ {
+		field := structType.Field(i)
+		Printfln("Field %v: Name : %v, Type : %v, Exported : %v", field.Index, field.Name, field.Type, field.PkgPath == "")
+	}
+	Printfln("--- End Struct Type : %v", structType)
+}
+
+func inspectStructsImprov(structs ...interface{}) {
+	for _, s := range structs {
+		structType := reflect.TypeOf(s)
+		if structType.Kind() == reflect.Struct {
+			inspectStructTypeImprov([]int{}, structType)
+		}
+	}
+}
+
+func inspectStructTypeImprov(baseIndex []int, structType reflect.Type) {
+	Printfln("--- Struct Type : %v", structType)
+	for i := 0; i < structType.NumField(); i++ {
+		fieldIndex := append(baseIndex, i)
+		field := structType.Field(i)
+		Printfln("Field %v: Name : %v, Type : %v, Exported : %v", field.Index, field.Name, field.Type, field.PkgPath == "")
+		if field.Type.Kind() == reflect.Struct {
+			field := structType.FieldByIndex(fieldIndex)
+			inspectStructTypeImprov(fieldIndex, field.Type)
+		}
+	}
+	Printfln("--- End Struct Type : %v", structType)
+}
+
+/*
+*
+La fonction describeField utilise la méthode FieldByName, qui localise le premier champ avec le nom spécifié et renvoie un StructField avec
+un champ Index correctement défini. Une boucle for est utilisée pour remonter la hiérarchie des types, en examinant tour à tour chaque parent.
+*
+*/
+func describeField(s interface{}, fieldName string) {
+	structType := reflect.TypeOf(s)
+	field, found := structType.FieldByName(fieldName)
+
+	if found {
+		Printfln("Found : %v, Type : %v, Index : %v", field.Name, field.Type, field.Index)
+		index := field.Index
+		for len(index) > 1 {
+			index = index[0 : len(index)-1]
+			field = structType.FieldByIndex(index)
+			Printfln("Parent : %v, Type : %v, Index : %v", field.Name, field.Type, field.Index)
+		}
+		Printfln("Top-Level Type : %v", structType)
+	} else {
+		Printfln("Field %v not found", fieldName)
+	}
+}
+
+/*
+*
+La fonction inspectTags énumère les champs définis par un type struct et utilise à la fois les méthodes Get et Lookup pour obtenir un tag spécifié.
+La fonction est appliquée au type Person, qui définit la tag alias sur certains de ses champs.
+*
+*/
+type Person struct {
+	Name    string `alias:"id"`
+	City    string `alias:""`
+	Country string
+}
+
+func inspectTags(s interface{}, tagName string) {
+	structType := reflect.TypeOf(s)
+	for i := 0; i < structType.NumField(); i++ {
+		field := structType.Field(i)
+		tag := field.Tag
+		valGet := tag.Get(tagName)
+		valLookup, ok := tag.Lookup(tagName)
+		Printfln("Field: %v, Tag %v : %v", field.Name, tagName, valGet)
+		Printfln("Field: %v, Tag %v : %v, Set : %v", field.Name, tagName, valLookup, ok)
+	}
+}
+
 func main() {
 	name1 := "Alice"
 	t := reflect.TypeOf(name1)
@@ -342,4 +469,25 @@ func main() {
 	for k, v := range namesMap {
 		Printfln("Key : %v, Value : %v", k, v)
 	}
+
+	/**
+	Inspection d'une classe struct
+	**/
+	inspectStructs(Purchase{})
+	inspectStructsImprov(Purchase{}) // Inspection des champs imbriqués d'une classe struct
+	describeField(Purchase{}, "Price")
+	inspectTags(Person{}, "alias") // Inspection des tags d'une classe
+
+	/**
+	Cet exemple crée une classe qui a les mêmes caractéristiques que la classe Person, avec les champs Name, City et Country.
+	Les champs sont décrits en créant des valeurs reflect.StructField, qui ne sont que des classes Go normales.
+	La fonction New est utilisée pour créer une nouvelle valeur (reflect.Value) à partir de la classe, qui est transmise à la fonction inspectTags
+	**/
+	stringType := reflect.TypeOf("this is a string")
+	structType := reflect.StructOf([]reflect.StructField{
+		{Name: "Name", Type: stringType, Tag: `alias:"id"`},
+		{Name: "City", Type: stringType, Tag: `alias:""`},
+		{Name: "Country", Type: stringType},
+	})
+	inspectTags(reflect.New(structType), "alias")
 }
