@@ -169,6 +169,48 @@ func inspectMethods(s interface{}) {
 	}
 }
 
+/*
+*
+La classe reflect.Method définit le champ Func, qui renvoie une valeur (reflect.Value) pouvant être utilisée pour appeler une méthode.
+*
+*/
+func executeFirstVoidMethod(s interface{}) {
+	sVal := reflect.ValueOf(s)
+	for i := 0; i < sVal.NumMethod(); i++ {
+		method := sVal.Type().Method(i)
+		// champ Type de la classe reflect.Method
+		if method.Type.NumIn() == 1 {
+			results := method.Func.Call([]reflect.Value{sVal})
+			Printfln("Type : %v, Method : %v, Results : %v", sVal.Type(), method.Name, results)
+			break
+		} else {
+			Printfln("Skipping method %v %v", method.Name, method.Type.NumIn())
+		}
+	}
+}
+
+/*
+*
+Pour trouver une méthode que nous pouvons invoquer sans fournir d'arguments supplémentaires, nous devons rechercher des paramètres zéro,
+car le récepteur n'est pas explicitement spécifié. Au lieu de cela, le récepteur est déterminé à partir de la valeur (reflect.Value) sur laquelle
+la méthode Call est invoquée.
+*
+*/
+func executeFirstVoidMethodWithValue(s interface{}) {
+	sVal := reflect.ValueOf(s)
+	for i := 0; i < sVal.NumMethod(); i++ {
+		method := sVal.Method(i)
+		// On teste si la méthode n'a pas d'argument
+		if method.Type().NumIn() == 0 {
+			results := method.Call([]reflect.Value{})
+			Printfln("Type : %v, Method : %v, Results : %v", sVal.Type(), sVal.Type().Method(i).Name, results)
+			break
+		} else {
+			Printfln("Skipping method %v %v", sVal.Type().Method(i).Name, method.Type().NumIn())
+		}
+	}
+}
+
 func main() {
 	// Inspection d'une fonction
 	inspectFuncType(Find)
@@ -208,4 +250,13 @@ func main() {
 	// Inspection d'une méthode d'une classe
 	inspectMethods(Purchase{})
 	inspectMethods(&Purchase{})
+
+	/**
+	La fonction executeFirstVoidMethod énumère les méthodes définies par le type du paramètre et appelle la première méthode qui définit un paramètre.
+	Lors de l'appel d'une méthode via le champ Method.Func, le premier argument doit être le récepteur, qui est la valeur de classe sur laquelle
+	la méthode sera appelée.
+	**/
+	executeFirstVoidMethod(&Product{Name: "Kayak", Price: 279})
+	// Invoquer une méthode via une valeur (reflect.Value)
+	executeFirstVoidMethodWithValue(&Product{Name: "Kayak", Price: 279})
 }
