@@ -7,13 +7,24 @@ import (
 )
 
 /**
-Les méthodes de type (reflect.Type) pour travailler avec des fonctions :
+Les méthodes de type (reflect.Type) pour travailler avec les fonctions :
 - NumIn() : cette méthode renvoie le nombre de paramètres définis par la fonction.
 - In(index) : cette méthode retourne un Type qui reflète le paramètre à l'index spécifié.
 - IsVariadic() : cette méthode renvoie vrai si le dernier paramètre est variadique.
 - NumOut() : cette méthode renvoie le nombre de résultats définis par la fonction.
 - Out(index) : cette méthode renvoie un Type qui reflète le résultat à l'index spécifié.
 
+
+Les méthodes de type (reflect.Type) pour travailler avec les interfaces :
+- Implements(type) : cette méthode renvoie true si la valeur reflétée implémente l'interface spécifiée, qui est également représentée par une valeur.
+- Elem() : cette méthode renvoie Value (reflect.Value) qui reflète la valeur contenue par l'interface.
+- NumMethod() : cette méthode renvoie le nombre de méthodes exportées définies pour le type de classe reflété.
+- Method(index) : cette méthode renvoie la méthode reflétée à l'index spécifié, représenté par la classe Method.
+- MethodByName(name) : cette méthode renvoie la méthode reflétée avec le nom spécifié. Les résultats sont une classe Method et un booléen
+                       qui indique si une méthode portant le nom spécifié existe.
+--- Des précautions doivent être prises lors de l'utilisation de la réflexion pour les interfaces car le package reflect commence toujours par une valeur
+et tentera de travailler avec le type sous-jacent de cette valeur (reflect.Value).
+La façon la plus simple de résoudre ce problème est de convertir une valeur nulle (nil).
 
 Les méthodes de type (reflect.Type) pour travailler avec des méthodes :
 - NumMethod() : cette méthode renvoie le nombre de méthodes exportées définies pour le type de classe reflété.
@@ -211,6 +222,54 @@ func executeFirstVoidMethodWithValue(s interface{}) {
 	}
 }
 
+func checkImplementation(check interface{}, targets ...interface{}) {
+	checkType := reflect.TypeOf(check)
+	if checkType.Kind() == reflect.Ptr && checkType.Elem().Kind() == reflect.Interface {
+		checkType := checkType.Elem()
+		for _, target := range targets {
+			targetType := reflect.TypeOf(target)
+			Printfln("Type %v implements %v : %v", targetType, checkType, targetType.Implements(checkType))
+		}
+	}
+}
+
+/*
+*
+Le type Wrapper définit un champ NamedItem imbriqué. La fonction getUnderlying utilise la réflexion pour obtenir le champ et écrit le type de champ
+et le type sous-jacent obtenu avec la méthode Elem.
+*
+*/
+type Wrapper struct {
+	NamedItem
+}
+
+func getUnderlying(item Wrapper, fieldName string) {
+	itemVal := reflect.ValueOf(item)
+	fieldVal := itemVal.FieldByName(fieldName)
+	Printfln("Field Type : %v", fieldVal.Type())
+	if fieldVal.Kind() == reflect.Interface {
+		Printfln("Underlying Type : %v", fieldVal.Elem().Type())
+	}
+}
+
+func getUnderlyingByExaminingInterfaceMethod(item Wrapper, fieldName string) {
+	itemVal := reflect.ValueOf(item)
+	fieldVal := itemVal.FieldByName(fieldName)
+	Printfln("Field Type : %v", fieldVal.Type())
+	for i := 0; i < fieldVal.Type().NumMethod(); i++ {
+		method := fieldVal.Type().Method(i)
+		Printfln("Interface Method : %v, Exported : %v", method.Name, method.PkgPath == "")
+	}
+	Printfln("--------")
+	if fieldVal.Kind() == reflect.Interface {
+		Printfln("Underlying Type : %v", fieldVal.Elem().Type())
+		for i := 0; i < fieldVal.Elem().Type().NumMethod(); i++ {
+			method := fieldVal.Elem().Type().Method(i)
+			Printfln("Underlying Method: %v", method.Name)
+		}
+	}
+}
+
 func main() {
 	// Inspection d'une fonction
 	inspectFuncType(Find)
@@ -259,4 +318,20 @@ func main() {
 	executeFirstVoidMethod(&Product{Name: "Kayak", Price: 279})
 	// Invoquer une méthode via une valeur (reflect.Value)
 	executeFirstVoidMethodWithValue(&Product{Name: "Kayak", Price: 279})
+
+	/**
+	Pour spécifier l'interface que nous voulons vérifier, nous convertissons nil en un pointeur de l'interface
+	Cela doit être fait avec un pointeur, qui est ensuite suivi dans la fonction checkImplementation à l'aide de la méthode Elem,
+	pour obtenir un Type qui reflète l'interface, qui est CurrencyItem dans cet exemple
+	**/
+	currencyItemType := (*CurrencyItem)(nil)
+	checkImplementation(currencyItemType, Product{}, &Product{}, &Purchase{})
+
+	/**
+	Obtenir des valeurs sous-jacentes à partir d'interfaces.
+	Le type de champ est l'interface NamedItem, mais la méthode Elem montre que la valeur sous-jacente affectée au champ NamedItem est un *Product.
+	**/
+	getUnderlying(Wrapper{NamedItem: &Product{}}, "NamedItem")
+	// Les modifications écrivent les détails des méthodes obtenues à partir de l'interface et des types sous-jacents.
+	getUnderlyingByExaminingInterfaceMethod(Wrapper{NamedItem: &Product{}}, "NamedItem")
 }
