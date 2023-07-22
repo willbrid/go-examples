@@ -63,6 +63,49 @@ Les fonctions du package reflect pour créer de nouveaux types de fonctions (ref
 - MakeFunc(type, fn) : cette fonction renvoie une valeur (reflect.Value) qui reflète une nouvelle fonction qui est un wrapper autour de la fonction fn.
                        La fonction doit accepter une tranche de valeur (reflect.Value) comme seul paramètre et renvoyer une tranche de valeur
 					   comme seul résultat.
+
+Les méthodes de type (reflect.Type) pour travailler avec des channel :
+- ChanDir() : cette méthode renvoie une valeur ChanDir qui décrit la direction du canal, en utilisant l'une des valeurs ci-après.
+              Les valeurs ChanDir :
+			  --- RecvDir : cette valeur indique que le canal peut être utilisé pour recevoir des données. Lorsqu'elle est exprimée sous forme de chaîne,
+			      cette valeur renvoie <-chan.
+			  --- SendDir : cette valeur indique que le canal peut être utilisé pour envoyer des données. Lorsqu'elle est exprimée sous forme de chaîne,
+			      cette valeur renvoie chan<-.
+			  --- BothDir : cette valeur indique que le canal peut être utilisé pour envoyer et recevoir des données. Lorsqu'elle est exprimée sous forme
+			                de chaîne, cette valeur renvoie chan.
+- Elem() : cette méthode renvoie un Type qui reflète le type porté par le canal.
+
+
+Les méthodes de valeur (reflect.Value) pour travailler avec des channel :
+- Send(val) : cette méthode envoie la valeur reflétée par l'argument Value (reflect.Value) sur le canal. Cette méthode bloque jusqu'à ce que
+              la valeur soit envoyée.
+- Recv() : cette méthode reçoit une valeur du canal, qui est renvoyée en tant que valeur (reflect.Value) pour la réflexion.
+           Cette méthode renvoie également un booléen, qui indique si une valeur a été reçue et sera faux si le canal s'est fermé.
+		   Cette méthode bloque jusqu'à ce qu'une valeur soit reçue ou que le canal soit fermé.
+- TrySend(val) : cette méthode envoie la valeur spécifiée mais ne bloquera pas. Le résultat booléen indique si la valeur a été envoyée.
+- TryRecv() : cette méthode tente de recevoir une valeur du canal mais ne bloquera pas. Les résultats sont une valeur reflétant la valeur reçue et
+              un booléen indiquant si une valeur a été reçue.
+- Close() : cette méthode ferme le canal.
+
+Les fonctions de package reflect pour la création de types et de valeurs de canal :
+- ChanOf(dir, type) : cette fonction renvoie un Type qui reflète un canal avec la direction et le type de données spécifiés, qui sont exprimés
+                      à l'aide d'un ChanDir et d'un type Value (reflect.Value).
+- MakeChan(type, buffer) : cette fonction renvoie une valeur (reflect.Value) qui reflète un nouveau canal, créé à l'aide du type et
+                           de la taille de tampon int spécifiés.
+
+La fonction de package reflect pour la sélection des canaux :
+- Select(cases) : cette fonction accepte une tranche SelectCase, où chaque élément décrit un ensemble d'opérations d'envoi ou de réception.
+                  Les résultats sont l'index int du SelectCase qui a été exécuté, la valeur qui a été reçue (si le cas sélectionné était une opération
+				  de lecture) et un booléen qui indique si une valeur a été lue ou si le canal a été bloqué ou fermé.
+				  La classe SelectCase est utilisée pour représenter une instruction case unique, en utilisant les champs :
+				  --- Chan : ce champ reçoit la valeur qui reflète le canal.
+				  --- Dir : ce champ se voit attribuer une valeur SelectDir, qui spécifie le type d'opération de canal pour ce cas.
+				  --- Send : ce champ se voit attribuer la valeur qui reflète la valeur qui sera envoyée sur le canal pour les opérations d'envoi.
+
+				  Le type SelectDir est un alias pour int, et le package reflect définit les constantes pour spécifier le type de cas de sélection :
+				  --- SelectSend : cette constante indique une opération pour envoyer une valeur sur un canal.
+				  --- SelectRecv : cette constante indique une opération pour recevoir une valeur du canal.
+				  --- SelectDefault : cette constante indique la clause par défaut pour le select.
 **/
 
 func inspectFuncType(f interface{}) {
@@ -270,6 +313,83 @@ func getUnderlyingByExaminingInterfaceMethod(item Wrapper, fieldName string) {
 	}
 }
 
+func inspectChannel(channel interface{}) {
+	channelType := reflect.TypeOf(channel)
+	if channelType.Kind() == reflect.Chan {
+		Printfln("Type %v, Direction : %v", channelType.Elem(), channelType.ChanDir())
+	}
+}
+
+/*
+*
+Le sendOverChannel vérifie les types qu'il reçoit, énumère les valeurs dans la tranche et envoie chacune d'elles sur le canal.
+Une fois toutes les valeurs envoyées, le canal est fermé.
+*
+*/
+func sendOverChannel(channel interface{}, data interface{}) {
+	channelVal := reflect.ValueOf(channel)
+	dataVal := reflect.ValueOf(data)
+
+	if channelVal.Kind() == reflect.Chan && dataVal.Kind() == reflect.Slice && channelVal.Type().Elem() == dataVal.Type().Elem() {
+		for i := 0; i < dataVal.Len(); i++ {
+			val := dataVal.Index(i)
+			channelVal.Send(val)
+		}
+		channelVal.Close()
+	} else {
+		Printfln("Unexpected types: %v, %v", channelVal.Type(), dataVal.Type())
+	}
+}
+
+/*
+*
+La fonction createChannelAndSend utilise le type d'élément de la tranche pour créer un type de canal, qui est ensuite utilisé pour créer un canal.
+Une goroutine est utilisée pour envoyer les éléments de la tranche au canal, et le canal est renvoyé comme résultat de la fonction.
+*
+*/
+func createChannelAndSend(data interface{}) interface{} {
+	dataVal := reflect.ValueOf(data)
+	channelType := reflect.ChanOf(reflect.BothDir, dataVal.Type().Elem())
+	channel := reflect.MakeChan(channelType, 1)
+	go func() {
+		for i := 0; i < dataVal.Len(); i++ {
+			channel.Send(dataVal.Index(i))
+		}
+		channel.Close()
+	}()
+	return channel.Interface()
+}
+
+/*
+*
+La fonction readChannels utilise la fonction Select pour lire les valeurs jusqu'à ce que tous les canaux soient fermés.
+Pour garantir que les lectures ne sont effectuées que sur des canaux ouverts, les valeurs SelecCase sont supprimées de la tranche transmise
+à la fonction Select lorsque le canal qu'elles représentent se ferme.
+*
+*/
+func readChannels(channels ...interface{}) {
+	channelsVal := reflect.ValueOf(channels)
+	cases := []reflect.SelectCase{}
+	for i := 0; i < channelsVal.Len(); i++ {
+		cases = append(cases, reflect.SelectCase{
+			Chan: channelsVal.Index(i).Elem(),
+			Dir:  reflect.SelectRecv,
+		})
+	}
+	for {
+		caseIndex, val, ok := reflect.Select(cases)
+		if ok {
+			Printfln("Value read : %v, Type : %v", val, val.Type())
+		} else {
+			if len(cases) == 1 {
+				Printfln("All channels closed.")
+				return
+			}
+			cases = append(cases[:caseIndex], cases[caseIndex+1:]...)
+		}
+	}
+}
+
 func main() {
 	// Inspection d'une fonction
 	inspectFuncType(Find)
@@ -334,4 +454,39 @@ func main() {
 	getUnderlying(Wrapper{NamedItem: &Product{}}, "NamedItem")
 	// Les modifications écrivent les détails des méthodes obtenues à partir de l'interface et des types sous-jacents.
 	getUnderlyingByExaminingInterfaceMethod(Wrapper{NamedItem: &Product{}}, "NamedItem")
+
+	// Inspection d'un type canal
+	var c chan<- string
+	inspectChannel(c)
+
+	// Travailler avec des type canal
+	values := []string{"Alice", "Bob", "Charlie", "Dora"}
+	channel := make(chan string)
+	go sendOverChannel(channel, values)
+	for {
+		if val, open := <-channel; open {
+			Printfln("Received value: %v", val)
+		} else {
+			break
+		}
+	}
+
+	slices := []string{"Alice", "Bob", "Charlie", "Dora"}
+	createdChannel := createChannelAndSend(slices).(chan string)
+	for {
+		if val, open := <-createdChannel; open {
+			Printfln("Received value from created channel : %v", val)
+		} else {
+			break
+		}
+	}
+
+	// Sélection de plusieurs channels
+	firtnames := []string{"Alice", "Bob", "Charlie", "Dora"}
+	firtnameChannel := createChannelAndSend(firtnames).(chan string)
+	cities := []string{"London", "Rome", "Paris"}
+	cityChannel := createChannelAndSend(cities).(chan string)
+	numbers := []float64{279, 48.95, 19.50}
+	numberChannel := createChannelAndSend(numbers).(chan float64)
+	readChannels(firtnameChannel, cityChannel, numberChannel)
 }
