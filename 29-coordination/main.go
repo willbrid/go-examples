@@ -54,11 +54,26 @@ jusqu'à ce que la méthode Unlock soit appelée.
 • Si le verrou est acquis par un lecteur et qu'un rédacteur appelle la méthode Lock, les méthodes Lock et RLock se bloqueront jusqu'à ce que
 la méthode Unlock soit appelée. Cela empêche le mutex d'être perpétuellement verrouillé par les lecteurs sans donner aux rédacteurs une chance d'acquérir
 le verrou en écriture.
+
+Le package sync fournit la fonction ci-après pour créer des valeurs de classe Cond.
+- NewCond(*locker) : cette fonction crée un Cond en utilisant le pointeur vers le Locker spécifié.
+L'argument de la fonction NewCond est un Locker, qui est une interface qui définit les méthodes :
+--- Lock() : cette méthode acquiert le verrou géré par le Locker.
+--- Unlock() : cette méthode libère le verrou géré par le Locker.
+Les classes Mutex et RWMutex définissent la méthode requise par l'interface Locker. Dans le cas du RWMutex, les méthodes Lock et Unlock fonctionnent sur
+le verrou en écriture, et la méthode RLocker peut être utilisée pour obtenir un Locker qui fonctionne sur le verrou en lecture.
+Le champ et les méthodes définis par la classe Cond :
+- L : ce champ renvoie le Locker qui a été transmis à la fonction NewCond et qui est utilisé pour acquérir le verrou.
+- Wait() : cette méthode libère le verrou et suspend la goroutine.
+- Signal() : cette méthode réveille une goroutine en attente.
+- Broadcast() : cette méthode réveille toutes les goroutines en attente.
 **/
 
 var waitGroup = sync.WaitGroup{}
 var mutex = sync.Mutex{}
 var rwmutex = sync.RWMutex{}
+var readyCond = sync.NewCond(rwmutex.RLocker())
+var once = sync.Once{}
 
 var squares = map[int]int{}
 
@@ -130,6 +145,79 @@ func calculateSquares(max, iterations int, waitGroup *sync.WaitGroup) {
 	waitGroup.Done()
 }
 
+/*
+*
+Cet exemple nécessite une coordination entre les goroutines qui serait difficile à réaliser sans Cond. Une goroutine est chargée de remplir une map
+avec des valeurs de données, qui sont ensuite lues par d'autres goroutines. Les lecteurs doivent être avertis que la génération des données est terminée
+avant de s'exécuter. Les lecteurs attendent en acquérant le verrou Cond et en appelant la méthode Wait.
+L'appel de la méthode Wait suspend la goroutine et libère le verrou afin qu'il puisse être acquis. L'appel à la méthode Wait est généralement
+effectué à l'intérieur d'une boucle for qui vérifie que la condition pour laquelle la goroutine attend s'est produite, juste pour s'assurer que
+les données sont dans l'état attendu. Il n'est pas nécessaire d'acquérir à nouveau le verrou lorsque la méthode Wait se débloque et une goroutine
+peut soit appeler à nouveau la méthode Wait, soit accéder aux données partagées. Lorsque nous avons terminé avec les données partagées, le verrou doit
+être libéré.
+La goroutine qui génère les données acquiert le verrou en écriture à l'aide du RWMutex, modifie les données, libère le verrou en écriture, puis appelle
+la méthode Cond.Broadcast, qui réveille toutes les goroutines en attente.
+L'appel à la fonction time.Sleep dans la fonction readSquares ralentit le processus de lecture des données de sorte que les deux goroutines de lecteur
+traitent les données en même temps, ce que nous pouvons voir dans l'entrelacement du premier nombre dans les lignes de sortie. Étant donné que
+ces goroutines acquièrent un verrou de lecture RWMutex, les deux acquièrent le verrou et peuvent lire les données simultanément.
+
+La classe Once (sync.Once) définit une méthode :
+- Do(func) : cette méthode exécute la fonction spécifiée, mais seulement si elle n'a pas déjà été exécutée.
+*
+*/
+func generateSquares(max int, waitGroup *sync.WaitGroup) {
+	rwmutex.Lock()
+	Printfln("Generating data...")
+	for val := 0; val < max; val++ {
+		squares[val] = int(math.Pow(float64(val), 2))
+	}
+	rwmutex.Unlock()
+	Printfln("Broadcasting condition")
+	readyCond.Broadcast()
+	waitGroup.Done()
+}
+
+func readSquares(id, max, iterations int, waitGroup *sync.WaitGroup) {
+	readyCond.L.Lock()
+	for len(squares) == 0 {
+		readyCond.Wait()
+	}
+	for i := 0; i < iterations; i++ {
+		key := rand.Intn(max)
+		Printfln("#%v Read value : %v = %v", id, key, squares[key])
+		time.Sleep(time.Millisecond * 100)
+	}
+	readyCond.L.Unlock()
+	waitGroup.Done()
+}
+
+/*
+*
+L'utilisation de la classe Once simplifie l'exemple précédente car la méthode Do se bloque jusqu'à ce que la fonction qu'elle reçoit ait été exécutée,
+après quoi elle revient sans exécuter à nouveau la fonction. Étant donné que les seules modifications apportées aux données partagées dans cet exemple
+sont apportées par la fonction generateSquaresByOnce, l'utilisation de la méthode Do pour exécuter cette fonction garantit que les modifications
+sont apportées en toute sécurité.
+*
+*/
+func generateSquaresByOnce(max int) {
+	Printfln("Generating data...")
+	for val := 0; val < max; val++ {
+		squares[val] = int(math.Pow(float64(val), 2))
+	}
+}
+
+func readSquaresWithOnce(id, max, iterations int, waitGroup *sync.WaitGroup) {
+	once.Do(func() {
+		generateSquaresByOnce(max)
+	})
+	for i := 0; i < iterations; i++ {
+		key := rand.Intn(max)
+		Printfln("#%v Read value : %v = %v", id, key, squares[key])
+		time.Sleep(time.Millisecond * 100)
+	}
+	waitGroup.Done()
+}
+
 func main() {
 	rand.New(rand.NewSource(time.Now().UnixNano()))
 
@@ -165,5 +253,27 @@ func main() {
 		go calculateSquares(10, 5, &waitGroup3)
 	}
 	waitGroup3.Wait()
+	Printfln("Cached values : %v", len(squares))
+
+	// Utilisation conditionnelle de go routine
+	numRoutines4 := 2
+	waitGroup4 := sync.WaitGroup{}
+	waitGroup4.Add(numRoutines4)
+	for i := 0; i < numRoutines4; i++ {
+		go readSquares(i, 10, 5, &waitGroup4)
+	}
+	waitGroup4.Add(1)
+	go generateSquares(10, &waitGroup4)
+	waitGroup4.Wait()
+	Printfln("Cached values : %v", len(squares))
+
+	// Exécuter une fonction une fois
+	numRoutines5 := 2
+	waitGroup5 := sync.WaitGroup{}
+	waitGroup5.Add(numRoutines5)
+	for i := 0; i < numRoutines5; i++ {
+		go readSquaresWithOnce(i, 10, 5, &waitGroup5)
+	}
+	waitGroup5.Wait()
 	Printfln("Cached values : %v", len(squares))
 }
