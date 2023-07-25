@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"math"
 	"math/rand"
 	"sync"
@@ -67,6 +68,22 @@ Le champ et les méthodes définis par la classe Cond :
 - Wait() : cette méthode libère le verrou et suspend la goroutine.
 - Signal() : cette méthode réveille une goroutine en attente.
 - Broadcast() : cette méthode réveille toutes les goroutines en attente.
+
+
+Le package context fournit l'interface Context, qui facilite la gestion des requêtes à l'aide des méthodes :
+- Value(key) : cette méthode renvoie la valeur associée à la clé spécifiée.
+- Done() : cette méthode renvoie un canal qui peut être utilisé pour recevoir une notification d'annulation.
+- Deadline() : cette méthode renvoie le time.Time qui représente le délai de la requête et une valeur booléenne qui sera fausse si aucun délai
+			   n'a été spécifié.
+- Err() : cette méthode renvoie une erreur qui indique pourquoi le canal Done a reçu un signal. Le package context définit deux variables
+          qui peuvent être utilisées pour comparer l'erreur : Canceled indique que la demande a été annulée et DeadlineExeeded indique que le délai est passé.
+
+Le package context fournit les fonctions de création de valeurs de contexte :
+- Background() : cette méthode renvoie le contexte par défaut, à partir duquel d'autres contextes sont dérivés.
+- WithCancel(ctx) : cette méthode renvoie un contexte et une fonction d'annulation.
+- WithDeadline(ctx, time) : cette méthode renvoie un contexte avec une échéance, qui est exprimée à l'aide d'une valeur time.Time.
+- WithTimeout(ctx, duration) : cette méthode renvoie un contexte avec une échéance, qui est exprimée à l'aide d'une valeur time.Duration.
+- WithValue(ctx, key, val) : cette méthode renvoie un contexte contenant la paire clé-valeur spécifiée.
 **/
 
 var waitGroup = sync.WaitGroup{}
@@ -74,6 +91,11 @@ var mutex = sync.Mutex{}
 var rwmutex = sync.RWMutex{}
 var readyCond = sync.NewCond(rwmutex.RLocker())
 var once = sync.Once{}
+
+const (
+	countKey = 0
+	sleepPeriodKey
+)
 
 var squares = map[int]int{}
 
@@ -218,6 +240,111 @@ func readSquaresWithOnce(id, max, iterations int, waitGroup *sync.WaitGroup) {
 	waitGroup.Done()
 }
 
+/*
+*
+La fonction processRequest simule le traitement d'une requête en incrémentant un compteur, avec un appel à la fonction time.Sleep pour tout ralentir.
+La fonction principale utilise une goroutine pour invoquer la fonction processRequest, prenant la place d'une requête provenant d'un client.
+*
+*/
+func processRequest(wg *sync.WaitGroup, count int) {
+	total := 0
+	for i := 0; i < count; i++ {
+		Printfln("Processing request: %v", total)
+		total++
+		time.Sleep(time.Millisecond * 250)
+	}
+	Printfln("Request processed...%v", total)
+	wg.Done()
+}
+
+/*
+*
+Stopper une requête
+Le canal Done se bloque si la requête n'a pas été annulée, donc la clause par défaut sera exécutée, permettant à la requête d'être traitée.
+Le canal est vérifié après chaque unité de travail et une instruction goto est utilisée pour sortir de la boucle de traitement afin que
+le WaitGroup puisse être signalé et que la fonction se termine.
+*
+*/
+func processRequestWithCancelation(ctx context.Context, wg *sync.WaitGroup, count int) {
+	total := 0
+	for i := 0; i < count; i++ {
+		select {
+		case <-ctx.Done():
+			Printfln("Stopping processing - request cancelled")
+			goto end
+		default:
+			Printfln("Processing request: %v", total)
+			total++
+			time.Sleep(time.Millisecond * 250)
+		}
+	}
+	Printfln("Request processed...%v", total)
+end:
+	wg.Done()
+}
+
+/*
+*
+Les fonctions WithDeadline et WithTimeout renvoient le contexte dérivé et une fonction d'annulation, qui permet d'annuler la demande avant
+l'expiration du délai. Dans cet exemple, le temps requis par la fonction processRequest dépasse le délai, ce qui signifie que le canal Done
+mettra fin au traitement.
+*
+*/
+func processRequestWithDeadline(ctx context.Context, wg *sync.WaitGroup, count int) {
+	total := 0
+	for i := 0; i < count; i++ {
+		select {
+		case <-ctx.Done():
+			if ctx.Err() == context.Canceled {
+				Printfln("Stopping processing - request cancelled")
+			} else {
+				Printfln("Stopping processing - deadline reached")
+			}
+			goto end
+		default:
+			Printfln("Processing request: %v", total)
+			total++
+			time.Sleep(time.Millisecond * 250)
+		}
+	}
+	Printfln("Request processed...%v", total)
+end:
+	wg.Done()
+}
+
+/*
+*
+La fonction WithValue n'accepte qu'une seule paire clé-valeur, mais les fonctions (Background, WithCancel, WithTimeout, WithDeadline, WithValue)
+peuvent être appelées à plusieurs reprises pour créer la combinaison requise de fonctionnalités. La fonction WithTimeout est utilisée
+pour dériver un contexte avec une échéance, et le contexte dérivé est utilisé comme argument de la fonction WithValue pour ajouter deux paires clé-valeur.
+Ces données sont accessibles via la méthode Value, ce qui signifie que les fonctions de traitement des demandes n'ont pas à définir de paramètres
+pour toutes les valeurs de données dont elles ont besoin.
+*
+*/
+func processRequestWithRequestData(ctx context.Context, wg *sync.WaitGroup) {
+	total := 0
+	count := ctx.Value(countKey).(int)
+	sleepPeriod := ctx.Value(sleepPeriodKey).(time.Duration)
+	for i := 0; i < count; i++ {
+		select {
+		case <-ctx.Done():
+			if ctx.Err() == context.Canceled {
+				Printfln("Stopping processing - request cancelled")
+			} else {
+				Printfln("Stopping processing - deadline reached")
+			}
+			goto end
+		default:
+			Printfln("Processing request: %v", total)
+			total++
+			time.Sleep(sleepPeriod)
+		}
+	}
+	Printfln("Request processed...%v", total)
+end:
+	wg.Done()
+}
+
 func main() {
 	rand.New(rand.NewSource(time.Now().UnixNano()))
 
@@ -276,4 +403,46 @@ func main() {
 	}
 	waitGroup5.Wait()
 	Printfln("Cached values : %v", len(squares))
+
+	// Introduction à la notion de contexte avec WaitGroup
+	waitGroup6 := sync.WaitGroup{}
+	waitGroup6.Add(1)
+	Printfln("Request dispatched...")
+	go processRequest(&waitGroup6, 10)
+	waitGroup6.Wait()
+
+	// Stopper une requête depuis context avec WithCancel
+	waitGroup7 := sync.WaitGroup{}
+	waitGroup7.Add(1)
+	Printfln("Request dispatched...")
+	ctx7, cancel7 := context.WithCancel(context.Background())
+	go processRequestWithCancelation(ctx7, &waitGroup7, 10)
+	time.Sleep(time.Second)
+	Printfln("Canceling request")
+	cancel7()
+	waitGroup7.Wait()
+
+	// Stopper une requête depuis context avec WithTimeout
+	waitGroup8 := sync.WaitGroup{}
+	waitGroup8.Add(1)
+	Printfln("Request dispatched...")
+	ctx8, cancel8 := context.WithTimeout(context.Background(), time.Second*2)
+	go processRequestWithDeadline(ctx8, &waitGroup8, 10)
+	time.Sleep(time.Second * 4)
+	Printfln("Canceling request")
+	cancel8()
+	waitGroup8.Wait()
+
+	// Fournir les données de requêtes
+	waitGroup9 := sync.WaitGroup{}
+	waitGroup9.Add(1)
+	Printfln("Request dispatched...")
+	ctx9, cancel9 := context.WithTimeout(context.Background(), time.Second*2)
+	ctx9 = context.WithValue(ctx9, countKey, 4)
+	ctx9 = context.WithValue(ctx9, sleepPeriodKey, time.Millisecond*250)
+	go processRequestWithRequestData(ctx9, &waitGroup9)
+	time.Sleep(time.Second * 4)
+	Printfln("Canceling request")
+	cancel9()
+	waitGroup8.Wait()
 }
