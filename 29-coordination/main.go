@@ -93,7 +93,7 @@ var readyCond = sync.NewCond(rwmutex.RLocker())
 var once = sync.Once{}
 
 const (
-	countKey = 0
+	countKey = iota
 	sleepPeriodKey
 )
 
