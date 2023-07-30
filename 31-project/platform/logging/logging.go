@@ -13,7 +13,7 @@ const (
 
 type Logger interface {
 	Trace(string)
-	tracef(string, ...interface{})
+	Tracef(string, ...interface{})
 
 	Debug(string)
 	Debugf(string, ...interface{})
