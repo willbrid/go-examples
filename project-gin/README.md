@@ -49,3 +49,37 @@ go mod vendor
 ```
 
 Vendor réinitialise le répertoire du fournisseur du module main pour inclure tous les packages nécessaires pour construire et tester tous les packages du module main. Il n'inclut pas le code de test pour les packages de vendor.
+
+<br>
+
+Nous pouvons utiliser la commande **go mod graph** pour afficher la liste des modules dans le fichier go.mod :
+
+```
+go mod graph | sed -Ee 's/@[^[:blank:]]+//g' | sort | uniq > unver.txt
+```
+
+Nous allons injecter la sortie de **unvert.txt** dans le fichier **graph.dot** avec les commandes suivantes :
+
+```
+cat unver.txt | awk '{print "\""$1"\" -> \""$2"\""};' >>graph.dot
+echo "}" >> graph.dot
+sed -i '' 's+\("github.com/[^/]*/\)\([^"]*"\)+\1\\n\2+g' graph.dot
+```
+
+Nous pouvons maintenant rendre les résultats avec l'outil **Graphviz**. Cet outil peut être installé avec la commande suivantes sous ubuntu20.04
+
+```
+sudo apt-get install graphviz
+```
+
+Une fois **Graphviz** installé, exécutons la commande suivante pour convertir le fichier **graph.dot** au format **.svg** :
+
+```
+sfdp -Tsvg -o graph.svg graph.dot
+```
+
+Un fichier **graph.svg** sera généré. Ouvrons le fichier avec la commande suivante :
+
+```
+open graph.svg
+```
