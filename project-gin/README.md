@@ -58,14 +58,25 @@ Nous pouvons utiliser la commande **go mod graph** pour afficher la liste des mo
 go mod graph | sed -Ee 's/@[^[:blank:]]+//g' | sort | uniq > unver.txt
 ```
 
+Nous créeons le fichier **graph.dot** avec pour contenu :
+
+```
+digraph {
+    graph [overlap=false, size=14];
+    root="hello-world";
+    node [ shape = plaintext, fontname = "Helvetica", fontsize=24];
+    "hello-world" [style = filled, fillcolor = "#E94762"];
+```
+
 Nous allons injecter la sortie de **unvert.txt** dans le fichier **graph.dot** avec les commandes suivantes :
 
 ```
-cat unver.txt | awk '{print "\""$1"\" -> \""$2"\""};' >>graph.dot
+cat unver.txt | awk '{print "\""$1"\" -> \""$2"\""};' >> graph.dot
 echo "}" >> graph.dot
-sed -i '' 's+\("github.com/[^/]*/\)\([^"]*"\)+\1\\n\2+g' graph.dot
 ```
 
+Il faudrait enlever toutes les lignes (vers la fin du fichier) commençant par **hello-world** dans le fichier **graph.dot**.
+<br>
 Nous pouvons maintenant rendre les résultats avec l'outil **Graphviz**. Cet outil peut être installé avec la commande suivantes sous ubuntu20.04
 
 ```
@@ -81,5 +92,5 @@ sfdp -Tsvg -o graph.svg graph.dot
 Un fichier **graph.svg** sera généré. Ouvrons le fichier avec la commande suivante :
 
 ```
-open graph.svg
+google-chrome ./graph.svg
 ```
