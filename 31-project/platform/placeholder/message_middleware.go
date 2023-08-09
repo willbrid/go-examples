@@ -6,11 +6,19 @@ import (
 	"platform/config"
 	"platform/pipeline"
 	"platform/services"
+	"platform/templates"
 )
 
-type SimpleMessageComponent struct{}
+type SimpleMessageComponent struct {
+	Message string
+	config.Configuration
+}
 
-func (c *SimpleMessageComponent) Init() {}
+func (lc *SimpleMessageComponent) ImplementsProcessRequestWithServices() {}
+
+func (c *SimpleMessageComponent) Init() {
+	c.Message = c.Configuration.GetStringDefault("main:message", "Default Message")
+}
 
 func (c *SimpleMessageComponent) ProcessRequest(ctx *pipeline.ComponentContext, next func(*pipeline.ComponentContext)) {
 	var cfg config.Configuration
@@ -22,4 +30,13 @@ func (c *SimpleMessageComponent) ProcessRequest(ctx *pipeline.ComponentContext, 
 		ctx.Error(errors.New("Cannot find config setting"))
 	}
 	next(ctx)
+}
+
+func (c *SimpleMessageComponent) ProcessRequestWithServices(ctx *pipeline.ComponentContext, next func(*pipeline.ComponentContext), executor templates.TemplateExecutor) {
+	err := executor.ExecTemplate(ctx.ResponseWriter, "simple_message.html", c.Message)
+	if err != nil {
+		ctx.Error(err)
+	} else {
+		next(ctx)
+	}
 }
