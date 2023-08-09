@@ -26,6 +26,8 @@ func (w *LoggingResponseWriter) Write(b []byte) (int, error) {
 
 type LoggingComponent struct{}
 
+func (lc *LoggingComponent) ImplementsProcessRequestWithServices() {}
+
 func (lc *LoggingComponent) Init() {}
 
 func (lc *LoggingComponent) ProcessRequest(ctx *pipeline.ComponentContext, next func(*pipeline.ComponentContext)) {
@@ -36,6 +38,14 @@ func (lc *LoggingComponent) ProcessRequest(ctx *pipeline.ComponentContext, next 
 		return
 	}
 
+	loggingWriter := LoggingResponseWriter{0, ctx.ResponseWriter}
+	ctx.ResponseWriter = &loggingWriter
+	logger.Infof("REQ --- %v - %v", ctx.Request.Method, ctx.Request.URL)
+	next(ctx)
+	logger.Infof("RSP %v %v", loggingWriter.statusCode, ctx.Request.URL)
+}
+
+func (lc *LoggingComponent) ProcessRequestWithServices(ctx *pipeline.ComponentContext, next func(*pipeline.ComponentContext), logger logging.Logger) {
 	loggingWriter := LoggingResponseWriter{0, ctx.ResponseWriter}
 	ctx.ResponseWriter = &loggingWriter
 	logger.Infof("REQ --- %v - %v", ctx.Request.Method, ctx.Request.URL)
