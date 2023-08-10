@@ -2,6 +2,7 @@ package placeholder
 
 import (
 	"platform/http"
+	"platform/http/handling"
 	"platform/pipeline"
 	"platform/pipeline/basic"
 	"platform/services"
@@ -14,6 +15,9 @@ func createPipeline() pipeline.RequestPipeline {
 		&basic.LoggingComponent{},
 		&basic.ErrorComponent{},
 		&basic.StaticFileComponent{},
+		handling.NewRouter(
+			handling.HandlerEntry{"", NameHandler{}},
+		),
 		&SimpleMessageComponent{},
 	)
 }
