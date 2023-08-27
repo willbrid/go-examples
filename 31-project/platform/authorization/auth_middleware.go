@@ -39,12 +39,15 @@ func (c *AuthMiddlewareComponent) Init() {
 
 func (*AuthMiddlewareComponent) ImplementsProcessRequestWithServices() {}
 
+func (c *AuthMiddlewareComponent) ProcessRequest(context *pipeline.ComponentContext, next func(*pipeline.ComponentContext)) {
+	c.RequestPipeline.ProcessRequest(context.Request, context.ResponseWriter)
+}
+
 func (c *AuthMiddlewareComponent) ProcessRequestWithServices(context *pipeline.ComponentContext, next func(*pipeline.ComponentContext), user identity.User) {
 	if strings.HasPrefix(context.Request.URL.Path, c.prefix) {
 		for expr, target := range c.fallbacks {
 			if expr.MatchString(context.Request.URL.Path) {
-				http.Redirect(context.ResponseWriter, context.Request,
-					target, http.StatusSeeOther)
+				http.Redirect(context.ResponseWriter, context.Request, target, http.StatusSeeOther)
 				return
 			}
 		}
@@ -52,8 +55,7 @@ func (c *AuthMiddlewareComponent) ProcessRequestWithServices(context *pipeline.C
 			c.RequestPipeline.ProcessRequest(context.Request, context.ResponseWriter)
 		} else {
 			if c.authFailURL != "" {
-				http.Redirect(context.ResponseWriter, context.Request,
-					c.authFailURL, http.StatusSeeOther)
+				http.Redirect(context.ResponseWriter, context.Request, c.authFailURL, http.StatusSeeOther)
 			} else if user.IsAuthenticated() {
 				context.ResponseWriter.WriteHeader(http.StatusForbidden)
 			} else {
