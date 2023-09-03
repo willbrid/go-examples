@@ -1,15 +1,39 @@
 package main
 
 import (
-	"platform/logging"
+	"platform/http"
+	"platform/http/handling"
+	"platform/pipeline"
+	"platform/pipeline/basic"
 	"platform/services"
+	"sportsstore/models/repo"
+	"sportsstore/store"
+	"sync"
 )
 
-func writeMessage(logger logging.Logger) {
-	logger.Info("SportsStore")
+func registerServices() {
+	services.RegisterDefaultServices()
+	repo.RegisterMemoryRepoService()
+}
+
+func createPipeline() pipeline.RequestPipeline {
+	return pipeline.CreatePipeline(
+		&basic.ServicesComponent{},
+		&basic.LoggingComponent{},
+		&basic.ErrorComponent{},
+		&basic.StaticFileComponent{},
+		handling.NewRouter(
+			handling.HandlerEntry{"", store.ProductHandler{}},
+		).AddMethodAlias("/", store.ProductHandler.GetProducts),
+	)
 }
 
 func main() {
-	services.RegisterDefaultServices()
-	services.Call(writeMessage)
+	registerServices()
+	results, err := services.Call(http.Serve, createPipeline())
+	if err == nil {
+		(results[0].(*sync.WaitGroup)).Wait()
+	} else {
+		panic(err)
+	}
 }
