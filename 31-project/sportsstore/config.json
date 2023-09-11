@@ -1,21 +1,21 @@
 {
     "logging" : {
-        "level": "debug"
+        "level": "information"
     },
     "files": {
         "path": "files"
     },
     "templates": {
         "path": "templates/*.html",
-        "reload": true
+        "reload": false
     },
     "sessions": {
         "key": "MY_SESSION_KEY",
-        "cyclekey": true
+        "cyclekey": false
     },
     "sql": {
         "connection_str": "store.db",
-        "always_reset": true,
+        "always_reset": false,
         "commands": {
             "Init": "sql/init_db.sql",
             "Seed": "sql/seed_db.sql",
@@ -41,5 +41,12 @@
     },
     "authorization": {
         "failUrl": "/signin"
+    },
+    "http": {
+        "enableHttp": false,
+        "enableHttps": true,
+        "httpsPort": 5500,
+        "httpsCert": "certificate.cer",
+        "httpsKey": "certificate.key"
     }
 }
