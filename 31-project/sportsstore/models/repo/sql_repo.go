@@ -25,4 +25,10 @@ type SqlCommands struct {
 	GetPageCount,
 	GetCategoryPage,
 	GetCategoryPageCount *sql.Stmt
+	GetOrder,
+	GetOrderLines,
+	GetOrders,
+	GetOrdersLines,
+	SaveOrder,
+	SaveOrderLine *sql.Stmt
 }
