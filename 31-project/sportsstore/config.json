@@ -38,5 +38,8 @@
             "UpdateCategory": "sql/update_category.sql",
             "UpdateOrder": "sql/update_order.sql"
         }
+    },
+    "authorization": {
+        "failUrl": "/signin"
     }
 }
