@@ -1,10 +1,10 @@
 # Installation et mise à jour du binaire Go sous ubuntu 20.04
 
-- Téléchargement du fichier archive Go pour la version **1.20.4**
+- Téléchargement du fichier archive Go pour la version **1.21.7**
 
 ```
 cd ~
-wget https://go.dev/dl/go1.20.4.linux-amd64.tar.gz
+wget https://go.dev/dl/go1.21.7.linux-amd64.tar.gz
 ```
 
 - décompression du fichier archive Go 
@@ -12,7 +12,7 @@ wget https://go.dev/dl/go1.20.4.linux-amd64.tar.gz
 Supprimons toute installation Go précédente en supprimant le dossier **/usr/local/go** (s'il existe), puis extrayons l'archive que nous venons de télécharger dans **/usr/local**, en créant une nouvelle arborescence **Go** dans **/usr/local/go** :
 
 ```
-sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.20.4.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.21.7.linux-amd64.tar.gz
 ```
 
 (Nous devons exécuter la commande en tant que root ou via sudo).
