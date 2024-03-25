@@ -17,9 +17,11 @@ type Account struct {
 // Définition d'un type alias à []Product
 type ProductList []Product
 
-/** Cette fonction est une méthode à la classe Product car nous avons défini un récepteur (receiver) (récepteur sur Product : (product *Product))
+/*
+* Cette fonction est une méthode à la classe Product car nous avons défini un récepteur (receiver) (récepteur sur Product : (product *Product))
 avant le nom de la fonction. Donc un récepteur est le type sur lequel la méthode opère.
-**/
+*
+*/
 func (product *Product) printDetails() {
 	fmt.Println("Name : ", product.name, " - Category : ", product.category, " - Price : ", product.price)
 }
@@ -37,10 +39,12 @@ func (product *Product) printDetailsWithTax() {
 	fmt.Println("Name : ", product.name, " - Category : ", product.category, " - Price : ", product.calcTax(0.2, 100))
 }
 
-/**
+/*
+*
 Chaque combinaison de nom de méthode et de type de récepteur doit être unique, quels que soient les autres paramètres définis.
 Nous pouvoir avoir donc deux méthodes avec le même nom mais de récepteur différent.
-**/
+*
+*/
 func (supplier *Supplier) printDetails() {
 	fmt.Println("Supplier : ", supplier.name, " - City : ", supplier.city)
 }
@@ -288,7 +292,7 @@ func main() {
 
 	// Utilisation d'interface vide
 	/**
-	Go permet à l'utilisateur de l'interface vide - c'est-à-dire une interface qui ne définit aucune méthode - de représenter n'importe quel type,
+	Go permet à l'utilisateur de l'interface vide (c'est-à-dire une interface qui ne définit aucune méthode) de représenter n'importe quel type,
 	ce qui peut être un moyen utile de regrouper des types disparates qui ne partagent aucune caractéristique commune
 	**/
 	fmt.Println("Utilisation d'interface vide")
