@@ -207,7 +207,7 @@ func main() {
 	Le type dynamique est le type de valeur attribuée à la variable qui implémente l'interface, telle que Product ou Service dans ce cas.
 	Le type statique ne change jamais—le type statique d'une variable Expense est toujours Expense, par exemple—mais le type dynamique peut changer
 	en affectant une nouvelle valeur d'un type différent qui implémente l'interface.
-	La boucle for ne traite que du type statique—Expense—et ne connaît pas (et n'a pas besoin de connaître) le type dynamique de ces valeurs.
+	La boucle for ne traite que du type statique (Expense) et ne connaît pas (et n'a pas besoin de connaître) le type dynamique de ces valeurs.
 	L'utilisation de l'interface nous permet de regrouper des types dynamiques disparates et d'utiliser les méthodes communes spécifiées par le
 	type d'interface statique.
 	**/
