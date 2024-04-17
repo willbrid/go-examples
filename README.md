@@ -188,6 +188,20 @@ Les avertissements produits par la commande **go vet** précisent l'emplacement 
 go mod tidy
 ```
 
+- Utiliser la commande **go get**
+
+--- ajouter ou mettre à jour une dépendance (par exemple **mux**) dans un module
+
+```
+go get github.com/gorilla/mux
+```
+
+--- supprimer une dépendance dans un module
+
+```
+go get github.com/gorilla/mux@none
+```
+
 ### Référence
  
 - [Go Documentation](https://go.dev/doc/) 
