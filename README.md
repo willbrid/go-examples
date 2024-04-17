@@ -100,6 +100,10 @@ go run main.go
 - Définir et exécuter un module Go
 
 ```
+mkdir tools && cd tools
+```
+
+```
 go mod init tools
 ```
 
@@ -131,6 +135,57 @@ source $HOME/.profile
 
 ```
 dlv version
+```
+
+- Analyser un code Go
+
+La commande **go vet** identifie les déclarations susceptibles d'être des erreurs.
+
+```
+mkdir testGOVETCmd && cd testGOVETCmd
+```
+
+```
+go mod init testGOVETCmd
+```
+
+```
+vi main.go
+```
+
+```
+package main
+
+import "fmt"
+
+func main() {
+    PrintHello()
+    for i := 0; i < 5; i++ {
+        i = i
+        PrintNumber(i)
+    }
+}
+
+func PrintHello() {
+    fmt.Println("Hello, Go")
+}
+
+func PrintNumber(number int) {
+    fmt.Println(number)
+}
+```
+
+```
+go vet main.go
+```
+
+Les avertissements produits par la commande **go vet** précisent l'emplacement dans le code où un problème a été détecté et fournissent une description du problème. La commande **go vet** applique plusieurs analyseurs au code, et nous pouvons voir la liste des analyseurs sur [https://golang.org/cmd/vet](https://golang.org/cmd/vet).
+
+
+- Analyser les dépendances et supprimer les dépendances inutilisées dans un module
+
+```
+go mod tidy
 ```
 
 ### Référence
