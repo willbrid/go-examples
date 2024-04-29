@@ -168,9 +168,9 @@ func main() {
 				Method: http.MethodPost,
 				URL:    reqURL,
 				Header: map[string][]string{
-					"Content-type": {"application.json"},
+					"Content-type": {"application/json"},
 				},
-				Body: io.NopCloser(strings.NewReader(builder.String())),
+				Body: io.NopCloser(strings.NewReader(builder1.String())),
 			}
 			response, err := http.DefaultClient.Do(&req)
 			if err == nil && response.StatusCode == http.StatusOK {
