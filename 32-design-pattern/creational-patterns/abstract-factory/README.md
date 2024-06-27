@@ -7,3 +7,5 @@ La **fabrique abstraite** définit une interface pour la création de chaque pro
 Le code client appelle les méthodes de création d’un objet **Fabrique** plutôt que de créer directement les produits à l’aide d’un constructeur (opérateur **new**). Comme chaque fabrique possède sa propre variante de produit, tous ses produits seront compatibles.
 
 Le code client manipule les fabriques et les produits uniquement via leurs interfaces abstraites, ce qui lui permet de travailler avec n’importe quelle variante de produit créée par un objet Fabrique. L'on crée juste une nouvelle classe concrète **Fabrique** et la passe au code client.
+
+**Exemple :** Prenons le cas d'un projet de e-commerce avec une fonctionnalité permettant aux clients d'acheter des produits de sport dont un produit est un ensemble de deux éléments de la même marque : une paire de chaussures et un maillot. Nous aimerions acquérir une tenue assortie de la même marque.
