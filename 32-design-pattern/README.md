@@ -8,4 +8,9 @@ Les patrons sont souvent confondus avec les algorithmes, car ils décrivent tous
 
 Un algorithme c’est un peu comme une recette de cuisine, ses étapes sont claires et nous guident vers un objectif précis. Un patron, c’est plutôt comme un plan : nous pouvons voir ses fonctionnalités et les résultats obtenus, mais la manière de l’implémenter nous revient.
 
+Les patrons de conception peuvent être catégorisés selon leur intention ou leur objectif :
+- les **patrons de création** fournissent des mécanismes de création d’objets, ce qui augmente la flexibilité et la réutilisation du code.
+- les **patrons structurels** expliquent comment assembler des objets et des classes en de plus grandes structures, tout en les gardant flexibles et efficaces.
+- les **patrons comportementaux** mettent en place une communication efficace et répartissent les responsabilités entre les objets.
+
 **Référence** : [Refactoring Guru](https://refactoring.guru/fr/design-patterns/what-is-pattern)
