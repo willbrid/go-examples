@@ -8,6 +8,10 @@ import (
 	"testing"
 )
 
+func init() {
+	log.Println("Init setup.")
+}
+
 func TestMain(m *testing.M) {
 	setup()
 
