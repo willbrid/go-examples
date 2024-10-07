@@ -3,8 +3,28 @@ package calculator_test
 import (
 	"calculator-project/calculator"
 
+	"log"
+	"os"
 	"testing"
 )
+
+func TestMain(m *testing.M) {
+	setup()
+
+	e := m.Run()
+
+	teardown()
+
+	os.Exit(e)
+}
+
+func setup() {
+	log.Println("Setting up.")
+}
+
+func teardown() {
+	log.Println("Teardown up.")
+}
 
 func TestAdd(t *testing.T) {
 	// Arrange
