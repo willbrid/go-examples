@@ -31,6 +31,10 @@ func teardown() {
 }
 
 func TestAdd(t *testing.T) {
+	defer func() {
+		log.Println("Deferred tearing down.")
+	}()
+
 	// Arrange
 	e := calculator.Engine{}
 	x, y := 2.5, 3.5
