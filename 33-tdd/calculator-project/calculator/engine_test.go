@@ -61,6 +61,14 @@ func TestAdd(t *testing.T) {
 	})
 }
 
+func BenchmarkAdd(b *testing.B) {
+	e := calculator.Engine{}
+
+	for i := 0; i < b.N; i++ {
+		e.Add(2, 3)
+	}
+}
+
 func TestSubtract(t *testing.T) {
 	e := calculator.Engine{}
 
