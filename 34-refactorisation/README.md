@@ -74,6 +74,5 @@ La refactorisation doit être effectuée sous la forme d'une série de petits ch
 - De nouvelles fonctionnalités ne doivent pas être créées pendant la réfactorisation.
 - Tous les tests existants doivent réussir après la refactorisation (un excellent moyen d'éviter des échecs de tests lors de la réfactorisation est d'écrire des tests de style **BDD**).
 
-<br>
 
 **Référence** : [Refactoring Guru](https://refactoring.guru/refactoring)
