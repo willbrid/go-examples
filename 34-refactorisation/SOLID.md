@@ -12,7 +12,7 @@ En Go, bien que le langage ne soit pas orienté objet au sens traditionnel, les 
 
 ### Détails sur les principes SOLID
 
-##### Single Responsibility Principle (SRP)
+#### Single Responsibility Principle (SRP)
 
 Le principe de responsabilité unique stipule qu'une classe ou une fonction doit avoir une seule raison de changer, c'est-à-dire qu'elle doit être responsable d'une seule fonctionnalité ou tâche.
 
@@ -64,7 +64,7 @@ func (r *UserRepository) save (u *User) error {
 
 A présent le struct **User** est uniquement responsable de la gestion des données des utilisateurs tandis que le struct **UserRepository** est responsable des opérations en base de données.
 
-##### Open/Closed Principle (OCP)
+#### Open/Closed Principle (OCP)
 
 Le principe **ouvert/fermé** stipule que les entités logicielles (classes, modules, fonctions) doivent être ouvertes à l'extension mais fermées à la modification. Cela signifie que nous devons être en mesure d'ajouter de nouvelles fonctionnalités sans modifier le code existant.
 
@@ -125,7 +125,7 @@ func (c *Circle) Area() float64 {
 
 Dans cet exemple, pour ajouter un nouveau type de surface (par exemple **triangle**), nous pouvons simplement définir un nouveau struct **Triangle** et implémenter la méthode **Area**.
 
-##### Liskov Substitution Principle (LSP)
+#### Liskov Substitution Principle (LSP)
 
 Le principe de substitution de Liskov stipule que les objets d'une classe dérivée doivent pouvoir remplacer les objets de la classe de base sans altérer le comportement du programme.
 
@@ -184,7 +184,7 @@ func (p *Penguin) MakeSound() string {
 
 Désormais, le type **Penguin** implémente correctement l'interface **Bird** sans violer le principe **LSP**, et nous avons introduit une nouvelle interface **FlyingBird** pour les oiseaux qui peuvent voler.
 
-##### Interface Segregation Principle (ISP)
+#### Interface Segregation Principle (ISP)
 
 Le principe de ségrégation des interfaces stipule qu'une classe ne doit pas être obligée d'implémenter des interfaces dont elle n'a pas besoin. Il est préférable de diviser les interfaces en plusieurs interfaces spécifiques plutôt qu'une seule interface générale.
 
@@ -247,7 +247,7 @@ func (q QAEngineer) TestCode() {
 
 Ici, **SoftwareEngineer** implémente l'interface **DeveloperEngineer**, et **QAEngineer** implémente l'interface **TesterEngineer**. Aucun n'est forcé d'implémenter des méthodes inutiles.
 
-##### Dependency Inversion Principle (DIP)
+#### Dependency Inversion Principle (DIP)
 
 Le **principe d'inversion de dépendance** stipule que les modules de haut niveau ne doivent pas dépendre des modules de bas niveau, mais plutôt des abstractions. Cela permet de découpler les différents composants du système.
 
