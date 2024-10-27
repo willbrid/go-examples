@@ -200,7 +200,27 @@ go get github.com/gorilla/mux
 go get github.com/gorilla/mux@none
 ```
 
+### Go test packages
+
+- **mockery**
+
+Mockery est un projet qui crée des implémentations fictives d'interfaces Golang. Les simulations générées dans ce projet sont basées sur la suite de packages de test github.com/stretchr/testify.
+
+```
+go install github.com/vektra/mockery/v2@v2.46.3
+```
+
+- **testify**
+
+Ensemble de packages Go Code (golang) qui fournissent de nombreux outils pour vérifier que notre code se comportera comme nous le souhaitons.
+
+```
+go get github.com/stretchr/testify
+```
+
 ### Référence
  
 - [Go Documentation](https://go.dev/doc/) 
 - Livre **The Complete Guide to Programming Reliable and efficient Software Using Golang d'Adam Freeman**
+- [Mockery](https://vektra.github.io/mockery/latest/)
+- [Testify](https://github.com/stretchr/testify)
