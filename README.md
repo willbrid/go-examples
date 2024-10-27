@@ -218,6 +218,18 @@ Ensemble de packages Go Code (golang) qui fournissent de nombreux outils pour v�
 go get github.com/stretchr/testify
 ```
 
+Générer des mocks pour nos interfaces en utilisant la commande suivante :
+
+```
+$HOME/go/bin/mockery --dir $HOME/go-examples/33-tdd/calculator-project --output $HOME/go-examples/33-tdd/calculator-project/mocks --all
+```
+
+La commande **mockery** prend en charge une variété d'indicateurs. Voici quelques-uns des indicateurs courants que nous pourrions utiliser : <br>
+--- **--dir** : spécifie le répertoire dans lequel rechercher les interfaces à simuler. <br>
+--- **--all** spécifie de rechercher dans tous les sous-répertoires et de générer des mocks. <br>
+--- **--name** spécifie le nom ou l'expression régulière à faire correspondre lors de la recherche d'interfaces pour générer des mocks. <br>
+--- **--output** spécifie le répertoire dans lequel placer les mocks générés. Par défaut, il est configuré sur **/mocks**.
+
 ### Référence
  
 - [Go Documentation](https://go.dev/doc/) 
