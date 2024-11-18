@@ -1,12 +1,18 @@
 package input
 
-import "calculator-project/calculator"
+import (
+	"calculator-project/calculator"
+)
 
-type Parser struct {
-	engine    *calculator.Engine
-	validator *Validator
+type OperationProcessor interface {
+	ProcessOperation(operation *calculator.Operation) (*string, error)
 }
 
-func (p *Parser) ProcessExpression(expr string) (*string, error) {
-	return nil, nil
+type ValidationHelper interface {
+	CheckInput(operator string, operands []float64) error
+}
+
+type Parser struct {
+	engine    OperationProcessor
+	validator ValidationHelper
 }
