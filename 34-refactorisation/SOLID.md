@@ -251,7 +251,7 @@ Ici, **SoftwareEngineer** implémente l'interface **DeveloperEngineer**, et **QA
 
 Le **principe d'inversion de dépendance** stipule que les modules de haut niveau ne doivent pas dépendre des modules de bas niveau, mais plutôt des abstractions. Cela permet de découpler les différents composants du système.
 
-**Exemple :** suppons un projet où il y'a un package service permettant de sauvegarder les données en base de données un package mysql.
+**Exemple :** suppons un projet où il y'a un package service permettant de sauvegarder les données en base de données en utilisant un package mysql.
 
 - sans appliquer le principe **DIP**, on a le code suivant :
 
