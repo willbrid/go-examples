@@ -236,3 +236,4 @@ La commande **mockery** prend en charge une variété d'indicateurs. Voici quelq
 - Livre **The Complete Guide to Programming Reliable and efficient Software Using Golang d'Adam Freeman**
 - [Mockery](https://vektra.github.io/mockery/latest/)
 - [Testify](https://github.com/stretchr/testify)
+- [Zerolog](https://github.com/rs/zerolog)
