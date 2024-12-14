@@ -22,32 +22,12 @@ my-project/
 - **internal/** : applications privées et bibliothèques de code. C'est le code dont nous ne souhaitons pas voir importé dans d'autres applications ou bibliothèques.
 
 - **pkg/** : l'on place le code qui peut être réutilisé par les applications externes. D'autres projets peuvent importer ces bibliothèques.
+Il peut stocker la couche d'infrastructure, comme la base de données (par exemple pour mysql : dossier pkg/mysql et 
+fichier pkg/mysql/mysql.go), comme un système de cache (par exemple pour redis : dossier pkg/redis et 
+fichier pkg/redis/redis.go), comme un système de gestion de fil d'attente (par exemple pour rabbitmq : dossier pkg/rabbitmq 
+et fichier pkg/rabbitmq/rabbitmq.go)
 
-### Organisation de base avec les répertoires d'application de services ou d'application web
-
-```
-my-project/
-├── cmd/
-│   └── main.go
-├── internal/
-├── pkg/
-│   └── util/
-├── api/
-│   └── openapi-spec/
-│   └── handler/
-│   └── router/
-├── web/
-├── Dockerfile
-├── go.mod
-├── go.sum
-└── README.md
-```
-
-- **api/** : spécifications OpenAPI/Swagger, fichiers de schémas JSON, fichiers de définitions de protocoles.
-
-- **web/** : les composants spécifiques aux applications web : assets statiques, templates serveurs et SPAs.
-
-### Organisation de base avec les répertoires d'application de services ou d'application web et les répertoires communs aux applications
+### Organisation de base avec les répertoires d'application web et les répertoires communs aux applications
 
 ```
 my-project/
@@ -60,10 +40,7 @@ my-project/
 ├── docs/
 ├── pkg/
 │   └── util/
-├── api/
-│   └── openapi-spec/
-│   └── handler/
-│   └── router/
+├── web/
 ├── config/
 ├── deployments/
 │   └── docker-compose.yaml
@@ -82,7 +59,9 @@ my-project/
 
 - **.env.example** : fichier exemple de configuration des variables d'environnement de l'application
 
-### Organisation de base avec modèle d'hexagonal (ports & adapters) 
+- **web/** : les composants spécifiques aux applications web : assets statiques, templates serveurs et SPAs.
+
+### Organisation complète
 
 ```
 my-project/
@@ -91,19 +70,21 @@ my-project/
 ├── internal/
 │   └── middleware/
 │   └── auth/
-│   └── util/
+|   └── delivery/
+|       └── http/
+|       └── grpc/
+|       └── workers/
+│   └── domain/
+|   └── dto/
+|   └── usecase/
+|   └── repository/
+|   └── microservice/
+|   └── cache/
+|   └── queue/
 ├── docs/
 ├── pkg/
 │   └── util/
-├── api/
-│   └── openapi-spec/
-│   └── handler/
-│   └── router/
-├── domain/
-├── dto/
-├── usecase/
-├── repository/
-├── infrastructure/
+├── web/
 ├── config/
 ├── deployments/
 │   └── docker-compose.yaml
@@ -114,20 +95,43 @@ my-project/
 └── README.md
 ```
 
+- **delivery/** : il contient les différentes points d'entrées (Handlers). Les Handlers sont regroupés par domaine d'application.
+Pour chaque groupe, sa propre structure de routeur est créée, dont les méthodes traitent les chemins.
+La structure de la logique métier est injectée dans la structure du routeur, qui sera appelée par les Handlers.
+
 - **domain/** : il contient les entités métiers
 
-- **dto/** : c'est similaire avec les entités mais les différences sont : ne pas définir de **dto** dans **repository/**, les entités **dto** sont utiles pour obtenir le corps de notre requête, les paramètres de notre requête ou répondre avec nos données de notre API REST.
+- **dto/** : c'est similaire avec les entités mais les différences sont : ne pas définir de **dto** dans **repository/**, les entités **dto** 
+sont utiles pour obtenir le corps de notre requête, les paramètres de notre requête ou répondre avec nos données de notre API REST.
 
-- **usecase/** (ou **service/**) : il contient toute la logique métier, comme la création d'un produit, la création d'un utilisateur, la validation des produits, la validation de la quantité de produits, l'exécution d'une transaction...
+- **usecase/** (ou **service/**) : il contient toute la logique métier, comme la création d'un produit, la création d'un utilisateur, 
+la validation des produits, la validation de la quantité de produits, l'exécution d'une transaction...
 
 - **repository/** : il contient toutes les requêtes de base de données.
 
-- **infrastructure/** : il stocke la couche d'infrastructure, comme la base de données (par exemple pour mysql : dossier infrastructure/db et fichier infrastructure/db/mysql.go), comme un système de cache (par exemple pour redis : dossier infrastructure/cache et fichier infrastructure/cache/redis.go), comme un système de gestion de fil d'attente (par exemple pour rabbitmq : dossier infrastructure/queue et fichier infrastructure/queue/rabbitmq.go).
+- **microservice/** : il contient toutes les requêtes vers les microservices externes.
+
+- **cache/** : il contient toutes les requêtes vers un serveur de cache.
+
+- **queue/** : il contient toutes les requêtes vers un serveur de fil d'attente.
 
 <br>
 
+**Framework et bibliothèque**
+
+- Gin (Web Framework) : https://github.com/gin-gonic/gin
+- GORM (ORM) : https://github.com/go-gorm/gorm
+- Viper (Configuration) : https://github.com/spf13/viper
+- Golang Migrate (Database Migration) : https://github.com/golang-migrate/migrate
+- Go Playground Validator (Validation) : https://github.com/go-playground/validator
+- Logrus (Logger) : https://github.com/sirupsen/logrus
+- Confluent Kafka Golang : https://github.com/confluentinc/confluent-kafka-go
+
 **Référence :**
 
+- [https://github.com/evrone/go-clean-template](https://github.com/evrone/go-clean-template)
 - [https://github.com/golang-standards/project-layout](https://github.com/golang-standards/project-layout)
 - [https://github.com/bxcodec/go-clean-arch](https://github.com/bxcodec/go-clean-arch)
 - [https://github.com/nurcahyaari/golang-starter](https://github.com/nurcahyaari/golang-starter)
+- [https://github.com/khannedy/golang-clean-architecture](https://github.com/khannedy/golang-clean-architecture)
+- [https://github.com/Creatly/creatly-backend](https://github.com/Creatly/creatly-backend)
