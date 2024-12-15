@@ -131,7 +131,7 @@ la validation des produits, la validation de la quantité de produits, l'exécut
 - Go library to parse environment variables into structs : https://github.com/caarlos0/env
 - Go library which loads env vars from a .env file : https://github.com/joho/godotenv
 
-**Référence :**
+**Références :**
 
 - [https://github.com/evrone/go-clean-template](https://github.com/evrone/go-clean-template)
 - [https://github.com/golang-standards/project-layout](https://github.com/golang-standards/project-layout)
