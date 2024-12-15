@@ -126,6 +126,10 @@ la validation des produits, la validation de la quantité de produits, l'exécut
 - Go Playground Validator (Validation) : https://github.com/go-playground/validator
 - Logrus (Logger) : https://github.com/sirupsen/logrus
 - Confluent Kafka Golang : https://github.com/confluentinc/confluent-kafka-go
+- Lodash-style Go library : https://github.com/samber/lo
+- Go implementation of JSON Web Tokens : https://github.com/golang-jwt/jwt
+- Go library to parse environment variables into structs : https://github.com/caarlos0/env
+- Go library which loads env vars from a .env file : https://github.com/joho/godotenv
 
 **Référence :**
 
