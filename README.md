@@ -89,6 +89,16 @@ go build main.go
 go clean main.go
 ```
 
+La commande "**go clean**" supprime la sortie produite par la commande "**go build**", y compris l'exécutable et tous les fichiers temporaires créés pendant la construction.
+
+- Générer la documentation 
+
+```
+go doc
+```
+
+La commande "**go doc**" génère de la documentation à partir du code source.
+
 - Compiler et exécuter en une seule étape
 
 ```
@@ -115,6 +125,8 @@ go run .
 go install github.com/go-delve/delve/cmd/dlv@latest
 ```
 
+La commande "**go install**" télécharge des packages et est généralement utilisée pour installer des packages d'outils.
+
 --- ajoutons **$HOME/go/bin** à la variable d'environnement **PATH**.
 
 ```
@@ -137,7 +149,7 @@ dlv version
 
 - Analyser un code Go
 
-La commande **go vet** identifie les déclarations susceptibles d'être des erreurs.
+La commande "**go vet**" identifie les déclarations susceptibles d'être des erreurs.
 
 ```
 mkdir testGOVETCmd && cd testGOVETCmd
@@ -179,6 +191,13 @@ go vet main.go
 
 Les avertissements produits par la commande **go vet** précisent l'emplacement dans le code où un problème a été détecté et fournissent une description du problème. La commande **go vet** applique plusieurs analyseurs au code, et nous pouvons voir la liste des analyseurs sur [https://golang.org/cmd/vet](https://golang.org/cmd/vet).
 
+- Afficher l'aide de la fonctionnalité **build**
+
+```
+go help build
+```
+
+La commande "**go help**" affiche des informations d'aide pour d'autres fonctionnalités de Go.
 
 - Analyser les dépendances et supprimer les dépendances inutilisées dans un module
 
@@ -194,11 +213,21 @@ go mod tidy
 go get github.com/gorilla/mux
 ```
 
+La commande "**go get**" télécharge et installe des packages externes.
+
 --- supprimer une dépendance dans un module
 
 ```
 go get github.com/gorilla/mux@none
 ```
+
+- Exécuter un test unitaire
+
+```
+go test ./...
+```
+
+La commande "**go test**" permet d'exécuter des tests (unitaires, fonctionnels,...).
 
 ### Go test packages
 
@@ -224,7 +253,8 @@ Générer des mocks pour nos interfaces en utilisant la commande suivante :
 $HOME/go/bin/mockery --dir $HOME/go-examples/33-tdd/calculator-project --output $HOME/go-examples/33-tdd/calculator-project/mocks --all
 ```
 
-La commande **mockery** prend en charge une variété d'indicateurs. Voici quelques-uns des indicateurs courants que nous pourrions utiliser : <br>
+La commande **mockery** prend en charge une variété d'indicateurs. Voici quelques-uns des indicateurs courants que nous pourrions utiliser :
+
 --- **--dir** : spécifie le répertoire dans lequel rechercher les interfaces à simuler. <br>
 --- **--all** spécifie de rechercher dans tous les sous-répertoires et de générer des mocks. <br>
 --- **--name** spécifie le nom ou l'expression régulière à faire correspondre lors de la recherche d'interfaces pour générer des mocks. <br>
