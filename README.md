@@ -260,7 +260,7 @@ La commande **mockery** prend en charge une variété d'indicateurs. Voici quelq
 --- **--name** spécifie le nom ou l'expression régulière à faire correspondre lors de la recherche d'interfaces pour générer des mocks. <br>
 --- **--output** spécifie le répertoire dans lequel placer les mocks générés. Par défaut, il est configuré sur **/mocks**.
 
-### Référence
+### Références
  
 - [Go Documentation](https://go.dev/doc/) 
 - Livre **The Complete Guide to Programming Reliable and efficient Software Using Golang d'Adam Freeman**
