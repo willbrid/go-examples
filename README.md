@@ -121,6 +121,8 @@ go run .
 
 - Installer **Delve** le débogueur standard pour les applications Go
 
+Le **débogueur standard** pour les applications Go s'appelle **Delve**. Il s'agit d'un outil tiers, mais il est bien pris en charge et recommandé par l'équipe de développement de Go.
+
 ```
 go install github.com/go-delve/delve/cmd/dlv@latest
 ```
@@ -141,11 +143,74 @@ export PATH=$PATH:$HOME/go/bin
 source $HOME/.profile
 ```
 
---- vérifions la configuration en affichant la version de la commande **dlv**
+--- Vérifions la configuration en affichant la version de la commande **dlv**
 
 ```
 dlv version
 ```
+
+--- Supposons un code Go dans le fichier **main.go**
+
+```
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("Hello, Go")
+    for i := 0; i < 5; i++ {
+        fmt.Println(i)
+    }
+}
+```
+
+On peut démarrer le debogeur sur ce fichier **main.go**
+
+```
+dlv debug main.go
+```
+
+On peut créer un point d'arrêt, ce qui se fait en spécifiant un emplacement dans le code
+
+```
+break bp1 main.main:3
+```
+
+Le nom du point d'arrêt est **bp1** et l'emplacement spécifie la troisième ligne de la fonction **main** du package **main**.
+
+On peut créer une condition pour le point d’arrêt afin que l’exécution soit interrompue uniquement lorsqu’une expression spécifiée est évaluée à vrai.
+
+```
+condition bp1 i == 2
+```
+
+Les arguments de la commande **condition** spécifient un point d'arrêt et une expression. Cette commande indique au débogueur que le point d'arrêt nommé **bp1** doit interrompre l'exécution uniquement lorsque l'expression **i == 2** est vraie. Pour démarrer l'exécution, l'on entre la commande
+
+```
+continue
+```
+
+On peut afficher la valeur courante de la variable **i**
+
+```
+print i
+```
+
+Le débogueur fournit un ensemble complet de commandes pour inspecter et modifier l'état de l'application dont ci-dessous quelques unes :
+
+----- **print <expr>** : Cette commande évalue une expression et affiche le résultat. Elle peut être utilisée pour afficher une valeur (**print i**) ou effectuer un test plus complexe (**print i > 0**) <br>
+----- **set <variable> = <value>** : Cette commande modifie la valeur de la variable spécifiée <br>
+----- **locals** : Cette commande imprime la valeur de toutes les variables locales <br>
+----- **whatis <expr>** : Cette commande imprime le type de l'expression spécifiée (**whatis i**)
+
+Quelques commandes de débogage utiles pour contrôler l'exécution :
+
+----- **continue** : cette commande reprend l'exécution de l'application <br>
+----- **next** : cette commande passe à l'instruction suivante <br>
+----- **step** : cette commande passe à l'instruction en cours <br>
+----- **stepout** : cette commande quitte l'instruction en cours <br>
+----- **restart** : cette commande redémarre le processus. Utilisez la commande continue pour commencer l'exécution <br>
+----- **exit** : cette commande quitte le débogueur
 
 - Analyser un code Go
 
