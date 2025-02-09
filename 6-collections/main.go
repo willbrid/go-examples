@@ -36,9 +36,9 @@ func main() {
 	var names4 [3]string = [3]string{"Kayak", "Lifejacket", "Paddle"}
 	var names5 [3]string = names4
 
-	names[0] = "Canoe"
-	fmt.Println(names)
-	fmt.Println(names5)
+	names4[0] = "Canoe"
+	fmt.Println("names4 : ", names4)
+	fmt.Println("names5 : ", names5)
 
 	var names6 [3]string = [3]string{"Kayak", "Lifejacket", "Paddle"}
 	var pointerNames6 *[3]string = &names6
