@@ -35,3 +35,5 @@ Pour exécuter un ensemble de tests :
 ```
 go test
 ```
+
+Méthodologie de test : **red, green, refactor**
