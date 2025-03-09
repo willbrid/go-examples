@@ -1,11 +1,11 @@
 # Go-Examples
 
-### Installation et mise à jour du binaire Go sous ubuntu 22.04
+### Installation et mise à jour du binaire Go sous ubuntu 24.04
 
-- Téléchargement du fichier archive Go pour la version **1.22.12**
+- Téléchargement du fichier archive Go pour la version **1.23.7**
 
 ```
-cd $HOME && wget https://go.dev/dl/go1.22.12.linux-amd64.tar.gz
+cd $HOME && wget https://go.dev/dl/go1.23.7.linux-amd64.tar.gz
 ```
 
 - décompression du fichier archive Go 
@@ -13,7 +13,7 @@ cd $HOME && wget https://go.dev/dl/go1.22.12.linux-amd64.tar.gz
 Supprimons toute installation Go précédente en supprimant le dossier **/usr/local/go** (s'il existe), puis extrayons l'archive que nous venons de télécharger dans **/usr/local**, en créant une nouvelle arborescence **Go** dans **/usr/local/go** :
 
 ```
-sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.22.12.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go1.23.7.linux-amd64.tar.gz
 ```
 
 Ne décompressons pas l'archive dans une arborescence **/usr/local/go** existante. Ceci est connu pour produire des installations Go cassées.
