@@ -37,3 +37,5 @@ go test
 ```
 
 Méthodologie de test : **red, green, refactor**
+
+#### Référence -> LIVRE : The power of GO - Tests
