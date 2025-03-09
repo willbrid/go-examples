@@ -105,6 +105,86 @@ go test -run TestRunningIsTrueWhenServiceIsRunning
 go test -run TestDatabase
 ```
 
+- **t.Helper** marque la fonction comme une aide au test, ce qui signifie que tout échec sera signalé sur la ligne appropriée du test, et non dans cette fonction.
+
+```
+func TestUserCanLogin(t *testing.T) {
+    createTestUser(t, "Jo Schmo", "dummy password")
+    ... // check that User can log in
+}
+
+func createTestUser(t *testing.T, user, pass string) {
+    t.Helper()
+    ... // create user ...
+    if err != nil {
+        t.Fatal(err)
+    }
+}
+```
+
+L’appel de **t.Helper** rend effectivement la fonction d’assistance invisible aux tests en échec. Cela est logique, car nous sommes généralement plus intéressés par le fait de savoir quel test a rencontré un problème.
+
+- Si le test doit créer ou écrire des données dans des fichiers, nous pouvons utiliser **t.TempDir** pour créer un répertoire temporaire pour eux.
+
+```
+f, err := os.Create(t.TempDir()+"/result.txt")
+```
+
+Ce répertoire est propre au test, donc aucun autre test n'interférera avec lui. Une fois le test terminé, ce répertoire et tout son contenu seront également automatiquement nettoyés
+
+- Lorsque nous devons nettoyer quelque chose nous-mêmes à la fin d'un test, nous pouvons utiliser **t.Cleanup** pour enregistrer une fonction appropriée. La fonction enregistrée par **t.Cleanup** sera appelée une fois le test terminé.
+
+```
+func createTestDB(t *testing.T) *DB {
+    db := ... // create db
+    t.Cleanup(func() {
+        db.Close()
+    })
+    return db
+}
+
+res := someResource()
+t.Cleanup(func() {
+    res.GracefulShutdown()
+    res.Close()
+})
+```
+
+- Une façon utile de réfléchir à la valeur d’un test donné est de se demander « **Quelles implémentations incorrectes réussiraient encore ce test ?** ».
+- Dans nos projets, il faut toujours détecter et améliorer les **test faibles**.
+- **cmp.Equal** et **cmp.Diff** : deux fonctions de comparaison importantes du package [go-cmp](https://github.com/google/go-cmp/cmp).
+
+```
+import "github.com/google/go-cmp/cmp"
+
+func TestNewThing_ReturnsThingWithGivenXYZValues(t *testing.T) {
+    t.Parallel()
+    x, y, z := 1, 2, 3
+    want := &thing.Thing{
+        X: x,
+        Y: y,
+        Z: z,
+    }
+    got, err := thing.NewThing(x, y, z)
+    if err != nil {
+        t.Fatal(err)
+    }
+    if !cmp.Equal(want, got) {
+        t.Error(cmp.Diff(want, got))
+    }
+}
+```
+
+```
+func NewThing(x, y, z int) (*Thing, error) {
+    return &Thing{
+        X: x,
+        Y: y,
+        Z: z,
+    }, nil
+}
+```
+
 <br>
 
 #### Référence -> LIVRE : The power of GO - Tests [bitfieldconsulting](https://bitfieldconsulting.com/)
