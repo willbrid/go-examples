@@ -49,3 +49,23 @@ func TestValid_IsFalseForInvalidInput(t *testing.T) {
 // valid:
 //  ✔ Valid is false for invalid input (0.00s)
 //  ✔ Valid is true for valid input (0.00s)
+//
+// Nous pouvons garder nos phrases de test courtes et concises en omettant des mots comme should, must et will, puis
+// décrire simplement ce qu'elles font.
+// En d'autres termes, une unité bien conçue ne devrait pas avoir plus de comportement que ce qui peut être exprimé en quelques
+// phrases courtes, chacune pouvant être directement traduite en test. L'information contenue dans une seule phrase doit correspondre
+// assez bien au comportement qu'une unité devrait avoir.
+//
+// Une bonne conception ne se résume pas seulement à ce que nous avons l'imagination d'y intégrer, mais aussi à ce que
+// nous avons la clarté d'intention d'omettre.
+// Abstractions superficielles: Est-ce que ça en vaut vraiment la peine ?
+//
+// Ne nous soucions pas des noms de test longs.
+// Créer des messages d'échec informatifs
+// if err != nil {
+//     t.Error("input %d caused unexpected error: %v", input, err)
+// }
+//
+// if want != got {
+// 	   t.Errorf("want %v, got %v", want, got)
+// }
