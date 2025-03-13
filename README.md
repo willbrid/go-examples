@@ -285,6 +285,12 @@ La commande "**go get**" télécharge et installe des packages externes.
 go get github.com/gorilla/mux@none
 ```
 
+- Mettre à jour toutes les dépendances d'un projet
+
+```
+go get -u ./...
+```
+
 - Exécuter un test unitaire
 
 ```
