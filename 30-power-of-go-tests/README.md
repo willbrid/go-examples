@@ -185,6 +185,8 @@ func NewThing(x, y, z int) (*Thing, error) {
 }
 ```
 
+- Cela n’a pas de sens de comparer les valeurs d’erreur dans Go en utilisant l’opérateur **!=** : elles ne seront jamais égales.
+
 <br>
 
 #### Référence -> LIVRE : The power of GO - Tests [bitfieldconsulting](https://bitfieldconsulting.com/)
