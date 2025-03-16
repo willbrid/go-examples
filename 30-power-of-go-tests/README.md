@@ -187,6 +187,13 @@ func NewThing(x, y, z int) (*Thing, error) {
 
 - Cela n’a pas de sens de comparer les valeurs d’erreur dans Go en utilisant l’opérateur **!=** : elles ne seront jamais égales.
 
+- Il y a quatre points clés concernant les tests des erreurs :
+
+1. Toujours vérifier les erreurs dans les tests, qu'elles soient attendues ou non. <br>
+2. Leur nature importe généralement peu, tant qu'elles ne sont pas nulles. <br>
+3. Lorsque leur nature est importante, utilisons **errors.Is** pour les comparer à une erreur sentinelle. <br>
+4. Lorsque nous devons combiner une erreur sentinelle avec des informations dynamiques, utilisons **fmt.Errorf** et le verbe %w pour créer une erreur encapsulée.
+
 <br>
 
 #### Référence -> LIVRE : The power of GO - Tests [bitfieldconsulting](https://bitfieldconsulting.com/)
