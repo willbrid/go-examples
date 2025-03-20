@@ -202,6 +202,13 @@ Lorsque nous concevons des entrées de test, essayons de penser à des choses qu
 
 Nous pouvons et devons attaquer le système avec tous ces types d'entrées contradictoires, mais nous pouvons faire encore plus. Comme nous connaissons précisément l'implémentation du système, nous avons une bonne idée des bugs qui pourraient s'y cacher.
 
+Chaque fois qu'une instruction if dans le corps du test sélectionne une logique de test différente en fonction d'un élément du cas, nous devrions probablement refactoriser en plusieurs tests, un pour chaque type de cas. <br>
+Inversement, nous pouvons dire que chaque fois que nous testons exactement la même chose sur un ensemble d'entrées différentes, nous avons un bon candidat pour un test de table.
+
+- Externalisation des données de test vers des variables ou des fonctions
+
+Lorsque plusieurs tests doivent utiliser les mêmes entrées de test, utilisons des fonctions pour construire en toute sécurité tout type d'entrée de test contenant des map et des slice, y compris les structures dont les champs sont des map ou des slice.
+
 <br>
 
 #### Référence -> LIVRE : The power of GO - Tests [bitfieldconsulting](https://bitfieldconsulting.com/)
