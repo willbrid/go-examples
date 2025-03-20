@@ -194,6 +194,14 @@ func NewThing(x, y, z int) (*Thing, error) {
 3. Lorsque leur nature est importante, utilisons **errors.Is** pour les comparer à une erreur sentinelle. <br>
 4. Lorsque nous devons combiner une erreur sentinelle avec des informations dynamiques, utilisons **fmt.Errorf** et le verbe %w pour créer une erreur encapsulée.
 
+- **Les entrées de tests**
+
+Un bon testeur adopte une approche conflictuelle lors de la conception des entrées de test. Les utilisateurs ne chercheront peut-être pas délibérément à faire planter notre logiciel, mais cela peut parfois sembler le cas. Si nous ne parvenons pas à trouver des entrées improbables et bizarres qui font planter le système, nos utilisateurs le feront certainement.
+
+Lorsque nous concevons des entrées de test, essayons de penser à des choses qui ne peuvent théoriquement pas se produire, ou que seule une personne folle ferait, et testons-les.
+
+Nous pouvons et devons attaquer le système avec tous ces types d'entrées contradictoires, mais nous pouvons faire encore plus. Comme nous connaissons précisément l'implémentation du système, nous avons une bonne idée des bugs qui pourraient s'y cacher.
+
 <br>
 
 #### Référence -> LIVRE : The power of GO - Tests [bitfieldconsulting](https://bitfieldconsulting.com/)
