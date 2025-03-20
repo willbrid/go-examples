@@ -209,6 +209,38 @@ Inversement, nous pouvons dire que chaque fois que nous testons exactement la m�
 
 Lorsque plusieurs tests doivent utiliser les mêmes entrées de test, utilisons des fonctions pour construire en toute sécurité tout type d'entrée de test contenant des map et des slice, y compris les structures dont les champs sont des map ou des slice.
 
+- **Chargement des données de test à partir de fichiers**
+
+Lorsque les données de test peuvent devenir très volumineuses, il est conseillé de les placer dans un fichier pour éviter d'encombrer le code source. Par convention, nous plaçons ces fichiers dans un dossier nommé **testdata**, car les outils Go ignorent tout dossier portant ce nom lors de la recherche de packages.
+
+En particulier, évitons d'ouvrir un fichier uniquement pour créer un **io.Reader**, si c'est ce que la fonction doit utiliser, utilisons plutôt **strings.NewReader** pour créer un reader à partir de données statiques :
+
+```
+...
+input := strings.NewReader("hello world")
+got, err := parse.ParseReader(input)
+...
+```
+
+De même, ne créons pas de fichier uniquement pour obtenir une valeur **io.Writer**. Si la fonction testée utilise un script d'écriture, et que son contenu est indifférent, nous n'avons même pas besoin d'un **strings.Reader**. Nous pouvons simplement utiliser **io.Discard** prédéclaré, qui est un script d'écriture vers nulle part.
+
+```
+...
+tps.WriteReportTo(io.Discard)
+...
+```
+
+D'un autre côté, si le test doit examiner le **writer** par la suite, pour voir ce que la fonction lui a réellement écrit, alors nous pouvons utiliser un tampon :
+
+```
+...
+buf := new(bytes.Buffer)
+tps.WriteReportTo(buf)
+want := "PC Load Letter"
+got := buf.String()
+...
+```
+
 <br>
 
 #### Référence -> LIVRE : The power of GO - Tests [bitfieldconsulting](https://bitfieldconsulting.com/)
