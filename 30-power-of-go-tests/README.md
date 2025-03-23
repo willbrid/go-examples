@@ -263,6 +263,18 @@ results := find.GoFiles(fsys)
 ...
 ```
 
+- **Utilisation de t.TempDir pour la sortie de test avec nettoyage**
+
+La fonction **t.TempDir()** en Go permet de créer un répertoire temporaire unique pour chaque test, qui est automatiquement supprimé à la fin du test. Cela évite l'encombrement du système de fichiers et garantit un nettoyage efficace.
+
+Il est recommandé de nommer les fichiers créés avec **t.Name()**, qui retourne le nom du test ou du sous-test en cours. Cela facilite l'identification de l'origine des fichiers en cas d'erreur ou de persistance inattendue.
+
+```
+...
+image.Generate(t.TempDir()+"/"+t.Name()+".png")
+...
+```
+
 <br>
 
 #### Référence -> LIVRE : The power of GO - Tests [bitfieldconsulting](https://bitfieldconsulting.com/)
