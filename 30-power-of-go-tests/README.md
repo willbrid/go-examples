@@ -241,6 +241,28 @@ got := buf.String()
 ...
 ```
 
+Si nous devons créer ou ouvrir un fichier parce que la fonction testée attend un fichier **\*os.File**, nous avons deux cas : <br>
+--- Si la fonction souhaite simplement lire des octets, nous pouvons lui passer un **io.Reader**. Si elle doit écrire des octets (par exemple, pour afficher du texte), utilisons un **io.Writer**. C'est pratique pour les utilisateurs, car de nombreux éléments implémentent **io.Reader/Writer**. Et c'est pratique pour les tests : un **\*bytes.Buffer** implémente les deux interfaces. <br>
+--- En revanche, si la fonction traite réellement des fichiers, et pas seulement des flux d'octets, nous ne pouvons pas utiliser ces interfaces. Par exemple, si elle doit appeler des méthodes sur son argument spécifiques à **\*os.File**, comme **Name** ou **Stat**, nous devons lui passer un fichier.
+
+- **L'abstraction du système de fichiers**
+
+Le package **fs.FS** en Go fournit une abstraction pour le système de fichiers, permettant de parcourir une arborescence de fichiers sans se soucier de leur emplacement réel (sur disque ou en mémoire). Cette interface est utile pour éviter des accès disque coûteux, notamment lors des tests.
+
+L'implémentation fstest.MapFS propose un système de fichiers en mémoire, ce qui accélère considérablement les tests en éliminant les opérations d'E/S disque. Cela permet aux fonctions manipulant des fichiers de fonctionner de manière identique, qu'elles accèdent à un vrai disque ou à une structure simulée en mémoire.
+
+```
+...
+fsys := fstest.MapFS{
+  "file.go": {},
+  "subfolder/subfolder.go": {},
+  "subfolder2/another.go":{},
+  "subfolder2/file.go":{},
+}
+results := find.GoFiles(fsys)
+...
+```
+
 <br>
 
 #### Référence -> LIVRE : The power of GO - Tests [bitfieldconsulting](https://bitfieldconsulting.com/)
