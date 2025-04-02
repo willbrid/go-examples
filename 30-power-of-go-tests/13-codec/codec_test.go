@@ -29,3 +29,9 @@ func TestEncodeFollowedByDecode_GivesStartingValue(t *testing.T) {
 // aléatoire spécifique aux tests avec une graine fixe, comme 1.
 // var rng = rand.New(rand.NewSource(1))
 // rng.IntN(10) + 1
+
+// Permutation aléatoire d'un ensemble d'entrées connues
+// Une bonne façon d'utiliser l'aléatoire sans provoquer de tests aléatoires est de permuter un ensemble d'entrées, c'est-à-dire de
+// les réorganiser, dans un ordre aléatoire.
+// Par exemple, le code suivant génère une tranche contenant les entiers de 0 à 99, ordonnés aléatoirement :
+// inputs := rand.Perm(100)
