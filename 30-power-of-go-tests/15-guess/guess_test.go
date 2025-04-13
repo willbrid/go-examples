@@ -37,3 +37,12 @@ func FuzzGuess(f *testing.F) {
 // Remarque : le point après l'indicateur -fuzz est significatif. Tout comme l'indicateur -run utilise une expression régulière
 // pour spécifier les tests à exécuter, l'indicateur -fuzz fait de même. Dans ce cas, nous utilisons l'expression régulière «.»,
 // qui correspond à tous les tests fuzz.
+
+// Les tests fuzz peuvent aussi agir comme des tests classiques. Lorsqu'ils sont exécutés sans l'option -fuzz, ils n’utilisent pas
+// d’entrées aléatoires, mais rejouent les valeurs problématiques déjà découvertes lors de précédents tests de fuzzing.
+// Ces valeurs sont stockées dans des fichiers spéciaux sous le dossier testdata/fuzz.
+// Ainsi, une fois qu’un bug est détecté par le fuzzer, cette entrée sera testée à chaque exécution de go test,
+// sauf si nous supprimons manuellement les fichiers de test dans testdata.
+// C'est une fonctionnalité intéressante, car elle permet au fuzzer de créer automatiquement des tests de régression. Si un bug
+// devait survenir ultérieurement et entraîner l'échec de la fonction avec la même entrée, go test le détecterait. Chaque fois
+// qu'un nouveau cas de test défaillant est détecté par le fuzzer, il est intégré à notre suite de tests standard.
