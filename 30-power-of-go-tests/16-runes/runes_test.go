@@ -48,3 +48,12 @@ func FuzzFirstRune(f *testing.F) {
 // t.Errorf("étant donné %q (0x%x) ...", s, s)
 // Mais cela répète deux fois la même variable s. Pour éviter cela, on peut utiliser un index d’argument explicite dans le format, comme
 // t.Errorf("given %q (0x%[1]x): want '%c' (0x%[2]x)", s, want)
+
+// Nous pouvons également exécuter le fuzzer pendant une durée déterminée, en utilisant l'option -fuzztime. Par exemple :
+// go test -fuzz . -fuzztime=10m
+
+// Il s'avère que le fuzzer ne se contente pas de générer des entrées aléatoires. Il analyse également les chemins de code exécutés par
+// ces entrées. Il considère une entrée comme < intéressante > si elle provoque l'exécution d'un nouveau chemin de code dans le système testé.
+// Après tout, si un chemin de code n'est exécuté par aucun autre cas de test, des bugs pourraient bien s'y cacher. Le fuzzer tente donc
+// de découvrir les entrées qui provoquent l'exécution de nouveaux chemins de code. S'il en trouve, il les utilise comme base pour générer
+// des entrées similaires, espérant en trouver une qui déclenche un échec.
