@@ -275,6 +275,16 @@ image.Generate(t.TempDir()+"/"+t.Name()+".png")
 ...
 ```
 
+### Qu'est-ce que la couverture des tests ?
+
+La couverture des tests mesure la proportion du code exécutée lors des tests. Par exemple, une couverture de 80 % signifie que 80 % des instructions du package ont été testées. <br>
+Lorsqu'une partie du code n'est pas couverte, il est utile de se demander si cette partie a un impact sur le comportement utilisateur :
+
+- Si oui, il faut écrire des tests pour la couvrir
+- Si non, le code peut être supprimé
+
+Dans tous les 2 cas ci-dessus, cela améliore la qualité globale du code.
+
 <br>
 
 #### Référence -> LIVRE : The power of GO - Tests [bitfieldconsulting](https://bitfieldconsulting.com/)
