@@ -285,6 +285,38 @@ Lorsqu'une partie du code n'est pas couverte, il est utile de se demander si cet
 
 Dans tous les 2 cas ci-dessus, cela améliore la qualité globale du code.
 
+- Obtenir un simple pourcentage de couverture de tests
+
+```
+go test -cover
+```
+
+- Génèrer un rapport de couverture du code pendant les tests dans un fichier **coverage.out**
+
+```
+go test -coverprofile=coverage.out
+```
+
+- Génèrer une visualisation HTML de la couverture de test se trouvant dans le fichier **coverage.out**
+
+```
+go tool cover -html=coverage.out
+```
+
+Cela ouvrira le navigateur web par défaut et affichera une page HTML : <br>
+--- le code couvert est surligné en vert <br>
+--- le code non couvert est surligné en rouge <br>
+--- certaines lignes, comme les importations, noms de fonctions ou commentaires, ne sont pas pertinentes pour la couverture. Elles sont grisés et peuvent être ignorés.
+
+Tous les changements qui augmentent la couverture des tests ne constituent pas nécessairement une amélioration. En d’autres termes, il est possible d’avoir un test qui exécute un morceau de code, mais qui ne nous dit toujours rien d’utile sur son exactitude.
+
+- Utiliser le « bugging » pour identifier les tests faibles
+Un test faible est un test qui ne teste pas autant qu'il le devrait. Une façon de détecter de tels tests pourrait être d'ajouter délibérément des bugs au système et de voir si un test les détecte.
+
+- Détection de code inutile ou inaccessible
+si un bug délibérément introduit dans le code ne fait échouer aucun test, cela ne signifie pas forcément que les tests sont faibles. Il est possible que le code modifié ne soit pas nécessaire, car son bon ou mauvais fonctionnement n'affecte pas le comportement observable du système. Dans ce cas, ce code est inutile ou inaccessible, et peut être supprimé pour améliorer la qualité du programme. <br>
+Le bugging automatisé est appelé **test de mutation**.
+
 <br>
 
 #### Référence -> LIVRE : The power of GO - Tests [bitfieldconsulting](https://bitfieldconsulting.com/)
