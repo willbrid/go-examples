@@ -338,6 +338,8 @@ go-mutesting .
 
 si l'on obtient un score de **1,0** avec un testeur de mutation, cela signifie que toutes les mutations ont été détectées par les tests, ce qui est idéal. Si l’on veut examiner les mutations produites, il est possible de conserver les fichiers temporaires générés par go-mutesting en utilisant l'option **--do-not-remove-tmp-folder**, afin de consulter les versions modifiées du code car par défaut ils sont supprimés.
 
+L’utilisation d’outils comme **go-mutesting** (ou le nouveau **gremlins**(**https://github.com/go‐gremlins/gremlins**)) peut générer beaucoup de résultats sur de gros projets, dont certains seront pertinents, révélant des bugs réels, des tests faibles ou du code inutile. Il n’est pas nécessaire de faire ces tests souvent, mais plutôt comme un bilan de santé périodique, par exemple tous les deux mois ou après des changements importants. Il est aussi utile de suivre le score de mutation dans le temps : une baisse peut indiquer un affaiblissement des tests. Ces outils permettent d’améliorer la qualité des tests et de mieux cibler les comportements critiques.
+
 <br>
 
 #### Référence -> LIVRE : The power of GO - Tests [bitfieldconsulting](https://bitfieldconsulting.com/)
