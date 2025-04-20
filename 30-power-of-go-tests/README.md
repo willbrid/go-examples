@@ -310,12 +310,33 @@ Cela ouvrira le navigateur web par défaut et affichera une page HTML : <br>
 
 Tous les changements qui augmentent la couverture des tests ne constituent pas nécessairement une amélioration. En d’autres termes, il est possible d’avoir un test qui exécute un morceau de code, mais qui ne nous dit toujours rien d’utile sur son exactitude.
 
-- Utiliser le « bugging » pour identifier les tests faibles
+- Utiliser le **bugging** pour identifier les tests faibles
 Un test faible est un test qui ne teste pas autant qu'il le devrait. Une façon de détecter de tels tests pourrait être d'ajouter délibérément des bugs au système et de voir si un test les détecte.
 
-- Détection de code inutile ou inaccessible
+- **Détection de code inutile ou inaccessible**
 si un bug délibérément introduit dans le code ne fait échouer aucun test, cela ne signifie pas forcément que les tests sont faibles. Il est possible que le code modifié ne soit pas nécessaire, car son bon ou mauvais fonctionnement n'affecte pas le comportement observable du système. Dans ce cas, ce code est inutile ou inaccessible, et peut être supprimé pour améliorer la qualité du programme. <br>
 Le bugging automatisé est appelé **test de mutation**.
+
+- **test de mutation automatisé**
+C'est processus qui insère automatiquement des bugs dans le code pour tester l’efficacité de la suite de tests. Il analyse le code, modifie certaines instructions (par exemple, remplacer == par !=), puis exécute les tests : <br>
+--- si un test échoue : le code est bien testé. <br>
+--- si aucun test n’échoue : cela peut révéler un test manquant ou insuffisant, ou du code inutile.
+
+À la fin, l’outil fournit une liste de modifications qui n’ont provoqué aucun échec, que le développeur peut utiliser pour améliorer les tests ou nettoyer le code. <br>
+L'outil **go-mutesting** est un framework de test de mutaiton sur un code source Go, que nous pouvons installer en exécutant la commande :
+
+```
+go install github.com/avito-tech/go-mutesting/cmd/go-mutesting@latest
+```
+
+Il est recommandé d'effectuer une sauvegarde de l'intégralité de notre projet, y compris le répertoire **.git**, avant d'exécuter **go-mutesting**. <br>
+Nous exécutons la commande au niveau du repertoire de notre projet Go.
+
+```
+go-mutesting .
+```
+
+si l'on obtient un score de **1,0** avec un testeur de mutation, cela signifie que toutes les mutations ont été détectées par les tests, ce qui est idéal. Si l’on veut examiner les mutations produites, il est possible de conserver les fichiers temporaires générés par go-mutesting en utilisant l'option **--do-not-remove-tmp-folder**, afin de consulter les versions modifiées du code car par défaut ils sont supprimés.
 
 <br>
 
