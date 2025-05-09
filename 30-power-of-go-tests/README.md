@@ -340,6 +340,22 @@ si l'on obtient un score de **1,0** avec un testeur de mutation, cela signifie q
 
 L’utilisation d’outils comme **go-mutesting** (ou le nouveau **gremlins**(**https://github.com/go‐gremlins/gremlins**)) peut générer beaucoup de résultats sur de gros projets, dont certains seront pertinents, révélant des bugs réels, des tests faibles ou du code inutile. Il n’est pas nécessaire de faire ces tests souvent, mais plutôt comme un bilan de santé périodique, par exemple tous les deux mois ou après des changements importants. Il est aussi utile de suivre le score de mutation dans le temps : une baisse peut indiquer un affaiblissement des tests. Ces outils permettent d’améliorer la qualité des tests et de mieux cibler les comportements critiques.
 
+### Tester l'intestable
+
+- Il est préférable de lancer un projet rapidement, même incomplet, en mettant en place un squelette fonctionnel minimal.
+- Transformer rapidement le squelette en un package testable pour construire progressivement le système. Le squelette doit être couvert par des tests pour en assurer la fiabilité. Ne jamais trop s’éloigner d’un état exécutable. Avancer de façon incrémentale pour garder un système fonctionnel à chaque étape.
+- Commencer par un test très simple, même trivial, pour amorcer le développement guidé par les tests. Ne pas chercher à tester immédiatement un comportement complexe. Créer une version très simplifiée du problème pour pouvoir écrire un premier test réalisable.
+- Décomposer un problème complexe en petites unités testables. Approche progressive et modulaire pour traiter les grandes fonctionnalités.
+
+Les tests internes, placés dans des fichiers **_internal_test.go**, permettent de vérifier le bon fonctionnement des composants internes, mais ils sont plus fragiles car ils dépendent des détails d'implémentation. Une modification interne peut les casser même si le comportement global reste inchangé.
+
+- **Concurrence**
+
+Pour tester une fonction concurrente comme une tentative de connexion avec timeout, on utilise un select avec un canal de temporisation (timeout.C). Si le timeout est atteint (réception sur le canal), le test échoue. Sinon, on remet le timer en veille et on réessaie. Ce mécanisme permet de contrôler le comportement des goroutines dans le temps et de tester la robustesse de la logique concurrente.
+
 <br>
 
-#### Référence -> LIVRE : The power of GO - Tests [bitfieldconsulting](https://bitfieldconsulting.com/)
+### Référence 
+
+- LIVRE : The power of GO - Tests [bitfieldconsulting](https://bitfieldconsulting.com/)
+- Practical Go : [Practical Go](https://dave.cheney.net/practical-go/presentations/qcon-china.html)
