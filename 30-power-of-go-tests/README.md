@@ -353,6 +353,16 @@ Les tests internes, placés dans des fichiers **_internal_test.go**, permettent 
 
 Pour tester une fonction concurrente comme une tentative de connexion avec timeout, on utilise un select avec un canal de temporisation (timeout.C). Si le timeout est atteint (réception sur le canal), le test échoue. Sinon, on remet le timer en veille et on réessaie. Ce mécanisme permet de contrôler le comportement des goroutines dans le temps et de tester la robustesse de la logique concurrente.
 
+Une approche de gérer aussi une fonction concurrente consiste à laisser la concurrence à la fonction appelante.
+
+- **Sécurité de la concurrence**
+
+Pour tester la sécurité concurrente d’un code, on peut utiliser un test de détection de fuite qui exécute plusieurs goroutines simultanément, dans l’espoir de provoquer une course de données. Toutefois, ce type de test reste incertain car l’ordre d’exécution est imprévisible. Pour fiabiliser cela, Go fournit le détecteur de course (**-race**), un outil puissant capable d’identifier de nombreuses conditions de course durant l’exécution des tests.
+
+```
+go test -race
+```
+
 <br>
 
 ### Référence 
