@@ -87,3 +87,11 @@ Cette fonction **TestMain** en Go sert à préparer l’environnement avant d’
 La possibilité de définir et d'exécuter des programmes personnalisés de cette manière est essentielle pour tester les outils en ligne de commande avec TestScript. Nous pouvons invoquer le programme avec les arguments, les variables d'environnement et les fichiers nécessaires pour tester un comportement donné. Ainsi, nous pouvons tester des comportements même complexes avec un minimum de code.
 
 [https://github.com/rogpeppe/go‐internal](https://github.com/rogpeppe/go‐internal)
+
+### Vérification de la couverture des tests des scripts
+
+Une fonctionnalité particulièrement intéressante de **testscript** est qu'il peut même nous fournir des informations de couverture lors du test de notre binaire. Ce serait difficile à réaliser si nous construisions et exécutions le binaire nous-mêmes, mais **testscript** le fait fonctionner pour nous :
+
+```
+go test -coverprofile=cover.out
+```
