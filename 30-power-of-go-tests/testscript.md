@@ -95,3 +95,43 @@ Une fonctionnalité particulièrement intéressante de **testscript** est qu'il 
 ```
 go test -coverprofile=cover.out
 ```
+
+### Comparaison de la sortie avec les fichiers à l'aide de cmp
+
+Par exemple, supposons que nous souhaitions comparer la sortie du programme non pas à une chaîne ou à une expression régulière, mais au contenu d'un fichier (fichier de référence).
+Nous pouvons fournir un fichier de référence dans le fichier de script lui-même, en délimitant son contenu par une ligne de marquage spéciale commençant et se terminant par un double tiret (--).
+
+```
+exec echo "hello world"
+cmp stdout golden.txt
+
+-- golden.txt --
+hello world
+```
+
+La ligne de marquage contenant **golden.txt** ouvre une entrée de fichier : tout ce qui suit sera écrit dans **golden.txt** et placé dans le répertoire de travail du script avant son exécution.
+L'assertion **cmp** permet de comparer deux fichiers pour vérifier leur concordance. Si les correspondances sont exactes, le test réussit. Dans le cas contraire, l'échec sera accompagné d'un différentiel indiquant les parties non concordantes.
+
+Alternativement, nous pouvons utiliser **!** pour annuler la comparaison, auquel cas les fichiers ne doivent pas correspondre, et le test échouera s'ils le font :
+
+```
+exec echo hello
+! cmp stdout golden.txt
+
+-- golden.txt --
+goodbye world
+```
+
+Le premier argument de **cmp** peut être le nom d'un fichier, mais on peut aussi utiliser le nom spécial **stdout**, qui correspond à la sortie standard de l'exécutable précédent. De même, **stderr** désigne la sortie d'erreur standard.
+
+Si le programme produit une sortie différente selon la valeur d'une variable d'environnement, on peut utiliser l'assertion **cmpenv**. Cela fonctionne comme **cmp**, mais en interpolant les variables d'environnement dans le fichier source.
+
+```
+exec echo Running with home directory $HOME
+cmpenv stdout golden.txt
+
+-- golden.txt --
+Running with home directory $HOME
+```
+
+Lors de l'exécution de ce script, la variable **$HOME** de la commande **echo** sera étendue à la valeur réelle de la variable d'environnement **HOME**, quelle qu'elle soit. Cependant, comme nous utilisons **cmpenv**, nous étendons également la variable **$HOME** du fichier source à la même valeur.
