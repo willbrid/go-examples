@@ -135,3 +135,48 @@ Running with home directory $HOME
 ```
 
 Lors de l'exécution de ce script, la variable **$HOME** de la commande **echo** sera étendue à la valeur réelle de la variable d'environnement **HOME**, quelle qu'elle soit. Cependant, comme nous utilisons **cmpenv**, nous étendons également la variable **$HOME** du fichier source à la même valeur.
+
+### Plus de correspondances : exists, grep et -count
+
+Certains programmes créent des fichiers directement, sans afficher de sortie sur le terminal. Si nous souhaitons simplement vérifier l'existence d'un fichier donné suite à l'exécution du programme, sans nous soucier de son contenu, nous pouvons utiliser l'assertion **exists**.
+
+Par exemple, supposons un programme **myprog** qui écrit sa sortie dans un fichier spécifié par l'option **-o**. Nous pouvons vérifier l'existence de ce fichier après l'exécution du programme en utilisant exists.
+
+```
+exec myprog -o results.txt
+exists results.txt
+```
+
+Si nous souhaitons comparer le contenu exact du fichier de résultats, nous pouvons utiliser **cmp** pour le comparer à un fichier.
+
+```
+exec myprog -o results.txt
+cmp results.txt golden.txt
+
+-- golden.txt --
+hello world
+```
+
+Si les deux fichiers correspondent parfaitement, l'assertion réussit. Sinon, elle échoue et génère un différentiel indiquant la non-correspondance. Si le fichier de résultats n'existe pas, c'est également un échec.
+En revanche, si nous ne devons pas rechercher la correspondance du fichier entier, mais seulement d'une partie, nous pouvons utiliser l'assertion **grep** pour rechercher une expression régulière.
+
+```
+exec myprog -o results.txt
+grep '^hello' results.txt
+
+-- golden.txt --
+hello world
+```
+
+Une assertion **grep** réussit si le fichier correspond à l'expression donnée au moins une fois, quel que soit le nombre de correspondances. En revanche, s'il est important d'avoir un nombre précis de correspondances, nous pouvons utiliser l'option **-count** pour spécifier ce nombre.
+
+```
+grep -count=1 'beep' result.txt
+
+-- result.txt --
+beep beep
+```
+
+Dans cet exemple, nous avons spécifié que le modèle `beep` ne doit correspondre qu'une seule fois dans le fichier cible.
+
+Par défaut le répertoire de travail du script est automatiquement supprimé après le test, nous ne pouvons pas consulter son contenu. Pour conserver ce répertoire en cas de dépannage, nous pouvons utiliser l'option **-testwork** de la commande **go test** : cela préservera le répertoire de travail du script et affichera également son environnement, y compris la variable **WORK** qui indique où trouver ce répertoire.
