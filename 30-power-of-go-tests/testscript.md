@@ -215,3 +215,16 @@ Si nous devons créer des dossiers, voire des arborescences complètes de fichie
 ```
 
 Le format txtar (abréviation de **text archive**) permet de définir facilement un ensemble de fichiers et dossiers directement dans un fichier texte, souvent utilisé dans les tests avec **testscript**. Cela évite d’écrire du code Go ou de copier des fichiers depuis **testdata**. Un fichier **.txtar** peut contenir plusieurs fichiers texte et être utilisé aussi en dehors des tests, comme format simple d'archivage. Pour l’exploiter dans un programme Go, on peut importer le package **txtar**.
+
+### Fournir des entrées aux programmes à l'aide de stdin
+
+Puisqu’on peut créer des fichiers arbitraires dans le répertoire de travail d’un script, on peut s’en servir pour simuler une saisie utilisateur ou fournir des données à un programme, comme si elles étaient entrées via un shell ou en mode interactif.
+
+On peut aller encore plus loin avec **stdin**. On ne se limite pas à fournir une entrée à partir d'un fichier ; on peut aussi utiliser la sortie d'un exécutable précédent. Cela peut être utile lorsqu'un programme doit générer une sortie qui sera redirigée vers un autre, par exemple :
+
+```
+exec echo hello
+stdin stdout
+exec cat
+stdout 'hello'
+```
