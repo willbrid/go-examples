@@ -180,3 +180,38 @@ beep beep
 Dans cet exemple, nous avons spécifié que le modèle `beep` ne doit correspondre qu'une seule fois dans le fichier cible.
 
 Par défaut le répertoire de travail du script est automatiquement supprimé après le test, nous ne pouvons pas consulter son contenu. Pour conserver ce répertoire en cas de dépannage, nous pouvons utiliser l'option **-testwork** de la commande **go test** : cela préservera le répertoire de travail du script et affichera également son environnement, y compris la variable **WORK** qui indique où trouver ce répertoire.
+
+### Le format txtar : construction de fichiers de données de test
+
+Nous pouvons créer des fichiers dans le répertoire de travail du script, en utilisant cette syntaxe spéciale pour indiquer une ou plusieurs entrées de fichier.
+
+```
+-- filename1.txt --
+... file1 contents ...
+
+-- filename2.txt --
+... file2 contents ...
+
+-- filename3.txt --
+... file3 contents ...
+```
+
+La ligne commençant par **--**, appelée ligne de **marqueur de fichier**, indique à **testscript** que tout ce qui suit cette ligne (jusqu'au marqueur de fichier suivant) doit être traité comme le contenu du fichier.
+Une ligne de marqueur de fichier doit commencer par deux tirets et un espace et se terminer par un espace et deux tirets. La partie entre ces marqueurs spécifie le nom du fichier, qui sera débarrassé de tout espace.
+
+Chaque ligne de marqueur indique le début d'un nouveau fichier, suivi de zéro ou plusieurs lignes de contenu, et se terminant à la ligne de marqueur de fichier suivante, le cas échéant. Tous ces fichiers seront créés dans le répertoire de travail avant le démarrage du script.
+
+Si nous devons créer des dossiers, voire des arborescences complètes de fichiers et de dossiers, nous pouvons le faire en utilisant des chemins séparés par des barres obliques dans les noms de fichiers.
+
+```
+-- folder1/filename1.txt --
+... file1 contents ...
+
+-- folder2/subfolder2/filename2.txt --
+... file2 contents ...
+
+-- folder3/filename3.txt --
+... file3 contents ...
+```
+
+Le format txtar (abréviation de **text archive**) permet de définir facilement un ensemble de fichiers et dossiers directement dans un fichier texte, souvent utilisé dans les tests avec **testscript**. Cela évite d’écrire du code Go ou de copier des fichiers depuis **testdata**. Un fichier **.txtar** peut contenir plusieurs fichiers texte et être utilisé aussi en dehors des tests, comme format simple d'archivage. Pour l’exploiter dans un programme Go, on peut importer le package **txtar**.
