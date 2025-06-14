@@ -309,3 +309,53 @@ exec echo hello
 # try to run a command that doesn't exist
 exec bogus
 ```
+
+### Conditions
+
+Dans les scripts de test, il peut être nécessaire de conditionner l'exécution d'une action selon l’environnement (ex. : la présence d’un programme). Pour cela, on peut précéder une ligne de script par une condition qui vérifie si l’action doit être exécutée ou non.
+
+```
+[exec:sh] exec echo yay, we have a shell
+```
+
+Les crochets contiennent une condition, qui peut être vraie ou fausse. Si la condition est vraie, le reste de la ligne est exécuté. Sinon, elle est ignorée.
+Dans cet exemple, la condition **[exec:sh]** est vraie si un programme nommé sh est présent dans notre $PATH et que nous avons l'autorisation d'exécuter. Dans le cas contraire, cette ligne du script sera ignorée.
+
+Si nous devons vérifier la présence d'un programme sur un chemin spécifique, nous pouvons indiquer ce chemin dans la condition.
+
+```
+[exec:/bin/sh] exec echo yay, we have /bin/sh
+```
+
+Parmi les conditions intégrées les plus utiles dans les scripts de test figurent celles permettant de vérifier la **version de Go**, le **système d’exploitation** et l’**architecture du processeur** de la machine d’exécution.
+
+```
+# 'go1.x' is true if this is Go 1.x or higher
+[go1.99] exec echo 'We have at least Go 1.99'
+
+# Any known value of GOOS is also a valid condition
+[darwin] exec echo 'We''re on macOS'
+
+# As is any known value of GOARCH
+[!arm64] exec echo 'This is a non-arm64 machine'
+```
+
+Comme dans l'exemple ci-dessus, nous pouvons également nier une condition en la préfixant avec **!** .
+
+Nous pouvons utiliser l'instruction **skip** pour ignorer le test dans certaines circonstances.
+
+```
+# Skip this test unless we have Go 1.99 or later
+[!go1.99] skip
+
+# Skip this test on Linux
+[linux] skip
+```
+
+La condition **Unix** est vraie lorsque le système d'exploitation cible est l'un de ceux que Go considère comme « de type **Unix** », notamment **Linux**, **macOS**, **FreeBSD** et autres.
+
+```
+[unix] exec echo 'It''s a UNIX system! I know this!'
+```
+
+En fait, les seuls systèmes d’exploitation pris en charge par Go pour lesquels la condition **Unix** n’est pas vraie sont **js**, **nacl**, **plan9**, **Windows** et **zos**.
