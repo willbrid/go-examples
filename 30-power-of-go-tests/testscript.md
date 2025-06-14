@@ -291,3 +291,21 @@ Si nous souhaitons utiliser le caractère pipe (**|**) (sans utiliser la techniq
 ```
 exec sh -c 'echo hello | wc -l'
 ```
+
+### Commentaires et phases
+
+Dans un script de test, un **#** démarre un commentaire. Tout ce qui suit sur la ligne est ignoré, ce qui permet d’ajouter des explications après les commandes.
+
+```
+exec echo hello # this comment will not appear in output
+```
+
+Les commentaires ne servent pas uniquement à documenter. Ils délimitent aussi des phases du script. Lors d’un échec, **testscript** n’affiche que le journal de la phase en cours ; les phases précédentes sont résumées par leurs commentaires, indiquant qu’elles ont réussi.
+
+```
+# run an existing command: this will succeed
+exec echo hello
+
+# try to run a command that doesn't exist
+exec bogus
+```
