@@ -228,3 +228,50 @@ stdin stdout
 exec cat
 stdout 'hello'
 ```
+
+### Opérations sur les fichiers
+
+Tout comme dans un script shell traditionnel, nous pouvons copier un fichier vers un autre en utilisant **cp**.
+
+```
+cp a.txt b.txt
+```
+
+Cependant, le premier argument de **cp** peut également être **stdout** ou **stderr**, indiquant que nous voulons copier la sortie d'un exécutable précédent dans un fichier.
+
+```
+exec echo hello
+cp stdout tmp.txt
+```
+
+Nous pouvons également utiliser **mv** pour déplacer un fichier (c'est-à-dire le renommer).
+
+```
+mv a.txt b.txt
+```
+
+Nous pouvons également créer un répertoire en utilisant **mkdir**, puis y copier plusieurs fichiers avec **cp**.
+
+```
+mkdir data
+cp a.txt b.txt c.txt data
+```
+
+L'instruction **cd** modifiera le répertoire actuel pour les programmes ultérieurs exécutés par **exec**.
+
+```
+cd data
+```
+
+Pour supprimer un fichier ou un répertoire, nous utilisons l'instruction **rm**. Utilisée avec un répertoire, **rm** agit de manière récursive : elle supprime tous les fichiers et sous-répertoires qu'il contient avant de supprimer le répertoire lui-même.
+
+```
+rm
+```
+
+Pour créer un lien symbolique d'un fichier ou d'un répertoire vers un autre, nous pouvons utiliser l'instruction **symlink**. Pour cela nous utilisons le caractère obligatoire **->** qui indique la direction du lien symbolique.
+
+```
+mkdir target
+symlink source -> target
+```
