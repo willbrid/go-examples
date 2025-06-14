@@ -275,3 +275,19 @@ Pour créer un lien symbolique d'un fichier ou d'un répertoire vers un autre, n
 mkdir target
 symlink source -> target
 ```
+
+### Différences avec les scripts shell
+
+Les scripts de test ressemblent aux scripts shell, mais sans structures de contrôle comme les boucles ou fonctions. Un échec d’assertion arrête simplement le script. Cela les rend simples et lisibles. Contrairement aux scripts shell, les commandes **exec** sont exécutées directement, sans passer par un shell, donc des fonctionnalités comme le globbing (*) ne sont pas disponibles.
+
+Si nous devons développer une expression glob, nous pouvons simplement demander au shell de le faire pour nous.
+
+```
+exec sh -c 'ls .*'
+```
+
+Si nous souhaitons utiliser le caractère pipe (**|**) (sans utiliser la technique **stdin** et **stdout**) pour envoyer la sortie d'une commande à une autre, nous pouvons simplement demander au shell de le faire pour nous.
+
+```
+exec sh -c 'echo hello | wc -l'
+```
