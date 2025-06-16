@@ -390,3 +390,15 @@ exec prog$exe
 Pour fournir des valeurs dynamiques à un script (ex. : une adresse générée au moment du test), on peut utiliser des variables d’environnement. Cela se fait via la fonction **Setup** passée à **testscript.Run** dans les paramètres. Cette méthode permet d’injecter des données calculées au moment de l’exécution dans les scripts de test.
 
 La fonction **Setup** s'exécute juste avant le lancement du script et reçoit un objet **Env** représentant l’environnement du script. Elle peut utiliser **env.Setenv** pour définir des variables d’environnement personnalisées (ex. : **SERVER_ADDR**). Le script peut ensuite y accéder via **$SERVER_ADDR**, comme avec toute variable d’environnement classique.
+
+### Exécution de programmes en arrière-plan avec &
+
+Les scripts de test permettent, tout comme les shells classiques, d’exécuter des programmes en arrière-plan. Cela signifie que le programme démarre comme un processus séparé, et que le script continue immédiatement son exécution, sans attendre la fin de ce programme.
+
+```
+exec sleep 10 &
+```
+
+Dans un script testscript, ajouter une esperluette (**&**) à la fin d’une commande lance le programme en arrière-plan, sans bloquer le reste du script. Son exécution est mise en mémoire tampon, ce qui permet d’y accéder plus tard. Pour s'assurer qu'un script n'expire pas avant la fin de ces programmes (programes en arrière plan), on utilise l’instruction **wait**, qui attend explicitement leur terminaison.
+
+L’instruction **wait** suspend l’exécution du script jusqu’à ce que tous les programmes lancés en arrière-plan soient terminés. Leurs sorties (stdout, stderr) peuvent ensuite être testées comme s’ils avaient été exécutés au premier plan.
