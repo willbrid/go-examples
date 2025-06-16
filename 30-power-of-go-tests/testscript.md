@@ -359,3 +359,34 @@ La condition **Unix** est vraie lorsque le système d'exploitation cible est l'u
 ```
 
 En fait, les seuls systèmes d’exploitation pris en charge par Go pour lesquels la condition **Unix** n’est pas vraie sont **js**, **nacl**, **plan9**, **Windows** et **zos**.
+
+### Définition des variables d'environnement avec env
+
+Pour définir une variable spécifique pour la durée du script, nous utilisons une instruction **env**. <br>
+Par exemple, pour tester qu'un programme **myprog** échoue et affiche un message d'erreur lorsque la variable d'environnement dont il a besoin n'a pas de valeur, nous pourrions écrire :
+
+```
+env AUTH_TOKEN=
+! exec myprog
+stderr 'AUTH_TOKEN must be set'
+```
+
+Dans les scripts, nous pouvons faire référence à la valeur d'une variable d'environnement en utilisant le symbole **$** suivi du nom de la variable, comme dans un script shell.
+
+```
+exec echo $PATH
+```
+
+Chaque script démarre avec un environnement vide, à l'exception de **$PATH** et de quelques autres variables prédéfinies. Par exemple, **HOME** est défini sur **/no-home**, car de nombreux programmes s'attendent à pouvoir trouver le répertoire personnel de l'utilisateur dans **$HOME**.
+
+Une variable utile pour les tests multiplateformes est **$exe**. Sa valeur sous Windows est **.exe**, mais sur toutes les autres plateformes, c'est une chaîne vide.
+
+```
+exec prog$exe
+```
+
+### Transmission de valeurs aux scripts via des variables d'environnement
+
+Pour fournir des valeurs dynamiques à un script (ex. : une adresse générée au moment du test), on peut utiliser des variables d’environnement. Cela se fait via la fonction **Setup** passée à **testscript.Run** dans les paramètres. Cette méthode permet d’injecter des données calculées au moment de l’exécution dans les scripts de test.
+
+La fonction **Setup** s'exécute juste avant le lancement du script et reçoit un objet **Env** représentant l’environnement du script. Elle peut utiliser **env.Setenv** pour définir des variables d’environnement personnalisées (ex. : **SERVER_ADDR**). Le script peut ensuite y accéder via **$SERVER_ADDR**, comme avec toute variable d’environnement classique.
