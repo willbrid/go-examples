@@ -407,3 +407,58 @@ L’instruction **wait** suspend l’exécution du script jusqu’à ce que tous
 exec sleep 10 &
 wait
 ```
+
+### L'exécuteur de scripts de test autonome
+
+Le langage de scripts de test est tellement pratique qu’il serait utile de l’utiliser en dehors des tests Go, par exemple dans des pipelines CI ou des projets non-Go. Bonne nouvelle : c’est possible grâce à un outil autonome permettant d’exécuter des scripts de test directement depuis la ligne de commande, sans écrire de code Go. Pour l'installer on exécute la commande :
+
+```
+go install github.com/rogpeppe/go-internal/cmd/testscript@latest
+```
+
+Pour l'utiliser, il suffit de donner le chemin vers un script, ou plusieurs scripts.
+
+```
+testscript testdata/script/*
+```
+
+Cela exécutera chaque script tour à tour et affichera PASS s'il réussit (ainsi que les commentaires décrivant chaque phase réussie). Sinon, le code affichera FAIL, accompagné du même message d'erreur que lors de l'exécution du script dans un test Go. <br>
+Si un script échoue, le code de sortie de testscript sera 1, ce qui est utile pour détecter les échecs dans les automatisations.
+
+Pour enregistrer l'activité du script, nous pouvons utiliser l'option **-v**, qui affiche un message détaillé, que le script réussisse ou échoue.
+
+```
+testscript -v echo.txtar
+```
+
+Pour transmettre des variables d'environnement aux scripts, nous pouvons les spécifier à l'aide de l'option **-e**. Nous répétons l'option **-e** pour chaque paire variable-valeur.
+
+```
+testscript -e VAR1=hello -e VAR2=goodbye script.txtar
+```
+
+Tout comme lors de l'exécution de scripts à partir de tests Go, chaque script dispose de son propre répertoire de travail, qui est ensuite nettoyé. Pour conserver ce répertoire et son contenu, par exemple pour le dépannage, nous utilisons l'option **-work**.
+
+```
+testscript -work script.txtar
+```
+
+Il est possible d'utiliser testscript comme un interpréteur de script, grâce à la ligne **shebang (#!)**, sur les systèmes Unix comme Linux ou macOS. Cela permet d'exécuter directement un fichier **.txtar** (exemple ci-dessus fichier **hello.txtar**) comme s’il s’agissait d’un script autonome.
+
+```
+vim hello.txtar
+```
+
+```
+#!/usr/bin/env testscript
+exec echo hello
+stdout 'hello'
+```
+
+Ainsi, si nous modifions les permissions du fichier pour le rendre exécutable, nous pouvons exécuter ce script directement depuis la ligne de commande.
+
+```
+chmod +x hello.txtar
+
+./hello.txtar
+```
