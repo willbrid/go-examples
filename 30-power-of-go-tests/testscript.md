@@ -474,3 +474,13 @@ stdout 'go version go2.\d+'
 ```
 
 Les mainteneurs peuvent utiliser le script fourni pour reproduire facilement un bug, tester une correction proposée et même l’intégrer aux tests automatisés du projet. Le format testscript simplifie ainsi la soumission, la reproduction et la discussion des cas de test, ce qui encourage l’adoption des tests automatisés, même dans des projets où ils sont peu utilisés.
+
+### Scripts de test comme tests
+
+Au lieu d’exécuter des scripts de test avec **go test**, on peut faire l’inverse : écrire un script de test qui lance **go test**. <br>
+Avec testscript, on peut écrire un seul script qui vérifie automatiquement si chaque test donne bien le résultat attendu (succès ou échec).
+
+```
+! exec go test
+stdout 'want 4, got 5'
+```
