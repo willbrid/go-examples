@@ -402,3 +402,8 @@ exec sleep 10 &
 Dans un script testscript, ajouter une esperluette (**&**) à la fin d’une commande lance le programme en arrière-plan, sans bloquer le reste du script. Son exécution est mise en mémoire tampon, ce qui permet d’y accéder plus tard. Pour s'assurer qu'un script n'expire pas avant la fin de ces programmes (programes en arrière plan), on utilise l’instruction **wait**, qui attend explicitement leur terminaison.
 
 L’instruction **wait** suspend l’exécution du script jusqu’à ce que tous les programmes lancés en arrière-plan soient terminés. Leurs sorties (stdout, stderr) peuvent ensuite être testées comme s’ils avaient été exécutés au premier plan.
+
+```
+exec sleep 10 &
+wait
+```
