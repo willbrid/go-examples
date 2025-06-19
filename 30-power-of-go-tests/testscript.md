@@ -462,3 +462,15 @@ chmod +x hello.txtar
 
 ./hello.txtar
 ```
+
+### Scripts de test en tant que reproductions de problèmes
+
+Le format **txtar** est particulièrement utile pour soumettre des rapports de bugs, car il permet de représenter à la fois un script de test et plusieurs fichiers/dossiers dans un seul bloc de texte facilement copiable. Il est souvent utilisé dans l’écosystème Go pour illustrer des problèmes de manière concise dans les demandes d’incidents.
+
+```
+# I was promised 'Go 2', are we there yet?
+exec go version
+stdout 'go version go2.\d+'
+```
+
+Les mainteneurs peuvent utiliser le script fourni pour reproduire facilement un bug, tester une correction proposée et même l’intégrer aux tests automatisés du projet. Le format testscript simplifie ainsi la soumission, la reproduction et la discussion des cas de test, ce qui encourage l’adoption des tests automatisés, même dans des projets où ils sont peu utilisés.
