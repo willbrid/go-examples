@@ -134,6 +134,7 @@ la validation des produits, la validation de la quantité de produits, l'exécut
 **Références :**
 
 - [https://github.com/evrone/go-clean-template](https://github.com/evrone/go-clean-template)
+- [https://github.com/Creatly/creatly-backend](https://github.com/Creatly/creatly-backend)
 - [https://github.com/golang-standards/project-layout](https://github.com/golang-standards/project-layout)
 - [https://github.com/bxcodec/go-clean-arch](https://github.com/bxcodec/go-clean-arch)
 - [https://github.com/nurcahyaari/golang-starter](https://github.com/nurcahyaari/golang-starter)
