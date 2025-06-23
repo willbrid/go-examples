@@ -1,3 +1,3 @@
 module valid
 
-go 1.23.7
+go 1.24.4
