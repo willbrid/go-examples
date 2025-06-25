@@ -40,13 +40,13 @@ L'objectif de l'injection de dépendances est de faciliter l'écriture de compos
 
 ### Éviter les dommages causés par les tests
 
-**Problème** : Une fonction qui interroge une API externe est difficile à tester :
+**Problème** : Une fonction qui interroge une API externe est difficile à tester
 - Le réseau est lent ou instable
 - L’API peut être en panne
 - Les tests deviennent coûteux ou peu fiables
 - Et surtout : on ne veut pas tester une API externe, mais notre propre code.
 
-**Tentative de solution** : Injecter l’URL de l’API en paramètre pour pouvoir utiliser un faux serveur en test :
+**Tentative de solution** : Injecter l’URL de l’API en paramètre pour pouvoir utiliser un faux serveur en test
 - Cela fonctionne, mais alourdit inutilement l’API de notre fonction : deux paramètres au lieu d’un
 - Et l’utilisateur réel doit aussi fournir ce deuxième paramètre, inutile pour lui
 - Cela dégrade la conception pour des raisons uniquement liées aux tests.
@@ -60,12 +60,12 @@ L'objectif de l'injection de dépendances est de faciliter l'écriture de compos
 
 **Problème** : Dans les cas d'exemple vus plus haut : « envoyer un e-mail » ou « créer un utilisateur », on ne peut pas toujours éliminer une dépendance externe (comme un serveur SMTP ou une base de données), mais on peut réduire sa portée pour améliorer la testabilité.
 
-**Exemple** : Nous prenons l'exemple d'une fonction **GetForecast** qui fait appel à une API externe. Nous pourrions la décomposer en plusieurs étapes indépendantes :
+**Exemple** : Nous prenons l'exemple d'une fonction **GetForecast** qui fait appel à une API externe. Nous pourrions la décomposer en plusieurs étapes indépendantes
 - FormatURL : construire l’URL de la requête avec la localisation.
 - Appel HTTP : envoyer la requête à l’API.
 - ParseResponse : analyser et formater la réponse.
 
-**Solution** : Isoler les étapes testables :
+**Solution** : Isoler les étapes testables
 - **FormatURL** peut être testée comme une simple fonction de transformation de chaînes.
 - **ParseResponse** peut être testée en lui injectant un exemple de réponse JSON.
 - Cela permet de tester l’essentiel de la logique métier sans dépendance réseau.
@@ -93,7 +93,7 @@ Supposons que nous souhaitons tester une logique de routage des requêtes à leu
 - les réponses sont trop similaires pour identifier quel gestionnaire a été réellement appelé
 
 Une solution de test serait : que chaque type de requête est dirigé vers le bon gestionnaire :
-- en utilisant une table de correspondance entre types de requêtes et gestionnaires.
+- en utilisant une table de correspondance entre types de requêtes et gestionnaires
 - en testant directement le contenu de cette table, plutôt que le système complet
 
 Même si le système global est difficile à tester, on peut isoler et tester la **logique critique** (ici, le routage) de manière simple et fiable, en la dissociant des **dépendances lourdes**.
@@ -101,17 +101,18 @@ Même si le système global est difficile à tester, on peut isoler et tester la
 ### Isoler en utilisant un adaptateur
 
 **Problème** : Les programmes interagissent souvent avec des dépendances externes (base de données, API, exécutable), ce qui complique :
-- la conception du code ;
+- la conception du code
 - la testabilité, notamment à cause de l’instabilité ou de l’indisponibilité de ces dépendances.
 
-**Solution** : le modèle d’adaptateur
+**Solution** : le modèle d’adaptateur <br>
 Un adaptateur (ou ambassadeur) est un composant qui centralise la gestion d’une dépendance externe :
-- Il traduit les requêtes internes en un format que comprend l’API externe (ex. : FormatURL).
+- Il traduit les requêtes internes en un format que comprend l’API externe (ex. : FormatURL)
 - Il interprète les réponses de l’API pour les convertir en structures internes (ex. : ParseResponse).
 
 **Avantages** :
-- Isolation du code dépendant de l’API : le reste du système n’a pas à connaître les détails de l’API externe.
-- Facilite les tests : on peut tester le reste du code sans dépendre de l’API distante.
+
+- Isolation du code dépendant de l’API : le reste du système n’a pas à connaître les détails de l’API externe
+- Facilite les tests : on peut tester le reste du code sans dépendre de l’API distante
 - Améliore la conception : l’interaction avec la dépendance est clairement encapsulée.
 
 L'utilisation d'un adaptateur permet de rendre le système plus modulaire, plus robuste, et plus testable, tout en réduisant l'impact des dépendances externes.
@@ -123,19 +124,23 @@ Dans le contexte des tests logiciels, un faux (ou test double) est un objet ou u
 **Types de faux évoqués**
 
 - **mock**
+
 Un **mock** est un faux qui a des attentes préprogrammées quant à son utilisation et qui vérifie ces attentes lors d'un test.
 
 - **Stub** 
---- Ne fait rien ou renvoie des réponses fixes. <br>
---- Utilisé uniquement pour satisfaire la syntaxe. <br>
+
+--- Ne fait rien ou renvoie des réponses fixes <br>
+--- Utilisé uniquement pour satisfaire la syntaxe <br>
 --- Considéré comme une mauvaise conception si le composant testé dépend de lui sans réelle utilité.
 
 - **Faux utile (ex. : MapStore)**
---- Composant fonctionnel mais allégé (par exemple, une base en mémoire au lieu d’une base persistante). <br>
+
+--- Composant fonctionnel mais allégé (par exemple, une base en mémoire au lieu d’une base persistante) <br>
 --- Accélère les tests tout en restant fidèle au comportement réel.
 
 - **Espion (spy)**
---- Faux qui enregistre les interactions (ex. : un bytes.Buffer utilisé pour vérifier ce qui a été écrit). <br>
+
+--- Faux qui enregistre les interactions (ex. : un bytes.Buffer utilisé pour vérifier ce qui a été écrit) <br>
 --- Permet d'inspecter les effets secondaires pour s'assurer qu’ils sont corrects.
 
 ### Ne soyez pas tenté d’écrire des mocks
@@ -146,14 +151,14 @@ Un simulacre (**mock**) est un faux (test double) programmable :
 
 **Inconvénients des mocks**
 
-- Complexité excessive : Les mocks peuvent devenir aussi complexes que les composants qu’ils remplacent.
-- Fragilité des tests : Les mocks vérifient des détails d’implémentation (séquences d’appels), pas de comportement observable. Cela rend les tests sensibles aux refactorings internes.
-- Couplage fort à la conception : Les mocks présupposent une structure rigide (souvent orientée objet) et freinent l'évolution naturelle du design.
+- Complexité excessive : Les mocks peuvent devenir aussi complexes que les composants qu’ils remplacent
+- Fragilité des tests : Les mocks vérifient des détails d’implémentation (séquences d’appels), pas de comportement observable. Cela rend les tests sensibles aux refactorings internes
+- Couplage fort à la conception : Les mocks présupposent une structure rigide (souvent orientée objet) et freinent l'évolution naturelle du design
 - Pollution d'interface : Créer des interfaces uniquement pour permettre le mocking rend les tests plus fragiles et le code plus verbeux.
 
 **Quand utiliser un mock ?**
 
-- En dernier recours, lorsqu’aucune autre technique (faux simple, espion, découplage) ne permet de tester efficacement un comportement.
+- En dernier recours, lorsqu’aucune autre technique (faux simple, espion, découplage) ne permet de tester efficacement un comportement
 - Exemple toléré : sqlmock pour simuler une base SQL difficile à tester autrement, mais à utiliser avec parcimonie.
 
 Les mocks ne sont pas intrinsèquement mauvais, mais doivent être utilisés avec modération. <br>
