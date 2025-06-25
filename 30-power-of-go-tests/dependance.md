@@ -166,3 +166,26 @@ Leur usage excessif est souvent un symptôme de mauvaise conception ou d’un re
 La priorité reste de créer des tests simples, fiables et découplés, en favorisant d’abord des structures plus légères comme les espions ou les faux en mémoire.
 
 ### Transformez le temps en données
+
+Pour écrire les tests sur les fonctions qui manipulent le temps, il vaut mieux transformer le temps en une donnée. **Go** facilite cette approche car il fournit le type **time.Time**, mais il faut être prudent : le temps n’est pas juste un nombre. En interne, Go utilise deux horloges :
+
+- une horloge murale (modifiable par le système ou l’utilisateur),
+- une horloge monotone (qui ne peut qu’avancer).
+
+Cela signifie que deux **time.Time** ne sont pas forcément identiques même si leurs dates semblent l’être, à cause de la partie monotone incluse. Donc, au lieu de comparer deux **time.Time** avec **==**, il vaut mieux utiliser la méthode : **.Equal()** si les deux temps sont "exactement" les mêmes, ou la méthode **.Sub()** pour mesurer une différence (**time.Duration**) et vérifier si elle est "assez petite".
+
+Exemple
+
+```
+func TestOneHourAgo_ReturnsExpectedTime(t *testing.T) {
+    t.Parallel()
+    now := time.Now()
+    want := now.Add(-time.Hour)
+    got := past.OneHourAgo()
+    delta := want.Sub(got).Abs()
+    
+    if delta > 10*time.Microsecond {
+        t.Errorf("want %v, got %v", want, got)
+    }
+}
+```
