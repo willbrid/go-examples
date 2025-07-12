@@ -41,3 +41,46 @@ Un autre problème fréquent : écrire les tests en dernier, ce qui conduit souv
 - Cela dit, l’ordre n’est pas une question morale : si écrire les tests en dernier aboutit à un code bien conçu et bien testé, c’est tout aussi valable.
 
 - Mais si les tests sont faibles ou absents, alors changer de méthode (comme adopter le TDD) peut être bénéfique.
+
+### Révision de code inefficace
+
+La revue de code est souvent délicate, car les auteurs peuvent être sur la défensive. Pour éviter une critique inefficace et superficielle (souvent focalisée sur le style), il est plus utile de centrer la revue sur les tests.
+
+Liste de contrôle en 10 points pour une revue centrée sur les tests :
+
+- **Comprendre le but** : Connaît-on la raison métier ou technique du changement ?
+- **Présence de tests pertinents** : Y a-t-il un test clair pour chaque objectif ou exigence du changement ?
+- **Reproductibilité** : Les tests passent-ils sur une nouvelle machine sans dépendance cachée ?
+- **Détection de bugs** : Les tests détectent-ils des bugs simulés (tests de mutation) ?
+- **Clarté des échecs** : Les messages d'erreur sont-ils informatifs sans avoir à lire le code de test ?
+- **Robustesse aux entrées** : Le code est-il testé avec des entrées variées (fuzzing, cas limites, entrées vides) ?
+- **Couverture de code** : Le nouveau code est-il complètement testé ? Le reste est-il justifié ?
+- **Code minimaliste** : Le code ne fait-il que ce qui est nécessaire pour passer les tests (pas de surconception) ?
+- **Tests ciblés** : Les tests évitent-ils de couvrir plus que le code concerné ?
+- **Lisibilité des tests** : Les tests expriment-ils clairement le comportement attendu, même pour un non-technique ?
+
+### Tests optimistes
+
+Même des tests avec une bonne couverture peuvent être trop optimistes, c’est-à-dire qu’ils cherchent uniquement à confirmer le bon fonctionnement du code, sans vérifier que les préconditions sont bien remplies ou que les erreurs sont détectées.
+
+**Exemple typique** :
+
+- On appelle Create(Alice) puis on vérifie si Alice existe.
+- Si Create ne fait rien, le test passe quand même si Alice existait déjà (résidu d’un test précédent).
+- Le test manque donc une vérification préalable de l’état initial (s’assurer qu’Alice n’existait pas avant).
+- Si la base de données n’est pas réinitialisée entre les tests, cela masque des bugs.
+
+Un bon test doit vérifier l’avant et l’après, pas juste le résultat attendu. Sinon, on peut croire à tort que tout fonctionne.
+
+### Des tests pointilleux
+
+Bien que la plupart des problèmes viennent d’un manque de tests, il arrive que certains développeurs aillent trop loin en testant plus que nécessaire.
+
+**Risques du surtesting** :
+
+- **Tests inutiles sur des comportements évidents ou difficilement ignorables**.
+- **Vérifications excessives** : comparaison de toute une structure ou d’un fichier, alors qu’un petit sous-ensemble est pertinent.
+- **Fragilité des tests** : tester des champs ou des messages d’erreur non essentiels rend les tests sensibles aux changements sans importance.
+- **Tests paresseux** : comparer la sortie à un fichier standard complet, alors qu’une propriété clé ou une invariance suffirait.
+
+**Bonne pratique** : Se concentrer sur le comportement utile à vérifier, éviter les détails non pertinents et préférer les propriétés générales (comme l’existence d’une erreur, ou des invariants) plutôt que des valeurs exactes.
