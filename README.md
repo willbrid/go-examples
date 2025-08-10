@@ -104,6 +104,8 @@ La commande "**go doc**" génère de la documentation à partir du code source.
 go run main.go
 ```
 
+Sans la création d'un module Go, nous sommes obligés de préciser le nom du fichier de code dont nous souhaiterons compiler et exécuter.
+
 - Définir et exécuter un module Go
 
 ```
@@ -117,6 +119,8 @@ go mod init tools
 ```
 go run .
 ```
+
+Avec la création d'un module Go, au lieu de spécifier un fichier de code particulier, le projet peut être compilé et exécuté à l'aide d'un point, indiquant le projet dans le répertoire courant.
 
 - Installer **Delve** le débogueur standard pour les applications Go
 
