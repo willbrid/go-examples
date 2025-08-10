@@ -215,6 +215,13 @@ Quelques commandes de débogage utiles pour contrôler l'exécution :
 ----- **restart** : cette commande redémarre le processus. Utilisez la commande continue pour commencer l'exécution <br>
 ----- **exit** : cette commande quitte le débogueur
 
+- linter de code Go
+
+Un **linter** est un outil qui vérifie les fichiers de code à l'aide d'un ensemble de règles décrivant les problèmes susceptibles de créer de la confusion, de produire des résultats inattendus ou de réduire la lisibilité du code.
+
+Exemple de package linter pour Go : **revive** [https://github.com/mgechev/revive](https://github.com/mgechev/revive)
+
+
 - Analyser un code Go
 
 La commande "**go vet**" identifie les déclarations susceptibles d'être des erreurs.
