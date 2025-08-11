@@ -221,6 +221,15 @@ Un **linter** est un outil qui vérifie les fichiers de code à l'aide d'un ense
 
 Exemple de package linter pour Go : **revive** [https://github.com/mgechev/revive](https://github.com/mgechev/revive)
 
+```
+go install github.com/mgechev/revive@latest
+```
+
+Cet utilitaire est installé sur dans le repertoire **go/bin** dans notre dossier personnel et pour exécuter cette commande, nous saisissons
+
+```
+revive
+```
 
 - Analyser un code Go
 
