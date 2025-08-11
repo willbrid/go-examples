@@ -225,11 +225,52 @@ Exemple de package linter pour Go : **revive** [https://github.com/mgechev/reviv
 go install github.com/mgechev/revive@latest
 ```
 
-Cet utilitaire est installé sur dans le repertoire **go/bin** dans notre dossier personnel et pour exécuter cette commande, nous saisissons
+Cet utilitaire est installé dans le repertoire **go/bin** dans notre dossier personnel et pour exécuter cette commande, nous saisissons
 
 ```
 revive
 ```
+
+Le package **revive** peut être configuré à l'aide de commentaires dans les fichiers de code. Par exemple désactiver une ou plusieurs règles pour des sections de code.
+
+La liste des règles supportées par le linter **revive** : [https://github.com/mgechev/revive#available-rules](https://github.com/mgechev/revive#available-rules).
+
+Syntaxe
+```
+revive:<enable|disable>:<rule>
+```
+
+Exemples
+```
+package main
+
+import "fmt"
+
+func main() {
+    PrintHello()
+    for i := 0; i < 5; i++ {
+        PrintNumber(i)
+    }
+}
+
+// revive:disable:exported
+
+func PrintHello() {
+    fmt.Println("Hello, Go")
+}
+
+// revive:enable:exported
+
+// PrintNumber writes a number using the fmt.Println function
+func PrintNumber(number int) {
+    fmt.Println(number)
+}
+```
+
+--- [https://github.com/mgechev/revive#recommended-configuration](https://github.com/mgechev/revive#recommended-configuration) <br>
+--- [https://github.com/mgechev/revive#available-rules](https://github.com/mgechev/revive#available-rules) <br>
+
+En Go, les commentaires de fonction doivent contenir une phrase commençant par le nom de la fonction et doivent fournir un aperçu concis de l’objectif de la fonction, comme décrit par [https://golang.org/doc/effective_go.html#commentary](https://golang.org/doc/effective_go.html#commentary).
 
 - Analyser un code Go
 
