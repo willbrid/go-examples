@@ -231,7 +231,7 @@ Cet utilitaire est installé dans le repertoire **go/bin** dans notre dossier pe
 revive
 ```
 
-Le package **revive** peut être configuré à l'aide de commentaires dans les fichiers de code. Par exemple désactiver une ou plusieurs règles pour des sections de code.
+Le package **revive** peut être configuré à l'aide de commentaires dans les fichiers de code. Par exemple désactiver une ou plusieurs règles pour des sections de code. Nous pouvons aussi utiliser un fichier de configuration au format TOML par exemple un ficier **revive.toml** .
 
 La liste des règles supportées par le linter **revive** : [https://github.com/mgechev/revive#available-rules](https://github.com/mgechev/revive#available-rules).
 
@@ -267,8 +267,13 @@ func PrintNumber(number int) {
 }
 ```
 
---- [https://github.com/mgechev/revive#recommended-configuration](https://github.com/mgechev/revive#recommended-configuration) <br>
---- [https://github.com/mgechev/revive#available-rules](https://github.com/mgechev/revive#available-rules) <br>
+--- [https://github.com/mgechev/revive#recommended-configuration](https://github.com/mgechev/revive#recommended-configuration)
+
+Exécuter la commande **revive** avec le fichier de configuration **revive.toml**
+
+```
+revive -config revive.toml
+```
 
 En Go, les commentaires de fonction doivent contenir une phrase commençant par le nom de la fonction et doivent fournir un aperçu concis de l’objectif de la fonction, comme décrit par [https://golang.org/doc/effective_go.html#commentary](https://golang.org/doc/effective_go.html#commentary).
 
