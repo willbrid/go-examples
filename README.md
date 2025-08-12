@@ -321,6 +321,32 @@ go vet main.go
 
 Les avertissements produits par la commande **go vet** précisent l'emplacement dans le code où un problème a été détecté et fournissent une description du problème. La commande **go vet** applique plusieurs analyseurs au code, et nous pouvons voir la liste des analyseurs sur [https://golang.org/cmd/vet](https://golang.org/cmd/vet).
 
+Pour déterminer quel analyseur est responsable d'un avertissement, nous utilisons l'argument **-json** qui génère une sortie au format **JSON** permettant de regrouper les avertissements par analyseur.
+
+```
+go vet -json main.go
+```
+
+Dans notre cas l'analyseur **assign**. Une fois l'analyseur connu, il peut être activé ou désactivé.
+
+```
+go vet -assign
+```
+
+```
+go vet -assign=false
+```
+
+L'analyse avec **Go Vet** est activée par défaut dans l'extension **Go** de vscode. Nous pouvons la désactiver via : **Settings > Extensions > Go > Manage > Settings > Vet on save**.
+
+- Utiliser la commande **go fmt**
+
+La commande **go fmt** reformate automatiquement le code Go selon le style officiel (style spécifié par l'équipe de développement Go) : indentation par tabulations, alignement des commentaires et suppression des points-virgules inutiles. Le format est fixe et non personnalisable.
+
+```
+go fmt
+```
+
 - Afficher l'aide de la fonctionnalité **build**
 
 ```
