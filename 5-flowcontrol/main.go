@@ -8,7 +8,7 @@ import (
 func main() {
 	fmt.Println("Contrôle de flux")
 
-	/** If else if et else **/
+	/** If, else if et else **/
 	var kayakPrice float32 = 275.00
 	fmt.Println("Price : ", kayakPrice)
 
@@ -78,6 +78,7 @@ func main() {
 		fmt.Println("Counter4: ", counter4)
 	}
 
+	// For : utilisation de for avec l'instruction range pour parcourir les chaines, les arrays, les slices et les maps
 	var product string = "Kayak"
 	for index, character := range product {
 		fmt.Println("Index: ", index, " Character: ", string(character))
@@ -109,6 +110,9 @@ func main() {
 		}
 	}
 
+	/**
+	    switch : on peut utiliser l'instruction break parmi les instructions d'un cas pour sortir immédiatement du switch
+	**/
 	var product2 string = "Kayak"
 	for index, character := range product2 {
 		switch character {
@@ -123,6 +127,9 @@ func main() {
 		}
 	}
 
+	/**
+	    Switch : l'instruction fallthrough exécutée dans un cas oblige l'exécution des instructions du prochain cas
+	**/
 	var product3 string = "Kayak"
 	for index, character := range product3 {
 		switch character {
@@ -136,6 +143,10 @@ func main() {
 		}
 	}
 
+	/**
+	    Switch : on peut avoir plusieurs valeurs de cas; elles doivent être séparées par une virgule
+		L'instruction default est exécutée lorsque tous les autres cas évalués ne sont correspondants
+	**/
 	var product4 string = "Kayak"
 	for index, character := range product4 {
 		switch character {
@@ -151,6 +162,9 @@ func main() {
 		}
 	}
 
+	/**
+	  Switch : il y'a duplication de l'expression -> counter5 / 2
+	**/
 	for counter5 := 0; counter5 < 20; counter5++ {
 		switch counter5 / 2 {
 		case 2, 3, 5, 7:
@@ -160,6 +174,9 @@ func main() {
 		}
 	}
 
+	/**
+	  Switch : on utilise une variable d'initialisaiton (déclaration courte de variable) pour éviter les duplications d'expression.
+	**/
 	for counter5 := 0; counter5 < 20; counter5++ {
 		switch val := counter5 / 2; val {
 		case 2, 3, 5, 7:
@@ -169,6 +186,9 @@ func main() {
 		}
 	}
 
+	/**
+		Switch : lorsque la valeur de comparaison est omise au niveau du switch, on utilise les expressions de comparaison dans les cas
+	**/
 	for counter6 := 0; counter6 < 10; counter6++ {
 		switch {
 		case counter6 == 0:
@@ -182,6 +202,7 @@ func main() {
 		}
 	}
 
+	// Target : les instructions d'étiquette permettent à l'exécution de passer à un point différent
 	var counter7 int = 0
 target:
 	fmt.Println("Counter : ", counter7)
