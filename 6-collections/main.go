@@ -70,7 +70,22 @@ func main() {
 
 	/** Travailler avec Slices : Tableau dont on ne connait pas sa longueur en avance ou dont sa longueur est variable.
 		Les tranches en Go sont des tableaux de taille variable, pratiques quand le nombre d’éléments est inconnu ou changeant.
-		On peut les créer avec la fonction make : make(Type slice, longueur)
+		On peut les créer avec la fonction make : make(Type slice, longueur, capacité)
+		Une tranche en Go est basée sur un tableau sous-jacent et contient trois informations :
+		- un pointeur vers ce tableau,
+		- sa longueur (nombre d’éléments qu'elle peut stocker (nombre d’éléments accessibles))
+		- sa capacité (nombre d’éléments qui peut être stocké dans le tableau sous-jacent).
+
+		La fonction len permet de déterminer la longueur d'une tranche : len(slicename)
+		La fonction cap permet de déterminer la capacité d'une tranche : cap(slicename)
+		La capacité sera toujours au moins égale à la longueur, mais peut être supérieure si une
+		capacité supplémentaire a été allouée via la fonction make
+
+		Avantage des tranches en Go : elles peuvent être agrandies avec la fonction append, qui ajoute de nouveaux éléments en créant
+		si besoin un tableau plus grand, en copiant l’existant et en y ajoutant les nouvelles valeurs.
+		Le résultat de la fonction append est une tranche dont la longueur a augmenté mais qui est toujours soutenue par
+		le même tableau sous-jacent.
+		La fonction append peut être utilisée pour ajouter une tranche à une autre.
 	**/
 	fmt.Println("Travailler avec Slices : Tableau dont on ne connait pas sa longueur en avance ou dont sa longueur est variable.")
 	var names12 []string = make([]string, 3)
