@@ -68,7 +68,10 @@ func main() {
 		fmt.Println("Value : ", value)
 	}
 
-	/** Travailler avec Slices : Tableau dont on ne connait pas sa longueur en avance ou dont sa longueur est variable. **/
+	/** Travailler avec Slices : Tableau dont on ne connait pas sa longueur en avance ou dont sa longueur est variable.
+		Les tranches en Go sont des tableaux de taille variable, pratiques quand le nombre d’éléments est inconnu ou changeant.
+		On peut les créer avec la fonction make : make(Type slice, longueur)
+	**/
 	fmt.Println("Travailler avec Slices : Tableau dont on ne connait pas sa longueur en avance ou dont sa longueur est variable.")
 	var names12 []string = make([]string, 3)
 	names12[0] = "Kayak"
