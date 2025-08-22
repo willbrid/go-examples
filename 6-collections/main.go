@@ -123,6 +123,13 @@ func main() {
 	appendedNames17 := append(names17, moreName...)
 	fmt.Println("AppendedNames : ", appendedNames17)
 
+	/**
+	Les plages sont exprimées entre crochets, les valeurs minimales et maximales étant séparées par deux points.
+	Le premier index de la tranche correspond à la valeur minimale, et la longueur est le résultat de la soustraction de la
+	valeur maximale et de la valeur minimale. Cela signifie que la plage [1:3] crée une plage dont l'index zéro est mappé à
+	l'index 1 du tableau et dont la longueur est 2.
+	L'index de début et le nombre peuvent être omis d'une plage pour inclure tous les éléments de la source.
+	**/
 	var products [4]string = [4]string{"Kayak", "Lifejacket", "Paddle", "Hat"}
 	someNames := products[1:3]
 	allNames := products[:]
