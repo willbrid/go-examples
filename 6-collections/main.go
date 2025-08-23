@@ -124,12 +124,33 @@ func main() {
 	fmt.Println("AppendedNames : ", appendedNames17)
 
 	/**
-	Les plages sont exprimées entre crochets, les valeurs minimales et maximales étant séparées par deux points.
-	Le premier index de la tranche correspond à la valeur minimale, et la longueur est le résultat de la soustraction de la
-	valeur maximale et de la valeur minimale. Cela signifie que la plage [1:3] crée une plage dont l'index zéro est mappé à
-	l'index 1 du tableau et dont la longueur est 2.
-	L'index de début et le nombre peuvent être omis d'une plage pour inclure tous les éléments de la source.
-	**/
+		Créer une tranche à partir d'un tableau.
+		- par défaut une tranche créée est basée sur un tableau sous-jacent.
+		- si une tranche est créée à partir d'un tableau alors ce tableau devient le tableau sous-jacent de la tranche.
+		- si on a une tranche avec la plage [x:y] créée à partir d'un tableau, sa capacité = (y-x) + 1
+		- toutes les tranches créées à partir d'un tableau, partagent le même tableau.
+		- Lorsqu’une tranche créée à partir d'un tableau existant est étendue avec append, elle utilise d’abord l’espace libre
+		  de ce tableau existant. Si la capacité est atteinte, un nouveau tableau est créé, les données sont copiées,
+		  et la tranche pointe alors vers ce nouveau tableau.
+
+		Les plages sont exprimées entre crochets, les valeurs minimales et maximales étant séparées par deux points.
+		Le premier index de la tranche correspond à la valeur minimale, et la longueur est le résultat de la soustraction de la
+		valeur maximale et de la valeur minimale. Cela signifie que la plage [1:3] crée une plage dont l'index zéro est mappé à
+		l'index 1 du tableau et dont la longueur est 2.
+		L'index de début et le nombre peuvent être omis d'une plage pour inclure tous les éléments de la source.
+
+		RENDRE LES TRANCHES PRÉVISIBLES : il faut traiter deux catégories de tranches en Go
+	    - Vue fixe d’un tableau fixe → on peut modifier les éléments mais pas en ajouter, et les changements affectent toutes les tranches liées.
+	    - Collection à taille variable → chaque tranche a son propre tableau, ce qui permet d’ajouter des éléments sans impacter d’autres tranches.
+
+		- Spécifier de la capacité lors de la création d'une tranche à partir d'un tableau
+		Les plages peuvent inclure une capacité maximale, ce qui permet de contrôler le moment où les tableaux seront dupliquées.
+		La valeur maximale ne spécifie pas directement la capacité maximale. Celle-ci est déterminée en soustrayant la valeur minimale de
+		la valeur maximale. Dans l'exemple avec la plage [1:3:3], la valeur maximale est de 3 et la valeur minimale de 1, ce qui signifie
+		que la capacité sera limitée à 2. Par conséquent, l'opération d'ajout entraîne le redimensionnement de la tranche et l'allocation
+		de son propre tableau, au lieu de l'étendre dans le tableau existant.
+		si on a une tranche avec la plage [x:y:z] créée à partir d'un tableau, sa capacité = (z-x) et y est sa longueur
+		**/
 	var products [4]string = [4]string{"Kayak", "Lifejacket", "Paddle", "Hat"}
 	someNames := products[1:3]
 	allNames := products[:]
