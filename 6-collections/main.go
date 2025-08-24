@@ -334,7 +334,11 @@ func main() {
 		fmt.Println("Key : ", key, " - Valeur : ", products14[key])
 	}
 
-	/** Comprendre la double nature des chaines de caractères **/
+	/** Comprendre la double nature des chaines de caractères
+	Go traite les chaînes de caractères comme des tableaux d'octets et prend en charge la notation d'index de tableau et de plage de tranches.
+	--- Lorsque la notation d'index est utilisée, le résultat est un octet de l'emplacement spécifié dans la chaîne
+	--- Lorsqu'une chaîne est découpée en tranches, la tranche est également décrite à l'aide d'octets, mais le résultat est une chaîne
+	**/
 	fmt.Println("Comprendre la double nature des chaines de caractères")
 	var price string = "$48.95"
 	var currencyByte byte = price[0] // Byte est l'alias à uint8
