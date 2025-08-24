@@ -249,6 +249,18 @@ func main() {
 	products10 := products9
 	fmt.Println("Equal : ", reflect.DeepEqual(products9, products10)) // Comparaison de tableau avec la fonction DeepEqual du package reflect
 
+	/**
+	    Obtenir le tableau sous-jacent à une tranche
+	    Si nous avons une tranche mais que nous avez besoin d'un tableau, généralement parce qu'une fonction en requiert un comme argument,
+		nous pouvons effectuer une conversion explicite sur la tranche. Nous devons être prudent lors de la spécification du type de tableau,
+		car une erreur se produira si le nombre d'éléments requis par le tableau dépasse la longueur de la tranche. La longueur du tableau
+		peut être inférieure à celle de la tranche, auquel cas le tableau ne contiendra pas toutes les valeurs de la tranche.
+		**/
+	p1 := []string{"Kayak", "Lifejacket", "Paddle", "Hat"}
+	arrayPtr := (*[3]string)(p1)
+	array := *arrayPtr
+	fmt.Println("Array from slice p1 :", array)
+
 	/** Travailler avec Maps : tableau associatif clé-valeur **/
 	fmt.Println("Travailler avec Maps : tableau associatif clé-valeur")
 	var products11 map[string]float64 = make(map[string]float64, 10) // string représente le type de la clé et float64 le type de la valeur
