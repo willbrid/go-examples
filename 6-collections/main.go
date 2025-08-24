@@ -19,6 +19,7 @@ func main() {
 	names[2] = "Paddle"
 	fmt.Println(names)
 
+	// Les tableaux peuvent également être définies à l’aide d’une syntaxe littérale.
 	var names1 [3]string = [3]string{"Kayak", "Lifejacket", "Paddle"}
 	fmt.Println(names1)
 
@@ -68,7 +69,7 @@ func main() {
 		fmt.Println("Value : ", value)
 	}
 
-	/** Travailler avec Slices : Tableau dont on ne connait pas sa longueur en avance ou dont sa longueur est variable.
+	/** Travailler avec Tranches : Tableau dont on ne connait pas sa longueur en avance ou dont sa longueur est variable.
 		Les tranches en Go sont des tableaux de taille variable, pratiques quand le nombre d’éléments est inconnu ou changeant.
 		On peut les créer avec la fonction make : make(Type slice, longueur, capacité).
 		La fonction make permet d'initialiser une tranche lors de sa création.
@@ -88,13 +89,14 @@ func main() {
 		le même tableau sous-jacent.
 		La fonction append peut être utilisée pour ajouter une tranche à une autre.
 	**/
-	fmt.Println("Travailler avec Slices : Tableau dont on ne connait pas sa longueur en avance ou dont sa longueur est variable.")
+	fmt.Println("Travailler avec Tranches : Tableau dont on ne connait pas sa longueur en avance ou dont sa longueur est variable.")
 	var names12 []string = make([]string, 3)
 	names12[0] = "Kayak"
 	names12[1] = "Lifejacket"
 	names12[2] = "Paddle"
 	fmt.Println(names12)
 
+	// Les tranches peuvent également être définies à l’aide d’une syntaxe littérale.
 	names13 := []string{"Kayak", "Lifejacket", "Paddle"}
 	fmt.Println(names13)
 
@@ -274,6 +276,7 @@ func main() {
 	fmt.Println("Price: ", products11["Kayak"])
 	fmt.Println("Price: ", products11["Hat"])
 
+	// Les dictionnaires peuvent également être définies à l’aide d’une syntaxe littérale.
 	var products12 map[string]float64 = map[string]float64{
 		"Kayak":      279,
 		"Lifejacket": 48.95,
