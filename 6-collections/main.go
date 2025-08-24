@@ -261,7 +261,11 @@ func main() {
 	array := *arrayPtr
 	fmt.Println("Array from slice p1 :", array)
 
-	/** Travailler avec Maps : tableau associatif clé-valeur **/
+	/** Travailler avec Maps : tableau associatif (dictionnaire) clé-valeur
+	Les dictionnaires sont une structure de données intégrée qui associe des valeurs de données à des clés. Ils sont créées avec la
+	fonction intégrée make, comme pour les tranches. Le type d'un dictionnaire est spécifié à l'aide du mot-clé map,
+	suivi du type de clé entre crochets, puis du type de valeur.
+	**/
 	fmt.Println("Travailler avec Maps : tableau associatif clé-valeur")
 	var products11 map[string]float64 = make(map[string]float64, 10) // string représente le type de la clé et float64 le type de la valeur
 	products11["Kayak"] = 279
