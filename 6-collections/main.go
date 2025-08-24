@@ -355,6 +355,10 @@ func main() {
 		fmt.Println("Parse Error : ", parseErr)
 	}
 
+	/**
+	Le type rune représente un point de code Unicode, qui est essentiellement un caractère unique. Pour éviter de découper
+	les chaînes au milieu des caractères, une conversion explicite en tranche de rune peut être effectuée.
+	**/
 	var price1 []rune = []rune("€48.95") // rune est l'alias à int32
 	var currency1 string = string(price1[0])
 	var amountString1 string = string(price1[1:])
@@ -373,9 +377,33 @@ func main() {
 		fmt.Println("Index : ", index, " - value : ", char, " - value string : ", string(char))
 	}
 
+	/**
+	Notez que les valeurs d'index ne sont pas séquentielles. La boucle for traite la chaîne comme une séquence de caractères dérivée
+	de la séquence d'octets sous-jacente. Les valeurs d'index correspondent au premier octet composant chaque caractère.
+	La deuxième valeur d'index est 3, car le premier caractère de la chaîne est composé d'octets en positions 0, 1 et 2.
+	**/
 	var price3 string = "€48.95"
-	for index, char := range []byte(price3) {
+	for index, char := range price3 {
 		// Le symbole € en byte c'est 3 nombres : 226, 130 et 172
-		fmt.Println("Index : ", index, " - value : ", char)
+		fmt.Println("price3 Index : ", index, " - value : ", char, " - value string : ", string(char))
+	}
+
+	/**
+	Pour énumérer les octets sous-jacents sans les convertir en caractères, nous pouvons effectuer une conversion explicite
+	en tranche d'octets.
+	**/
+	var price4 string = "€48.95"
+	for index, char := range []byte(price4) {
+		// Le symbole € en byte c'est 3 nombres : 226, 130 et 172
+		fmt.Println("price4 Index : ", index, " - value : ", char, " - value string : ", string(char))
+	}
+
+	/**
+	Pour énumérer les caractères de la chaine, nous pouvons aussi effectuer une conversion explicite en tranche de rune.
+	**/
+	var price5 []rune = []rune("€48.95")
+	for index, char := range price5 {
+		// Le symbole € en byte c'est 3 nombres : 226, 130 et 172
+		fmt.Println("price5 Index : ", index, " - value : ", char, " - value string : ", string(char))
 	}
 }
