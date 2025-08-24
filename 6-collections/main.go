@@ -315,6 +315,11 @@ func main() {
 		fmt.Println("Key : ", key, " - Value: ", value)
 	}
 
+	/**
+	Il n'y a aucune garantie que le contenu d'un dictionnaire soit énuméré dans un ordre spécifique. Pour classer les valeurs d'un
+	dictionnaire, la meilleure approche consiste à énumérer le dictionnaire, à créer une tranche contenant les clés,
+	à trier la tranche, puis à énumérer la tranche pour lire les valeurs du dictionnaire.
+	**/
 	var products14 map[string]float64 = map[string]float64{
 		"Kayak":      279,
 		"Lifejacket": 48.95,
