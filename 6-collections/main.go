@@ -285,6 +285,14 @@ func main() {
 	fmt.Println("Price: ", products12["Kayak"])
 	fmt.Println("Price: ", products12["Hat"])
 
+	/**
+	Les dictionnaires renvoient le zéro pour le type de valeur lors de la lecture d'une clé inexistante. Il peut alors être difficile
+	de distinguer une valeur stockée avec le zéro du type de valeur d'une clé inexistante. Pour résoudre ce problème,
+	les dictionnaires produisent deux valeurs lors de la lecture d'une valeur :
+	--- la première valeur est soit la valeur associée à la clé spécifiée, soit le zéro du type de valeur en l'absence de clé.
+	--- la seconde valeur est une valeur booléenne qui est vraie si le dictionnaire contient la clé spécifiée et fausse dans
+	    le cas contraire. Cette seconde valeur est généralement affectée à une variable nommée ok, d'où le terme « comma ok ».
+	**/
 	var products13 map[string]float64 = map[string]float64{
 		"Kayak":      279,
 		"Lifejacket": 48.95,
