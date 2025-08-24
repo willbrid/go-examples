@@ -70,7 +70,8 @@ func main() {
 
 	/** Travailler avec Slices : Tableau dont on ne connait pas sa longueur en avance ou dont sa longueur est variable.
 		Les tranches en Go sont des tableaux de taille variable, pratiques quand le nombre d’éléments est inconnu ou changeant.
-		On peut les créer avec la fonction make : make(Type slice, longueur, capacité)
+		On peut les créer avec la fonction make : make(Type slice, longueur, capacité).
+		La fonction make permet d'initialiser une tranche lors de sa création.
 		Une tranche en Go est basée sur un tableau sous-jacent et contient trois informations :
 		- un pointeur vers ce tableau,
 		- sa longueur (nombre d’éléments qu'elle peut stocker (nombre d’éléments accessibles))
@@ -192,6 +193,14 @@ func main() {
 	fmt.Println("SomeNames3 : ", someNames3)
 	fmt.Println("AllNames3 : ", allNames3)
 
+	/**
+	La fonction copy en Go permet de copier des éléments d’une tranche vers une autre, garantissant des tableaux distincts.
+	Elle peut dupliquer tout ou partie d’une tranche. La copie s’arrête à la fin de la tranche source ou cible,
+	mais ne redimensionne pas la tranche cible, qui doit donc avoir une longueur suffisante.
+
+	Si la tranche de destination n’est pas initialisée, sa longueur est nulle et copy ne copie aucun élément.
+	Aucune erreur n’est générée, mais cela conduit souvent à une tranche vide inattendue.
+	**/
 	var products4 [4]string = [4]string{"Kayak", "Lifejacket", "Paddle", "Hat"}
 	allNames4 := products4[1:]
 	someNames4 := []string{"Boots", "Canoe"}
@@ -200,11 +209,22 @@ func main() {
 	fmt.Println("SomeNames4 : ", someNames4)
 	fmt.Println("AllNames4 : ", allNames4)
 
+	/**
+	On peut spécifier des plages lors de la copie de tranches.
+	Si la tranche de destination est plus grande que la tranche source, la copie se poursuit jusqu'à la copie du dernier élément de la source.
+	La tranche source ne contient que deux éléments et aucune plage n'est utilisée. Par conséquent, la fonction de copie commence à copier
+	les éléments de la tranche replacementProducts vers la tranche products5 et s'arrête lorsque la fin de la tranche replacementProducts
+	est atteinte. Les éléments restants de la tranche products ne sont pas affectés par la copie.
+	**/
 	var products5 [4]string = [4]string{"Kayak", "Lifejacket", "Paddle", "Hat"}
 	replacementProducts := []string{"Canoe", "Boots"}
 	copy(products5[:], replacementProducts)
 	fmt.Println("products5 : ", products5) // La copie sera effective uniquement sur les deux premiers éléments du tableau products5
 
+	/**
+	Si la tranche de destination est plus petite que la tranche source, la copie continue jusqu'à ce que tous les éléments
+	de la tranche de destination aient été remplacés
+	**/
 	var products6 [4]string = [4]string{"Kayak", "Lifejacket", "Paddle", "Hat"}
 	replacementProducts1 := []string{"Canoe", "Boots"}
 	copy(products6[0:1], replacementProducts1)
