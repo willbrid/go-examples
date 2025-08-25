@@ -15,7 +15,8 @@ func printPriceWithParam(product string, price float64, taxRate float64) {
 	fmt.Println(product, " price: ", price, " Tax: ", taxAmount)
 }
 
-func printPriceWithParamTypeOmit(product string, price, taxRate float64) { // price et taxRate sont des variables consécutives : elles ont le même type float64
+// price et taxRate sont des variables consécutives : elles ont le même type float64
+func printPriceWithParamTypeOmit(product string, price, taxRate float64) {
 	var taxAmount float64 = price * taxRate
 	fmt.Println(product, " price: ", price, " Tax: ", taxAmount)
 }
@@ -25,11 +26,19 @@ func printPriceWithParamNameOmit(product string, price, _ float64) {
 	fmt.Println(product, " price: ", price, " Tax: ", taxAmount)
 }
 
-func printPriceWithNoParam(string, float64, float64) { // c'est uniquement les types qui sont mentionnés
+// fonction où c'est uniquement les types qui sont mentionnés
+func printPriceWithNoParam(string, float64, float64) {
 	fmt.Println("No parameters")
 }
 
-func printSuppliers(product string, suppliers ...string) { // fonction avec un paramètre dynamique : ce paramètre doit être en dernière position
+/*
+*
+fonction avec un paramètre dynamique : ce paramètre doit être en dernière position.
+Les paramètres dynamiques permettent à une fonction de recevoir un nombre variable d'arguments.
+Le paramètre dynamiques est défini par une ellipse (trois points), suivie d'un type.
+*
+*/
+func printSuppliers(product string, suppliers ...string) {
 	for _, supplier := range suppliers {
 		fmt.Println("Product : ", product, " - Supplier : ", supplier)
 	}
@@ -76,10 +85,12 @@ func calcTaxWithTwoResults(price float64) (float64, bool) {
 	return 0, false
 }
 
-/**
+/*
+*
 La fonction définit les résultats nommés total et taxe. Les deux sont des valeurs float64,
 ce qui signifie que l'on peut omettre le type de données du premier nom.
-**/
+*
+*/
 func calcTotalPrice(products map[string]float64, minSpend float64) (total, tax float64) {
 	total = minSpend
 	for _, price := range products {
@@ -102,14 +113,16 @@ func calcTotalPriceWithOneParam(products map[string]float64) (count int, total f
 	return
 }
 
-/**
+/*
+*
 L'utilisation principale du mot-clé defer est d'appeler des fonctions qui libèrent des ressources, telles que la fermeture de fichiers ouverts ou
 de connexions HTTP. Sans le mot-clé defer, l'instruction qui libère la ressource doit apparaître à la fin d'une fonction, qui peut être composée de
 plusieurs instructions après la création et l'utilisation de la ressource. Le mot clé defer nous permet de regrouper les instructions qui créent,
 utilisent et libèrent la ressource ensemble.
 Le mot-clé defer peut être utilisé avec n'importe quel appel de fonction, et une seule fonction peut utiliser le mot-clé defer plusieurs fois.
 Juste avant le retour de la fonction, Go effectuera les appels programmés avec le mot-clé defer dans l'ordre dans lequel ils ont été définis.
-**/
+*
+*/
 func calcTotalPriceWithDefer(products map[string]float64) (count int, total float64) {
 	fmt.Println("Function started")
 	defer fmt.Println("First defer call")
@@ -140,9 +153,10 @@ func main() {
 	printSuppliers("Kayak", "Acme Kayaks", "Bob's Boats", "Crazy Canoes")
 	printSuppliers("Lifejacket", "Sail Safe Co")
 
+	// Utilisation de tranches comme valeurs pour les paramètres dynamiques
+	// Passer un tableau dynamique en paramètre à la position de l'argument dynamique d'une fonction en utilisant ...
 	var names []string = []string{"Acme Kayaks", "Bob's Boats", "Crazy Canoes"}
-	printSuppliers("Soccer Ball", names...) // Passer un tableau dynamique en paramètre à la position de l'argument dynamique d'une fonction en utilisant ...
-
+	printSuppliers("Soccer Ball", names...)
 	printSuppliersWithCond("Kayak", "Acme Kayaks", "Bob's Boats", "Crazy Canoes")
 	printSuppliersWithCond("Lifejacket", "Sail Safe Co")
 	printSuppliersWithCond("Soccer Ball")
