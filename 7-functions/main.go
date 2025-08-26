@@ -71,6 +71,13 @@ func swapValuesWithTwoResults(first int, second int) (int, int) { // Fonction av
 	return second, first
 }
 
+/*
+*
+Donner plusieurs significations à un même résultat peut devenir problématique à mesure que les projets évoluent.
+La valeur de -1 peut être ambiguë, car elle pourrait indiquer qu'aucune taxe n'est due ou qu'un remboursement de 1$
+devrait être effectué.
+*
+*/
 func calcTaxWithCond(price float64) float64 {
 	if price > 100 {
 		return price * 0.2
@@ -78,6 +85,12 @@ func calcTaxWithCond(price float64) float64 {
 	return -1
 }
 
+/*
+*
+Utiliser plusieurs résultats de fonctions est une solution élégante qui résoud le problème issu par le retour
+de plusieurs significations à un même résultat.
+*
+*/
 func calcTaxWithTwoResults(price float64) (float64, bool) {
 	if price > 100 {
 		return price * 0.2, true
@@ -87,8 +100,13 @@ func calcTaxWithTwoResults(price float64) (float64, bool) {
 
 /*
 *
-La fonction définit les résultats nommés total et taxe. Les deux sont des valeurs float64,
+Les résultats d'une fonction peuvent être nommés et recevoir des valeurs lors de son exécution. Lorsque l'exécution atteint
+le mot-clé return, les valeurs actuelles attribuées aux résultats sont renvoyées.
+
+La fonction définit les résultats nommés comme variable : total et taxe. Les deux sont des valeurs float64,
 ce qui signifie que l'on peut omettre le type de données du premier nom.
+
+Au sein de la fonction, les résultats nommés comme variable peuvent être utilisés comme des variables normales.
 *
 */
 func calcTotalPrice(products map[string]float64, minSpend float64) (total, tax float64) {
@@ -115,10 +133,11 @@ func calcTotalPriceWithOneParam(products map[string]float64) (count int, total f
 
 /*
 *
-L'utilisation principale du mot-clé defer est d'appeler des fonctions qui libèrent des ressources, telles que la fermeture de fichiers ouverts ou
-de connexions HTTP. Sans le mot-clé defer, l'instruction qui libère la ressource doit apparaître à la fin d'une fonction, qui peut être composée de
-plusieurs instructions après la création et l'utilisation de la ressource. Le mot clé defer nous permet de regrouper les instructions qui créent,
-utilisent et libèrent la ressource ensemble.
+L'utilisation principale du mot-clé defer est d'appeler des fonctions qui libèrent des ressources, telles que la fermeture de fichiers
+ouverts ou de connexions HTTP. Sans le mot-clé defer, l'instruction qui libère la ressource doit apparaître à la fin d'une fonction,
+qui peut être composée de plusieurs instructions après la création et l'utilisation de la ressource. Le mot clé defer nous permet
+de regrouper les instructions qui créent, utilisent et libèrent la ressource ensemble.
+
 Le mot-clé defer peut être utilisé avec n'importe quel appel de fonction, et une seule fonction peut utiliser le mot-clé defer plusieurs fois.
 Juste avant le retour de la fonction, Go effectuera les appels programmés avec le mot-clé defer dans l'ordre dans lequel ils ont été définis.
 *
@@ -184,6 +203,7 @@ func main() {
 	valResult1, valResult2 := swapValuesWithTwoResults(val3, val4)
 	fmt.Println("After calling function : ", valResult1, valResult2)
 
+	// Eviter les fonctions avec plusieurs significations pour un même résultat
 	for product, price := range products {
 		tax := calcTaxWithCond(price)
 		if tax != -1 {
@@ -193,6 +213,8 @@ func main() {
 		}
 	}
 
+	// Opter pour les fonctions avec plusieurs retours pour éviter les problèmes issus
+	// des fonctions avec plusieurs significations pour un même résultat
 	for product, price := range products {
 		taxAmount, taxDue := calcTaxWithTwoResults(price)
 		if taxDue {
@@ -215,6 +237,14 @@ func main() {
 	total2, tax2 := calcTotalPrice(nil, 10)
 	fmt.Println("Total 2:", total2, "Tax 2:", tax2)
 
+	/**
+	Go requiert l'utilisation de toutes les variables déclarées, ce qui peut être gênant lorsqu'une fonction renvoie des valeurs inutiles.
+	Pour éviter les erreurs de compilation, l'identifiant vide (le caractère underscore _) peut être utilisé pour indiquer les résultats
+	qui ne seront pas utilisés.
+
+	La fonction calcTotalPriceWithOneParam renvoie deux résultats, dont un seul est utilisé. L'identifiant vide est utilisé pour la valeur
+	non souhaitée, évitant ainsi une erreur de compilation.
+	**/
 	_, total3 := calcTotalPriceWithOneParam(products)
 	fmt.Println("Total : ", total3)
 
