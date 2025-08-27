@@ -13,6 +13,8 @@ func calcWithoutTax(price float64) float64 {
 	return price
 }
 
+// Les types de fonctions peuvent être utilisés de la même manière que n'importe quel autre type, y compris comme arguments
+// pour d'autres fonctions
 func printPrice(product string, price float64, calculator func(float64) float64) {
 	fmt.Println("Product : ", product, " - Price : ", calculator(price))
 }
@@ -67,11 +69,13 @@ func selectCalculatorWithDirectLitteral(price float64) calcFunc {
 	}
 }
 
-/**
+/*
+*
 La fonctionnalité de closure permet à une fonction d'accéder aux variables et aux paramètres du code environnant. Dans ce cas, la fonction
 calculatrice (fonction retournée) s'appuie sur les paramètres de la fonction factory (priceCalcFactory).
 Lorsque la fonction de calculatrice est invoquée, les valeurs des paramètres de la fonction factory sont utilisées pour produire un résultat
-**/
+*
+*/
 func priceCalcFactory(threshold, rate float64) calcFunc {
 	return func(price float64) float64 {
 		if price > threshold {
@@ -129,16 +133,20 @@ func main() {
 		"Kayak":      275,
 		"Lifejacket": 48.95,
 	}
+	/**
+	Les opérateurs de comparaison Go ne peuvent pas être utilisés pour comparer des fonctions, mais ils peuvent être utilisés
+	pour déterminer si une fonction a été affectée à une variable
+	**/
 	for product, price := range products {
 		var calcFunc func(float64) float64 // Définition d'une variable de type fonction (signature de cette fonction)
-		fmt.Println("Function assigned : ", calcFunc == nil)
+		fmt.Println("Function not assigned : ", calcFunc == nil)
 		if price > 100 {
 			calcFunc = calcWithTax
 		} else {
 			calcFunc = calcWithoutTax
 		}
 
-		fmt.Println("Function assigned : ", calcFunc == nil)
+		fmt.Println("Function not assigned : ", calcFunc == nil)
 		totalPrice := calcFunc(price)
 		fmt.Println("Product : ", product, " - Price : ", totalPrice)
 	}
