@@ -2,7 +2,13 @@ package main
 
 import "fmt"
 
-/** Présentation des types fonctions **/
+/*
+*
+Présentation des types fonctions
+L'alias est créé avec le mot-clé "type", suivi d'un nom pour l'alias puis du type et ainsi
+le nom d'alias peut être utilisé à la place du type de fonction
+*
+*/
 type calcFunc func(float64) float64 // Définition d'un type fonction
 
 func calcWithTax(price float64) float64 {
@@ -15,15 +21,18 @@ func calcWithoutTax(price float64) float64 {
 
 // Les types de fonctions peuvent être utilisés de la même manière que n'importe quel autre type, y compris comme arguments
 // pour d'autres fonctions
+// On peut utiliser les fonctions comme argument à une autre fonction
 func printPrice(product string, price float64, calculator func(float64) float64) {
 	fmt.Println("Product : ", product, " - Price : ", calculator(price))
 }
 
 // Utilisation du type fonction *calcFunc* en tant que type d'argument à une fonction
+// via la création d'une alias de type de fonction
 func printPriceWithTypeFunction(product string, price float64, calculator calcFunc) {
 	fmt.Println("Product : ", product, " - Price : ", calculator(price))
 }
 
+// Une fonction peut être le résultat de retour d'une autre fonction
 func selectCalculator(price float64) func(float64) float64 {
 	if price > 100 {
 		return calcWithTax
@@ -33,6 +42,7 @@ func selectCalculator(price float64) func(float64) float64 {
 }
 
 // Utilisation du type fonction *calcFunc* en tant que type de retour à une fonction
+// via la création d'une alias de type de fonction
 func selectCalculatorWithTypeFunction(price float64) calcFunc {
 	if price > 100 {
 		return calcWithTax
@@ -41,7 +51,12 @@ func selectCalculatorWithTypeFunction(price float64) calcFunc {
 	return calcWithoutTax
 }
 
-/** Utilisation de la syntaxe de la fonction littérale **/
+/*
+*
+Utilisation de la syntaxe littérale d'une fonction
+La syntaxe littérale de fonction permet de définir des fonctions de manière à ce qu'elles soient spécifiques à une région de code
+*
+*/
 func selectCalculatorWithLitteral(price float64) calcFunc {
 	if price > 100 {
 		var withTax calcFunc = func(price float64) float64 {
@@ -57,6 +72,7 @@ func selectCalculatorWithLitteral(price float64) calcFunc {
 	return withoutTax
 }
 
+// Les fonctions peuvent ne pas être affectées à des variables et peuvent être utilisées comme n'importe quelle autre valeur littérale.
 func selectCalculatorWithDirectLitteral(price float64) calcFunc {
 	if price > 100 {
 		return func(price float64) float64 {
@@ -177,6 +193,7 @@ func main() {
 		printPrice(product, price, selectCalculatorWithDirectLitteral(price))
 	}
 
+	// Les fonctions littérales peuvent également être utilisées comme arguments pour d'autres fonctions
 	for product, price := range products {
 		printPrice(product, price, func(price float64) float64 {
 			return price + (price * 0.2)
