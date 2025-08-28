@@ -193,7 +193,7 @@ func main() {
 		printPrice(product, price, selectCalculatorWithDirectLitteral(price))
 	}
 
-	// Les fonctions littérales peuvent également être utilisées comme arguments pour d'autres fonctions
+	// La syntaxe littérale de fonctions peut également être utilisée comme arguments pour d'autres fonctions
 	for product, price := range products {
 		printPrice(product, price, func(price float64) float64 {
 			return price + (price * 0.2)
@@ -229,7 +229,9 @@ func main() {
 		printPrice(product, price, soccerCalc1)
 	}
 
-	// La fonction calculatrice de la closure priceCalcFactoryWithEvaluator n'est pas affectée par le changement de valeur de la variable prizeGiveaway
+	// Forcer une évaluation précoce
+	// La fonction calculatrice de la closure priceCalcFactoryWithEvaluator n'est pas affectée par le changement de valeur
+	// de la variable prizeGiveaway
 	prizeGiveaway = false
 	waterCalc2 := priceCalcFactoryWithEvaluator(100, 0.2, prizeGiveaway)
 	prizeGiveaway = true
@@ -241,7 +243,10 @@ func main() {
 		printPrice(product, price, soccerCalc2)
 	}
 
-	// Le pointeur est suivi lorsque la fonction calculatrice est appelée, ce qui garantit que la valeur actuelle est utilisée.
+	// La plupart des problèmes de closure sont causés par des modifications apportées aux variables après la création d'une fonction.
+	// Dans ce cas, l'utilisation d'un pointeur empêchera la copie des valeurs.
+	// Le pointeur est suivi lorsque la fonction priceCalcFactoryWithEvaluatorPointer est appelée, ce qui garantit que la
+	// valeur actuelle est utilisée.
 	prizeGiveaway = false
 	waterCalc3 := priceCalcFactoryWithEvaluatorPointer(100, 0.2, &prizeGiveaway)
 	prizeGiveaway = true
