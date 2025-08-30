@@ -18,7 +18,7 @@ type Account struct {
 type ProductList []Product
 
 /*
-* Cette fonction est une méthode à la classe Product car nous avons défini un récepteur (receiver) (récepteur sur Product : (product *Product))
+* Cette fonction est une méthode à la structure Product car nous avons défini un récepteur (receiver) (récepteur sur Product : (product *Product))
 avant le nom de la fonction. Donc un récepteur est le type sur lequel la méthode opère.
 *
 */
@@ -133,12 +133,12 @@ func main() {
 		fmt.Println("Name : ", p.name, " - Category : ", p.category, " - Price : ", p.price)
 	}
 
-	/** Définir et utiliser des méthodes de classe
-		Les méthodes sont des fonctions qui sont appelées sur une classe et ont accès à tous les champs définis par le type de la valeur.
+	/** Définir et utiliser des méthodes de structure
+		Les méthodes sont des fonctions qui sont appelées sur une structure et ont accès à tous les champs définis par le type de la valeur.
 	**/
-	fmt.Println("Définir et utiliser des méthodes de classe")
+	fmt.Println("Définir et utiliser des méthodes de structure")
 	for _, p := range products {
-		p.printDetails() // On invoque la méthode printDetails depuis un objet de la classe Product
+		p.printDetails() // On invoque la méthode printDetails depuis un objet de la structure Product
 	}
 
 	for _, p := range products {
@@ -214,7 +214,7 @@ func main() {
 	// Utilisation d'une interface dans une méthode
 	fmt.Println("Total : ", calcTotal(expenses))
 
-	// Utilisation d'une interface pour les champs de classe
+	// Utilisation d'une interface pour les champs de structure
 	var account Account = Account{
 		accountNumber: 12345,
 		expenses: []Expense{
@@ -227,7 +227,7 @@ func main() {
 	}
 	fmt.Println("Total : ", calcTotal(account.expenses))
 
-	// On peut assigner une instance d'une classe à une variable interface si et seulement si cette classe implémente cette interface.
+	// On peut assigner une instance d'une structure à une variable interface si et seulement si cette structure implémente cette interface.
 	var product Product = Product{"Kayak", "Watersports", 275}
 	/**
 	La valeur Product a été copiée lorsqu'elle a été affectée à la variable expense1, ce qui signifie que
