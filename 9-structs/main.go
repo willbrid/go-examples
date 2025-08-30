@@ -231,7 +231,11 @@ func main() {
 	}
 	fmt.Println("Map : ", kvp1["kayak"].Product.name)
 
-	/** Comprendre les structures et les pointeurs **/
+	/**
+	Comprendre les structures et les pointeurs
+	L'affectation d'une structure à une nouvelle variable ou l'utilisation d'une structure comme paramètre de fonction crée
+	une nouvelle valeur qui copie les valeurs du champ.
+	**/
 	fmt.Println("Comprendre les structures et les pointeurs")
 	var p4 Product = Product{
 		name:     "Kayak",
@@ -242,12 +246,18 @@ func main() {
 	p4.name = "Original Kayak"
 	fmt.Println("P4 : ", p4.name)
 	fmt.Println("P5 : ", (*p5).name)
-	fmt.Println("P5 : ", p5.name) // Avec les pointeurs sur les structures, on peut omettre l'astérisque pour accéder à un champ de la structure
+	// Avec les pointeurs sur les structures, on peut omettre l'astérisque pour accéder à un champ de la structure
+	fmt.Println("P5 : ", p5.name)
 
 	calcTax(&p4)
 	fmt.Println("Name : ", p4.name, " - Category : ", p4.category, " - Price : ", p4.price)
 
-	// L'opérateur d'adresse est utilisé avant le type de structure
+	/**
+	L'opérateur d'adresse est utilisé avant le type de structure
+	Avec les pointeurs sur les structures, on peut omettre l'astérisque pour accéder à un champ de la structure.
+	Il n'y a aucun intérêt à créer une variable standard puis à l'utiliser pour créer le pointeur.
+	La possibilité de créer des pointeurs directement depuis des valeurs rend le code plus concis.
+	**/
 	var p6 *Product = &Product{
 		name:     "Kayak",
 		category: "Watersports",
@@ -300,7 +310,11 @@ func main() {
 		fmt.Println("Name : ", p.name, " - Supplier : ", p.Supplier.name, p.Supplier.city) // Ici les objets Supplier sont différents
 	}
 
-	// Afficher la valeur zéro des variables de type Product
+	/**
+	Afficher la valeur zéro des variables de type Product
+	La valeur zéro d’une structure correspond à une instance dont chacun des champs est initialisé à la valeur zéro de son type.
+	La valeur zéro d'un pointeur vers une structure est nil.
+	**/
 	var prod2 Product
 	var prod2Ptr *Product
 	fmt.Println("Value Product : ", prod2.name, prod2.category, prod2.price)
