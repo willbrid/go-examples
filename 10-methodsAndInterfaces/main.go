@@ -133,8 +133,10 @@ func main() {
 		fmt.Println("Name : ", p.name, " - Category : ", p.category, " - Price : ", p.price)
 	}
 
-	/** Définir et utiliser des méthodes de structure
+	/**
+		Définir et utiliser des méthodes de structure
 		Les méthodes sont des fonctions qui sont appelées sur une structure et ont accès à tous les champs définis par le type de la valeur.
+		Les méthodes sont invoquées via une valeur dont le type correspond au récepteur.
 	**/
 	fmt.Println("Définir et utiliser des méthodes de structure")
 	for _, p := range products {
