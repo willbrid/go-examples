@@ -2,7 +2,9 @@ package main
 
 /** Une façon de gérer les conflits de noms de packages consiste à utiliser un alias,
 ce qui permet d'accéder à un package en utilisant un nom différent.
- Il existe un alias spécial, connu sous le nom d'importation de points, qui permet d'utiliser les fonctionnalités d'un package sans utiliser de préfixe
+
+Il existe un alias spécial, connu sous le nom d'importation de points, qui permet d'utiliser les fonctionnalités d'un package
+sans utiliser de préfixe.
 
 Si nous avons besoin de l'effet de la fonction d'initialisation du package data, mais que
 nous n'avons pas besoin d'utiliser la fonction GetData que le package exporte,

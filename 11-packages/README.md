@@ -18,7 +18,7 @@ Lien pour trouver les packages
 - https://pkg.go.dev
 - https://github.com/golang/go/wiki/Projects
 
-L'instruction **require** note la dépendance au module **github.com/fatih/color** et aux autres modules dont il a besoin. Le commentaire **indirect** à la fin des instructions est ajouté automatiquement car les packages ne sont pas utilisés par le code dans le projet. Un fichier nommé **go.sum** est créé lors de l'obtention du module et contient les sommes de contrôle utilisées pour valider les packages.
+L'instruction **require** dans le fichier **go.mod** note la dépendance au module **github.com/fatih/color** et aux autres modules dont il a besoin. Le commentaire **indirect** à la fin des instructions est ajouté automatiquement car les packages ne sont pas utilisés par le code dans le projet. Un fichier nommé **go.sum** est créé lors de l'obtention du module et contient les sommes de contrôle utilisées pour valider les packages.
 
 Nous pouvons constater que notre projet a des dépendances sur différentes versions d'un module, en particulier dans les projets complexes qui ont beaucoup de dépendances. Dans ces situations, Go résout cette dépendance en utilisant la version la plus récente spécifiée par ces dépendances. Ainsi, par exemple, s'il existe des dépendances sur les versions 1.1 et 1.5 d'un module, Go utilisera la version 1.5 lors de la construction du projet. Go utilisera uniquement la version la plus récente spécifiée par une dépendance, même si une version plus récente est disponible. Si la dépendance la plus récente pour un module spécifie la version 1.5, par exemple, Go n'utilisera pas la version 1.6, même si elle est disponible.
 
