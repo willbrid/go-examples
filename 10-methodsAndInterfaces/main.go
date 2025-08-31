@@ -100,7 +100,7 @@ func processItem(item interface{}) {
 	}
 }
 
-func processItemsWithVariadicParam(items ...interface{}) {
+func processItemsWithVariadicParam(items ...any) {
 	for _, item := range items {
 		switch value := item.(type) {
 		case Product:
@@ -265,8 +265,13 @@ func main() {
 
 	// Les contrôles d'égalité d'interface peuvent également provoquer des erreurs d'exécution si le type dynamique n'est pas comparable.
 
-	// Effectuer des assertions de type
-	// Une assertion de type est utilisée pour accéder au type dynamique d'une valeur d'interface.
+	/** Effectuer des assertions de type
+	Une assertion de type est utilisée pour accéder au type dynamique d'une valeur d'interface.
+
+	Les assertions de type ne s'appliquent qu'aux interfaces et permettent d'indiquer au compilateur qu'une valeur d'interface
+	possède un type dynamique spécifique. Les conversions de type ne s'appliquent qu'à des types spécifiques, et non aux interfaces,
+	et uniquement si la structure de ces types est compatible, par exemple entre des types de structure possédant les mêmes champs.
+	**/
 	fmt.Println("Effectuer des assertions de type")
 	var expenses1 []Expense = []Expense{
 		Service{"Boat Cover", 12, 89.50},
@@ -294,12 +299,16 @@ func main() {
 
 	// Utilisation d'interface vide
 	/**
-	Go permet à l'utilisateur de l'interface vide (c'est-à-dire une interface qui ne définit aucune méthode) de représenter n'importe quel type,
-	ce qui peut être un moyen utile de regrouper des types disparates qui ne partagent aucune caractéristique commune
+	Go permet l'utilisation de l'interface vide (c'est-à-dire une interface qui ne définit aucune méthode) qui représente n'importe quel type,
+	ce qui peut être un moyen utile de regrouper des types disparates qui ne partagent aucune caractéristique commune.
+
+	L'interface vide représente tous les types, y compris les types intégrés et toutes les structures et interfaces qui ont été définies.
+
+	type any = interface{} : any est un alias pour interface{} et est équivalent à interface{} à tous égards.
 	**/
 	fmt.Println("Utilisation d'interface vide")
 	var expense3 Expense = &Product{"Kayak", "Watersports", 275}
-	var data []interface{} = []interface{}{ // définition d'un tableau d'interface vide : []interface{}
+	var data []any = []any{ // définition d'un tableau d'interface vide : []interface{}
 		expense3,
 		Product{"Lifejacket", "Watersports", 48.95},
 		Service{"Boat Cover", 12, 89.50},
