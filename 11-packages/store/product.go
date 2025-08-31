@@ -1,3 +1,8 @@
+/**
+Go prend également en charge un commentaire décrivant un package complet, qui apparaît avant le mot-clé « package ».
+Ces commentaires sont traités par l'outil "go doc", qui génère la documentation du code.
+**/
+
 // Package store provides types and methods
 // commonly required for online sales
 package store
