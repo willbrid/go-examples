@@ -24,10 +24,14 @@ func main() {
 	}
 	/**
 	Pour atteindre le champ Name, nous pouvons naviguer dans le type imbriqué Product.
+
 	Go permet également d'utiliser directement les types de champs imbriqués. Ainsi le type Boat ne définit pas de champ Name,
 	mais il peut être traité comme s'il le faisait grâce à la fonction d'accès direct.
+
 	Les méthodes sont également promues afin que les méthodes définies pour
 	le type imbriqué (Product) puissent être appelées à partir du type englobant (Boat).
+
+	On a deux types de promotion : promotion de champ et promotion de méthode.
 	**/
 	for _, b := range boats {
 		fmt.Println("Conventional : ", b.Product.Name, " - Direct : ", b.Name, " - Price : ", b.Price(0.2))
@@ -76,6 +80,10 @@ func main() {
 	for key, p := range products {
 		fmt.Println("Key : ", key, " - Price : ", p.Price(0.2))
 	}
+	/**
+	Une assertion de type est effectuée par l'instruction "case" du "switch" lorsqu'un seul type est spécifié, même si cela peut conduire à
+	une duplication lorsque chaque type est traité.
+	**/
 	for key, p := range products {
 		switch item := p.(type) {
 		case *store.Product:
@@ -88,7 +96,7 @@ func main() {
 	}
 
 	/**
-	Composition d'interface :Une interface peut en enfermer une autre, avec pour effet que les types doivent implémenter
+	Composition d'interface : une interface peut en enfermer une autre, avec pour effet que les types doivent implémenter
 	toutes les méthodes définies par les interfaces englobantes et enfermées. Les interfaces sont plus simples que les structures,
 	et il n'y a pas de champs ou de méthode à promouvoir. Le résultat de la composition des interfaces est une union de la méthode
 	définie par les types englobant et clos.
