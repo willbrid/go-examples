@@ -6,8 +6,24 @@ import (
 )
 
 /**
-Fonction permettant de recevoir les valeurs depuis un canal
+- Pour exécuter une fonction de manière asynchrone, créer une goroutine
+
+- Pour produire un résultat à partir d'une fonction exécutée de manière asynchrone, utiliser un canal
+
+- Pour envoyer et recevoir des valeurs via un canal, utiliser des expressions fléchées
+
+- Pour indiquer qu'aucune autre valeur ne sera envoyée, utiliser la fonction close sur un canal
+
+- Pour énumérer les valeurs reçues d'un canal, utiliser une boucle for avec le mot-clé range
+
+- Pour envoyer ou recevoir des valeurs via plusieurs canaux, utiliser une instruction select
 **/
+
+/*
+*
+Fonction permettant de recevoir les valeurs depuis un canal
+*
+*/
 func receiveDispatches(channel <-chan DispatchNotification1) {
 	var details DispatchNotification1
 
