@@ -81,6 +81,12 @@ qui est la fonction main du package main. Chaque instruction de la fonction main
 La goroutine continue d'exécuter des instructions jusqu'à ce qu'elle atteigne la fin de la fonction main, moment auquel l'application se termine.
 La goroutine exécute chaque instruction de la fonction main de manière synchrone, ce qui signifie qu'elle attend que l'instruction se
 termine avant de passer à l'instruction suivante.
+
+Une goroutine est créée à l'aide du mot-clé "go" suivi de la fonction ou de la méthode à exécuter de manière asynchrone.
+Lorsque l'environnement d'exécution Go rencontre le mot-clé go, il crée une nouvelle goroutine et l'utilise pour exécuter
+la fonction ou la méthode spécifiée. Cela modifie l'exécution du programme, car à tout moment, plusieurs goroutines sont présentes,
+chacune exécutant son propre ensemble d'instructions. Ces instructions sont exécutées simultanément, ce qui signifie simplement
+qu'elles sont exécutées en même temps.
 **/
 
 func main() {
