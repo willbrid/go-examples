@@ -68,9 +68,9 @@ func main() {
 	**/
 	Printfln("RoundToEven: %v", math.RoundToEven(val2))
 
-	// Cette fonction rand.Seed définit la valeur de départ à l'aide de la valeur int64 spécifiée.
-	// rand.Seed utilise la valeur de départ fournie pour initialiser la source par défaut à un état déterministe.
-	rand.Seed(time.Now().UnixNano()) // obsolète depuis 1.20
+	// Cette fonction rand.NewSource définit la valeur de départ à l'aide de la valeur int64 spécifiée.
+	// rand.NewSource utilise la valeur de départ fournie pour initialiser la source par défaut à un état déterministe.
+	rand.NewSource(time.Now().UnixNano()) // obsolète depuis 1.20
 	for i := 0; i < 5; i++ {
 		// Cette fonction rand.Int génère une valeur int aléatoire.
 		Printfln("Value rand.Int %v : %v", i, rand.Int())
