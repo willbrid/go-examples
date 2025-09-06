@@ -5,7 +5,9 @@ import (
 	"time"
 )
 
-/** Utilisation d'un canal avec tampon et avec les actions d'envoie et de reception de valeur depuis ce canal
+/**
+Utilisation d'un canal avec tampon et avec les actions d'envoie et de reception de valeur depuis ce canal
+
 Cela fait de l'envoi d'un message une opération non bloquante, permettant à un expéditeur de transmettre sa valeur au canal
 et de continuer à travailler sans avoir à attendre un destinataire.
 Dans les projets réels, un tampon plus grand (taille = 100) est utilisé, choisi de manière à ce qu'il y ait une capacité

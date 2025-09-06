@@ -22,7 +22,7 @@ ne sera envoyée via le canal. Les récepteurs peuvent vérifier si un canal est
 func DispatchOrders(channel chan DispatchNotification) {
 	var orderCount int
 
-	rand.Seed(time.Now().UTC().UnixNano())
+	rand.NewSource(time.Now().UTC().UnixNano())
 	orderCount = rand.Intn(3) + 2
 	fmt.Println("Order count : ", orderCount)
 
