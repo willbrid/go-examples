@@ -1,6 +1,6 @@
 module sportsstore
 
-go 1.20
+go 1.24.7
 
 require platform v1.0.0
 
