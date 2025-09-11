@@ -19,47 +19,13 @@ my-project/
 
 - **cmd/** : les applications principales de ce projet. Le nom de répertoire de chaque application doit correspondre au nom de l'exécutable que nous souhaitons avoir.
 
-- **internal/** : applications privées et bibliothèques de code. C'est le code dont nous ne souhaitons pas voir importé dans d'autres applications ou bibliothèques.
+- **internal/** : applications privées et bibliothèques de code. C'est le code dont nous ne souhaitons pas voir importé dans d'autres applications ou bibliothèques. Pour une architecture hexagonale, on retrouve les couches de notre hexagone.
 
 - **pkg/** : l'on place le code qui peut être réutilisé par les applications externes. D'autres projets peuvent importer ces bibliothèques.
 Il peut stocker la couche d'infrastructure, comme la base de données (par exemple pour mysql : dossier pkg/mysql et 
 fichier pkg/mysql/mysql.go), comme un système de cache (par exemple pour redis : dossier pkg/redis et 
 fichier pkg/redis/redis.go), comme un système de gestion de fil d'attente (par exemple pour rabbitmq : dossier pkg/rabbitmq 
 et fichier pkg/rabbitmq/rabbitmq.go)
-
-### Organisation de base avec les répertoires d'application web et les répertoires communs aux applications
-
-```
-my-project/
-├── cmd/
-│   └── main.go
-├── internal/
-│   └── middleware/
-│   └── auth/
-│   └── util/
-├── docs/
-├── pkg/
-│   └── util/
-├── web/
-├── config/
-├── deployments/
-│   └── docker-compose.yaml
-├── .env.example
-├── Dockerfile
-├── go.mod
-├── go.sum
-└── README.md
-```
-
-- **config/** : templates de fichiers de configuration ou configurations par défaut ou modules de configuration pour l'application
-
-- **/deployments** : templates et configurations pour les IaaS, PaaS, système et l'orchestration de conteneurs (docker-compose, kubernetes/helm, mesos, terraform, bosh)
-
-- **/docs** : documentation de l'application
-
-- **.env.example** : fichier exemple de configuration des variables d'environnement de l'application
-
-- **web/** : les composants spécifiques aux applications web : assets statiques, templates serveurs et SPAs.
 
 ### Organisation complète
 
@@ -68,10 +34,13 @@ my-project/
 ├── cmd/
 │   └── main.go
 ├── internal/
-│   └── middleware/
-│   └── auth/
+│   └── app/
 |   └── delivery/
 |       └── http/
+|           └── v1/
+|               └── handler.go
+|           └── middleware.go
+|           └── handler.go
 |       └── grpc/
 |       └── workers/
 │   └── domain/
@@ -79,11 +48,16 @@ my-project/
 |   └── usecase/
 |   └── repository/
 |   └── microservice/
+├── docs/
+├── examples/
+├── pkg/
+│   └── auth/
+|   └── database/
 |   └── cache/
 |   └── queue/
-├── docs/
-├── pkg/
-│   └── util/
+|   └── storage/
+|   └── util/
+|   └── helper/
 ├── web/
 ├── config/
 ├── deployments/
@@ -95,25 +69,51 @@ my-project/
 └── README.md
 ```
 
+- **internal/app/** : orchestration de l’application (bootstrap, gestion des modules). Peut contenir des services applicatifs globaux.
+
+- **internal/delivery/** : les adaptateurs entrants.
+
+--- **internal/delivery/http** : gestion des routes HTTP, contrôleurs, middlewares <br>
+--- **internal/delivery/grpc** : serveurs gRPC, implémentations des services proto <br>
+--- **internal/delivery/grpc** : consumers de file (Kafka, RabbitMQ, etc.)
+
+- **config/** : templates de fichiers de configuration ou configurations par défaut ou modules de configuration pour l'application
+
 - **delivery/** : il contient les différentes points d'entrées (Handlers). Les Handlers sont regroupés par domaine d'application.
 Pour chaque groupe, sa propre structure de routeur est créée, dont les méthodes traitent les chemins.
 La structure de la logique métier est injectée dans la structure du routeur, qui sera appelée par les Handlers.
 
-- **domain/** : il contient les entités métiers
+- **internal/domain/** : il contient les entités métiers
 
-- **dto/** : c'est similaire avec les entités mais les différences sont : ne pas définir de **dto** dans **repository/**, les entités **dto** 
-sont utiles pour obtenir le corps de notre requête, les paramètres de notre requête ou répondre avec nos données de notre API REST.
+- **internal/dto/** : c'est similaire avec les entités mais les différences sont : ne pas définir de **dto** dans **repository/**, les entités **dto** sont utiles pour obtenir le corps de notre requête, les paramètres de notre requête ou répondre avec nos données de notre API REST.
 
-- **usecase/** (ou **service/**) : il contient toute la logique métier, comme la création d'un produit, la création d'un utilisateur, 
-la validation des produits, la validation de la quantité de produits, l'exécution d'une transaction...
+- **internal/usecase/** (ou **internal/service/**) : il contient toute la logique métier, comme la création d'un produit, la création d'un utilisateur, la validation des produits, la validation de la quantité de produits, l'exécution d'une transaction...
 
-- **repository/** : il contient toutes les requêtes de base de données.
+- **internal/repository/** : il contient toutes les requêtes de base de données.
 
-- **microservice/** : il contient toutes les requêtes vers les microservices externes.
+- **internal/microservice/** : il contient toutes les requêtes vers les microservices externes.
 
-- **cache/** : il contient toutes les requêtes vers un serveur de cache.
+- **pkg/database/** : initialisation DB, migrations
 
-- **queue/** : il contient toutes les requêtes vers un serveur de fil d'attente.
+- **pkg/cache/** : il contient toutes les requêtes vers un serveur de cache (redis, mémoire).
+
+- **pkg/queue/** : il contient toutes les requêtes vers un serveur de fil d'attente.
+
+- **pkg/storage/** : initialisation s3, filesystem
+
+- **pkg/util/** : helpers génériques (convertisseurs, parseurs)
+
+- **pkg/helper/** : helpers mais plutôt spécifique à notre application
+
+- **web/** : les composants spécifiques aux applications web : assets statiques, templates serveurs et SPAs.
+
+- **examples/** : exemples d’utilisation du projet, mini-programmes de démo.
+
+- **docs/** : documentation technique de l'application
+
+- **deployments/** : templates et configurations pour les IaaS, PaaS, système et l'orchestration de conteneurs (docker-compose, kubernetes/helm, mesos, terraform, bosh)
+
+- **.env.example** : fichier exemple de configuration des variables d'environnement de l'application
 
 <br>
 
