@@ -155,8 +155,12 @@ func main() {
 	go DispatchOrders1(sendOnlyChannel)
 	receiveDispatches(receiveOnlyChannel)
 
-	// Utilisation de l'instruction select
 	/**
+	Utilisation de l'instruction select
+	L'instruction select évalue ses instructions case une seule fois, c'est pourquoi on peut utiliser également utilisé une boucle for.
+	La boucle continue d'exécuter l'instruction select, qui recevra les valeurs du canal dès qu'elles seront disponibles.
+	Si aucune valeur n'est disponible, la clause default est exécutée.
+
 	L'utilisation la plus simple des instructions select est de recevoir d'un canal sans bloquer,
 	garantissant qu'une goroutine n'aura pas à attendre lorsque le canal est vide.
 	Une instruction select a une structure similaire à une instruction switch, sauf que les instructions case sont des opérations de canal.
