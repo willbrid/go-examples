@@ -48,6 +48,7 @@ my-project/
 |   └── usecase/
 |   └── repository/
 |   └── microservice/
+|   └── pkg/
 ├── docs/
 ├── examples/
 ├── pkg/
@@ -56,8 +57,6 @@ my-project/
 |   └── cache/
 |   └── queue/
 |   └── storage/
-|   └── util/
-|   └── helper/
 ├── web/
 ├── config/
 ├── deployments/
@@ -93,6 +92,8 @@ La structure de la logique métier est injectée dans la structure du routeur, q
 
 - **internal/microservice/** : il contient toutes les requêtes vers les microservices externes.
 
+- **internal/pkg/** : il contient les packages propre à notre application (par exemple les package **util** et **helper**)
+
 - **pkg/database/** : initialisation DB, migrations
 
 - **pkg/cache/** : il contient toutes les requêtes vers un serveur de cache (redis, mémoire).
@@ -100,10 +101,6 @@ La structure de la logique métier est injectée dans la structure du routeur, q
 - **pkg/queue/** : il contient toutes les requêtes vers un serveur de fil d'attente.
 
 - **pkg/storage/** : initialisation s3, filesystem
-
-- **pkg/util/** : helpers génériques (convertisseurs, parseurs)
-
-- **pkg/helper/** : helpers mais plutôt spécifique à notre application
 
 - **web/** : les composants spécifiques aux applications web : assets statiques, templates serveurs et SPAs.
 
