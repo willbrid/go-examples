@@ -127,6 +127,7 @@ La structure de la logique métier est injectée dans la structure du routeur, q
 - Go implementation of JSON Web Tokens : https://github.com/golang-jwt/jwt
 - Go library to parse environment variables into structs : https://github.com/caarlos0/env
 - Go library which loads env vars from a .env file : https://github.com/joho/godotenv
+- Go a fast Go linters runner : https://github.com/golangci/golangci-lint
 
 **Références :**
 
