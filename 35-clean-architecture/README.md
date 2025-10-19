@@ -47,13 +47,16 @@ my-project/
 |   └── dto/
 |   └── usecase/
 |   └── repository/
-|   └── microservice/
+|   └── gateway/
+|       └── microservice/
+|       └── grpc/
+|       └── messaging/
 |   └── pkg/
 ├── docs/
 ├── examples/
 ├── pkg/
 │   └── auth/
-|   └── database/
+|   └── database/gateway
 |   └── cache/
 |   └── queue/
 |   └── storage/
@@ -90,9 +93,13 @@ La structure de la logique métier est injectée dans la structure du routeur, q
 
 - **internal/repository/** : il contient toutes les requêtes de base de données.
 
-- **internal/microservice/** : il contient toutes les requêtes vers les microservices externes.
+- **internal/gateway** : les adaptateurs sortants.
 
-- **internal/pkg/** : il contient les packages propre à notre application (par exemple les package **util** et **helper**)
+--- **internal/gateway/microservice/** : il contient toutes les requêtes http vers les microservices externes. <br>
+--- **internal/gateway/grpc/** : il contient toutes les requêtes grpc vers les microservices externes. <br>
+--- **internal/gateway/messaging/** : il contient toutes les requêtes en consommation vers les brokers.
+
+- **internal/pkg/** : il contient les packages propre à notre application (par exemple les packages **util** et **helper**)
 
 - **pkg/database/** : initialisation DB, migrations
 
@@ -122,7 +129,7 @@ La structure de la logique métier est injectée dans la structure du routeur, q
 - Golang Migrate (Database Migration) : https://github.com/golang-migrate/migrate
 - Go Playground Validator (Validation) : https://github.com/go-playground/validator
 - Logrus (Logger) : https://github.com/sirupsen/logrus
-- Confluent Kafka Golang : https://github.com/confluentinc/confluent-kafka-go
+- Feature complete Kafka library in pure Go : https://github.com/twmb/franz-go
 - Lodash-style Go library : https://github.com/samber/lo
 - Go implementation of JSON Web Tokens : https://github.com/golang-jwt/jwt
 - Go library to parse environment variables into structs : https://github.com/caarlos0/env
