@@ -49,7 +49,7 @@ my-project/
 |   └── usecase/
 |   └── repository/
 |   └── gateway/
-|       └── microservice/
+|       └── http/
 |       └── grpc/
 |       └── messaging/
 |   └── pkg/
@@ -98,7 +98,7 @@ La structure de la logique métier est injectée dans la structure du routeur, q
 
 - **internal/gateway** : les adaptateurs sortants.
 
---- **internal/gateway/microservice/** : il contient toutes les requêtes http vers les microservices externes. <br>
+--- **internal/gateway/http/** : il contient toutes les requêtes http vers les microservices externes. <br>
 --- **internal/gateway/grpc/** : il contient toutes les requêtes grpc vers les microservices externes. <br>
 --- **internal/gateway/messaging/** : il contient toutes les requêtes de consommation des messages provenant des brokers.
 
