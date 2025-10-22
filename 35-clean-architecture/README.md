@@ -45,6 +45,7 @@ my-project/
 |       └── workers/
 │   └── domain/
 |   └── dto/
+|   └── events/
 |   └── usecase/
 |   └── repository/
 |   └── gateway/
@@ -56,7 +57,7 @@ my-project/
 ├── examples/
 ├── pkg/
 │   └── auth/
-|   └── database/gateway
+|   └── database/
 |   └── cache/
 |   └── queue/
 |   └── storage/
@@ -77,7 +78,7 @@ my-project/
 
 --- **internal/delivery/http** : gestion des routes HTTP, contrôleurs, middlewares <br>
 --- **internal/delivery/grpc** : serveurs gRPC, implémentations des services proto <br>
---- **internal/delivery/grpc** : consumers de file (Kafka, RabbitMQ, etc.)
+--- **internal/delivery/workers** : consommateurs de messages événementiels (Kafka, RabbitMQ, etc.)
 
 - **config/** : templates de fichiers de configuration ou configurations par défaut ou modules de configuration pour l'application
 
@@ -89,6 +90,8 @@ La structure de la logique métier est injectée dans la structure du routeur, q
 
 - **internal/dto/** : c'est similaire avec les entités mais les différences sont : ne pas définir de **dto** dans **repository/**, les entités **dto** sont utiles pour obtenir le corps de notre requête, les paramètres de notre requête ou répondre avec nos données de notre API REST.
 
+- **internal/events/** : il contient les structures de messages produits ou consommés via les brokers
+
 - **internal/usecase/** (ou **internal/service/**) : il contient toute la logique métier, comme la création d'un produit, la création d'un utilisateur, la validation des produits, la validation de la quantité de produits, l'exécution d'une transaction...
 
 - **internal/repository/** : il contient toutes les requêtes de base de données.
@@ -97,7 +100,7 @@ La structure de la logique métier est injectée dans la structure du routeur, q
 
 --- **internal/gateway/microservice/** : il contient toutes les requêtes http vers les microservices externes. <br>
 --- **internal/gateway/grpc/** : il contient toutes les requêtes grpc vers les microservices externes. <br>
---- **internal/gateway/messaging/** : il contient toutes les requêtes en consommation vers les brokers.
+--- **internal/gateway/messaging/** : il contient toutes les requêtes de consommation des messages provenant des brokers.
 
 - **internal/pkg/** : il contient les packages propre à notre application (par exemple les packages **util** et **helper**)
 
