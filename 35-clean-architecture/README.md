@@ -124,7 +124,7 @@ La structure de la logique métier est injectée dans la structure du routeur, q
 
 - **.env.example** : fichier exemple de configuration des variables d'environnement de l'application
 
-<br>
+![clean-architecture](./images/clean_architecture.png)
 
 **Framework et bibliothèque**
 
