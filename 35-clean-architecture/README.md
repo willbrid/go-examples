@@ -133,6 +133,7 @@ La structure de la logique métier est injectée dans la structure du routeur, q
 - Go Playground Validator (Validation) : https://github.com/go-playground/validator
 - Logrus (Logger) : https://github.com/sirupsen/logrus
 - Feature complete Kafka library in pure Go : https://github.com/twmb/franz-go
+- Sarama (Kafka Client) : https://github.com/IBM/sarama
 - Lodash-style Go library : https://github.com/samber/lo
 - Go implementation of JSON Web Tokens : https://github.com/golang-jwt/jwt
 - Go library to parse environment variables into structs : https://github.com/caarlos0/env
