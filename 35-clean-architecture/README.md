@@ -44,8 +44,9 @@ my-project/
 |       └── grpc/
 |       └── workers/
 │   └── domain/
-|   └── dto/
-|   └── events/
+|   └── model/
+|       └── dto/
+|       └── events/
 |   └── usecase/
 |   └── repository/
 |   └── gateway/
@@ -88,9 +89,10 @@ La structure de la logique métier est injectée dans la structure du routeur, q
 
 - **internal/domain/** : il contient les entités métiers
 
-- **internal/dto/** : c'est similaire avec les entités mais les différences sont : ne pas définir de **dto** dans **repository/**, les entités **dto** sont utiles pour obtenir le corps de notre requête, les paramètres de notre requête ou répondre avec nos données de notre API REST.
+ **internal/model** : il s'agit des modèles de données utilisés pour la communication entrante et sortante avec les systèmes externes.
 
-- **internal/events/** : il contient les structures de messages produits ou consommés via les brokers
+--- **internal/model/dto/** : c'est similaire avec les entités mais les différences sont : ne pas définir de **dto** dans **repository/**, les entités **dto** sont utiles pour obtenir le corps de notre requête, les paramètres de notre requête ou répondre avec nos données de notre API REST. <br>
+--- **internal/model/events/** : il contient les structures de messages produits ou consommés via les brokers
 
 - **internal/usecase/** (ou **internal/service/**) : il contient toute la logique métier, comme la création d'un produit, la création d'un utilisateur, la validation des produits, la validation de la quantité de produits, l'exécution d'une transaction...
 
