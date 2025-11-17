@@ -1,6 +1,6 @@
 module packages
 
-go 1.24.7
+go 1.24.10
 
 require (
 	github.com/fatih/color v1.10.0 // indirect

@@ -1,6 +1,6 @@
 module data
 
-go 1.24.7
+go 1.24.10
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
