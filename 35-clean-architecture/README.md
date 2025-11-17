@@ -148,6 +148,9 @@ La structure de la logique métier est injectée dans la structure du routeur, q
 - [https://github.com/Creatly/creatly-backend](https://github.com/Creatly/creatly-backend)
 - [https://github.com/golang-standards/project-layout](https://github.com/golang-standards/project-layout)
 - [https://github.com/bxcodec/go-clean-arch](https://github.com/bxcodec/go-clean-arch)
-- [https://github.com/nurcahyaari/golang-starter](https://github.com/nurcahyaari/golang-starter)
 - [https://github.com/khannedy/golang-clean-architecture](https://github.com/khannedy/golang-clean-architecture)
 - [https://github.com/projectcontour/contour](https://github.com/projectcontour/contour)
+
+**Liens utiles**
+
+- [https://12factor.net/fr/](https://12factor.net/fr/)
