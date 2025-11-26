@@ -1,6 +1,6 @@
 module platform
 
-go 1.24.10
+go 1.25.4
 
 require (
 	github.com/gorilla/securecookie v1.1.1 // indirect
