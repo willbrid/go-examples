@@ -120,7 +120,7 @@ go mod init tools
 go run .
 ```
 
-Avec la création d'un module Go, au lieu de spécifier un fichier de code particulier, le projet peut être compilé et exécuté à l'aide d'un point, indiquant le projet dans le répertoire courant.
+Avec la création d'un module Go, au lieu de spécifier un fichier de code particulier, le projet peut être compilé et exécuté à l'aide du caractère point (`.`), indiquant le projet dans le répertoire courant.
 
 - Installer **Delve** le débogueur standard pour les applications Go
 
