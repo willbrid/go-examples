@@ -52,4 +52,12 @@ func main() {
 	var _ = "Alice"
 	fmt.Println("Total :", price4+tax4)
 	fmt.Println("In Stock :", inStock4)
+
+	/*
+		Les chaines de caractères précédées d'une barre oblique inverse sont interprétées si la valeur est placée entre guillemets doubles
+		"Bonjour\n". Les caractères d'échappement ne sont pas interprétées si la valeur est placée entre guillemets obliques inverses
+		`Bonjour\n`.
+
+		Les caractères, les glyphes et les caractères d'échappement sont entourés de guillemets simples (le caractère ').
+	*/
 }
