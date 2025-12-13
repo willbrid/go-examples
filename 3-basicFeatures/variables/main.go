@@ -7,19 +7,19 @@ import (
 func main() {
 	/** Utilisation des variables **/
 
-	var price2 float32 = 275.00
-	var tax2 float32 = 27.50
-	var quantity2 float32 = 2
-	var inStock2 bool = true
+	var price float32 = 275.00
+	var tax float32 = 27.50
+	var quantity float32 = 2
+	var inStock bool = true
 
 	fmt.Println(20 + 20)
-	fmt.Println(price2 + tax2)
-	fmt.Println("Total : ", 2*quantity2*(price2+tax2))
-	fmt.Println("En stock : ", inStock2)
+	fmt.Println(price + tax)
+	fmt.Println("Total : ", 2*quantity*(price+tax))
+	fmt.Println("En stock : ", inStock)
 
-	fmt.Println(price2 + tax2)
-	price2 = 300
-	fmt.Println(price2 + tax2)
+	fmt.Println(price + tax)
+	price = 300
+	fmt.Println(price + tax)
 
 	/**
 	Les variables définies sans assignation de valeur se voient attribuer la valeur zéro pour le type spécifié.
@@ -32,15 +32,24 @@ func main() {
 	string : "" (chaîne vide)
 	rune : 0
 	*/
-	var price3 float32
-	fmt.Println(price3)
-	price3 = 275.00
-	fmt.Println(price3)
+	var price1 float32
+	fmt.Println(price1)
+	price1 = 275.00
+	fmt.Println(price1)
 
-	var price4, tax4 = 275.00, 27.50
-	fmt.Println(price4 + tax4)
+	var price3, tax3 = 275.00, 27.50
+	fmt.Println(price3 + tax3)
 
 	/** La déclaration de variable abrégée offre une syntaxe concise pour déclarer des variables. **/
 	price5 := 275.00
 	fmt.Println(price5)
+
+	/**
+	En Go, il est illégal de définir une variable et de ne pas l'utiliser.
+	Dans ces situations, Go fournit l'identifiant vide, utilisé pour désigner une valeur qui ne sera pas utilisée.
+	**/
+	price4, tax4, inStock4, _ := 275.00, 27.50, true, true
+	var _ = "Alice"
+	fmt.Println("Total :", price4+tax4)
+	fmt.Println("In Stock :", inStock4)
 }
