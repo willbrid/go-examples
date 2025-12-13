@@ -19,6 +19,17 @@ func main() {
 	const quantity = 2
 	fmt.Println("Constante : prix : ", price, " Tax : ", tax, " quantite : ", quantity)
 
+	/**
+	    Le mot-clé "iota" peut être utilisé pour créer une série de constantes entières non typées successives sans avoir besoin
+		de leur attribuer des valeurs individuelles.
+		**/
+	const (
+		foot1 = iota
+		foot2
+		foot3
+	)
+	fmt.Println("Foot1 :", foot1, " - Fooot2", foot2, " - Foot3", foot3)
+
 	/** Utilisation des constances **/
 	const price1, tax1 float32 = 275, 27.50
 	const quantity1, inStock1 = 2, true
@@ -39,6 +50,17 @@ func main() {
 	price2 = 300
 	fmt.Println(price + tax)
 
+	/**
+	Les variables définies sans assignation de valeur se voient attribuer la valeur zéro pour le type spécifié.
+	Les valeurs zéro pour les types de base :
+	int : 0
+	unit : 0
+	byte : 0
+	float64 : 0
+	bool : false
+	string : "" (chaîne vide)
+	rune : 0
+	*/
 	var price3 float32
 	fmt.Println(price3)
 	price3 = 275.00
@@ -46,17 +68,6 @@ func main() {
 
 	var price4, tax4 = 275.00, 27.50
 	fmt.Println(price4 + tax4)
-
-	/**
-	    Le mot-clé "iota" peut être utilisé pour créer une série de constantes entières non typées successives sans avoir besoin
-		de leur attribuer des valeurs individuelles.
-		**/
-	const (
-		foot1 = iota
-		foot2
-		foot3
-	)
-	fmt.Println("Foot1 :", foot1, " - Fooot2", foot2, " - Foot3", foot3)
 
 	/** Utilisation des pointeurs **/
 	var first int = 100
