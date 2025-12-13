@@ -9,7 +9,9 @@ import (
 func main() {
 	fmt.Println("Types, valeurs et pointeurs de base")
 
-	/** Types de données de base **/
+	/** Types de données de base
+	Avec le mot clé const, il existe deux façons de définir des constantes en Go : les constantes typées et les constantes non typées.
+	**/
 	fmt.Println("Value: ", rand.Int())
 	fmt.Println("Hello Will")
 	const price float32 = 275.00
