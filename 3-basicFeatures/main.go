@@ -47,6 +47,17 @@ func main() {
 	var price4, tax4 = 275.00, 27.50
 	fmt.Println(price4 + tax4)
 
+	/**
+	    Le mot-clé "iota" peut être utilisé pour créer une série de constantes entières non typées successives sans avoir besoin
+		de leur attribuer des valeurs individuelles.
+		**/
+	const (
+		foot1 = iota
+		foot2
+		foot3
+	)
+	fmt.Println("Foot1 :", foot1, " - Fooot2", foot2, " - Foot3", foot3)
+
 	/** Utilisation des pointeurs **/
 	var first int = 100
 	var second *int = &first
