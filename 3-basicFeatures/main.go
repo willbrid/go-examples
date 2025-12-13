@@ -55,6 +55,9 @@ func main() {
 		Les chaines de caractères précédées d'une barre oblique inverse sont interprétées si la valeur est placée entre guillemets doubles
 		"Bonjour\n". Les séquences d'échappement ne sont pas interprétées si la valeur est placée entre guillemets obliques inverses
 		`Bonjour\n`.
+
+		Les caractères, les glyphes et les séquences d'échappement sont entourés de guillemets
+		simples (le caractère ').
 	*/
 	fmt.Println("First : ", first)
 	fmt.Println("Second : ", second)
