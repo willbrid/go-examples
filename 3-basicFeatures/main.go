@@ -51,7 +51,11 @@ func main() {
 
 	first++
 	*second++
-
+	/*
+		Les chaines de caractères précédées d'une barre oblique inverse sont interprétées si la valeur est placée entre guillemets doubles
+		"Bonjour\n". Les séquences d'échappement ne sont pas interprétées si la valeur est placée entre guillemets obliques inverses
+		`Bonjour\n`.
+	*/
 	fmt.Println("First : ", first)
 	fmt.Println("Second : ", second)
 	fmt.Println("Second- : ", *second)
