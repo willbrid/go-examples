@@ -8,9 +8,14 @@ import (
 func main() {
 	/** Utilisation des opérateurs arithmétiques **/
 
+	/**
+		+ : cet opérateur renvoie la somme de deux opérandes.
+		- : cet opérateur renvoie la différence entre deux opérandes.
+		* : cet opérateur renvoie le produit de deux opérandes.
+	    / : cet opérateur renvoie le quotient de deux opérandes.
+	**/
 	var price, tax float32 = 275.00, 27.40
 	var sum, difference, product, quotient float32
-
 	sum = price + tax
 	difference = price - tax
 	product = price * tax
