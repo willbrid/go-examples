@@ -49,7 +49,7 @@ func main() {
 		fmt.Println("Counter4: ", counter4)
 	}
 
-	// Utilisation de `for` avec l'instruction `range` pour parcourir les chaines, les arrays, les slices et les maps
+	// Utilisation de `for` avec l'instruction `range` pour parcourir les chaines, les entiers, les arrays, les slices et les maps
 	/**
 	Cet exemple ci-dessous parcourt une chaîne de caractères que la boucle `for` traite comme une séquence de valeurs de type `rune`,
 	chacune représentant un caractère. À chaque itération de la boucle, des valeurs sont assignées à deux variables :
@@ -60,6 +60,18 @@ func main() {
 		fmt.Println("Index: ", index, " Character: ", string(character))
 	}
 
+	// for avec range peut également être utilisé pour parcourir les entiers.
+	fmt.Println("Range over integer")
+	for value := range 30 {
+		fmt.Println("Integer element Value: ", value)
+	}
+
+	fmt.Println("Range over slices")
+	var products []string = []string{"Kayak", "Lifejacket", "Soccer Ball"}
+	for index, element := range products {
+		fmt.Println("Index:", index, "Element:", element)
+	}
+
 	// Nous pouvons omettre la variable de valeur de l'instruction `for` range si nous n'avons besoin que des valeurs d'index.
 	for index := range product {
 		fmt.Println("Index: ", index)
@@ -68,10 +80,5 @@ func main() {
 	// L'identifiant vide (`_`) peut être utilisé lorsque nous avons uniquement besoin des valeurs de la séquence et non des indices.
 	for _, character := range product {
 		fmt.Println("Character: ", string(character))
-	}
-
-	var products []string = []string{"Kayak", "Lifejacket", "Soccer Ball"}
-	for index, element := range products {
-		fmt.Println("Index:", index, "Element:", element)
 	}
 }
