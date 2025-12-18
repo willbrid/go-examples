@@ -158,4 +158,41 @@ func main() {
 	fmt.Println("someProduct2s len :", len(someProduct2s), " cap :", cap(someProduct2s))
 	fmt.Println("allProduct2s :", allProduct2s)
 	fmt.Println("allProduct2s len :", len(allProduct2s), " cap :", cap(allProduct2s))
+
+	/**
+		Spécification de la capacité lors de la création d'une tranche à partir d'un tableau
+
+	    Les plages peuvent inclure une capacité maximale, ce qui permet de contrôler, dans une certaine mesure, le moment où les
+		tableaux seront dupliqués.
+		La valeur maximale ne spécifie pas directement la capacité maximale. Celle-ci est déterminée en soustrayant la valeur minimale
+		de la valeur maximale. Dans l'exemple ci-dessous, la valeur maximale est 3 et la valeur minimale est 1, ce qui limite la capacité à 2.
+		Par conséquent, l'opération d'ajout entraîne le redimensionnement de la tranche et l'allocation de son propre tableau,
+		au lieu de son extension dans le tableau existant. Le redimensionnement de la tranche signifie que la valeur 'Gloves' ajoutée
+		à la tranche someProduct3s ne fait pas partie des valeurs mappées par la tranche allProduct3s.
+	**/
+	product3s := [4]string{"kayak", "lifejacket", "paddle", "Hat"}
+	someProduct3s := product3s[1:3:3]
+	allProduct3s := product3s[:]
+	someProduct3s = append(someProduct3s, "Gloves")
+	fmt.Println("someProduct3s :", someProduct3s)
+	fmt.Println("someProduct3s len :", len(someProduct3s), " cap :", cap(someProduct3s))
+	fmt.Println("allProduct3s :", allProduct3s)
+	fmt.Println("allProduct3s len :", len(allProduct3s), " cap :", cap(allProduct3s))
+
+	/**
+	Création de tranches à partir d'autres tranches
+	Il est également possible de créer des tranches à partir d'autres tranches, mais la relation entre les tranches n'est pas conservée
+	si elles sont redimensionnées.
+
+	Les tranches sont essentiellement des pointeurs vers des sections de tableaux, ce qui signifie qu'elles ne peuvent pas pointer
+	vers une autre tranche. En réalité, les plages servent à déterminer les correspondances pour les tranches qui sont sous-jacentes
+	par le même tableau.
+	**/
+	product4s := [4]string{"kayak", "lifejacket", "paddle", "Hat"}
+	allProduct4s := product4s[1:]
+	someProduct4s := allProduct4s[1:3]
+	allProduct4s = append(allProduct4s, "Gloves")
+	allProduct4s[1] = "Canoe"
+	fmt.Println("someProduct4s :", someProduct4s)
+	fmt.Println("allProduct4s :", allProduct4s)
 }
