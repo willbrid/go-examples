@@ -77,4 +77,85 @@ func main() {
 	name5s[0] = "Canoe"
 	fmt.Println("name5s :", name5s)
 	fmt.Println("appendedName1s :", appendedName1s)
+
+	/**
+	La fonction `append` peut être utilisée pour ajouter une tranche à une autre.
+	Le deuxième argument est suivi de trois points de suspension (`...`), ce qui est nécessaire car la fonction `append`
+	intégrée définit un paramètre variadique.
+	**/
+	name6s := make([]string, 3, 6)
+	name6s[0] = "kayak"
+	name6s[1] = "lifejacket"
+	name6s[2] = "paddle"
+	moreNames := []string{"Hat", "Gloves"}
+	appendedName2s := append(name6s, moreNames...)
+	fmt.Println("appendedName2s :", appendedName2s)
+
+	/**
+	Il est possible de créer des tranches à partir de tableaux existants.
+	La variable « products » se voit attribuer un tableau standard de longueur fixe contenant des chaînes de caractères.
+	Ce tableau sert à créer des tranches à l'aide d'une plage, qui spécifie les valeurs minimale et maximale.
+
+	Les intervalles sont exprimés entre crochets, les valeurs minimale et maximale étant séparées par un deux-points.
+	Le premier indice de l'intervalle correspond à la valeur minimale, et sa longueur est égale à la
+	différence entre la valeur maximale et la valeur minimale.
+	Ainsi, l'intervalle [1:3] définit un intervalle dont l'indice zéro correspond à l'indice 1 du tableau et dont la longueur est de 2.
+	L'indice de départ et le nombre d'éléments peuvent être omis d'une plage pour inclure tous les éléments de la source.
+
+	Le code de l'exemple ci-dessous crée deux tranches, toutes deux basées sur le même tableau sous-jacent.
+	La relation entre la tranche et le tableau existant peut engendrer des résultats différents lors de l'ajout d'éléments.
+
+	Comme l'illustre l'exemple ci-dessous, il est possible de décaler une tranche afin que son premier indice ne corresponde pas au début
+	du tableau et que son dernier indice ne pointe pas vers le dernier élément du tableau. Ainsi, l'indice 0 de la tranche `someProducts`
+	correspond à l'indice 1 du tableau. Jusqu'à présent, la capacité des tranches était alignée sur la longueur du tableau sous-jacent,
+	mais ce n'est plus le cas, car le décalage réduit la portion du tableau utilisable par la tranche.
+	**/
+	products := [4]string{"kayak", "lifejacket", "paddle", "Hat"}
+	someProducts := products[1:3]
+	allProducts := products[:]
+	fmt.Println("someProducts :", someProducts)
+	fmt.Println("someProducts len :", len(someProducts), " cap :", cap(someProducts))
+	fmt.Println("allProducts :", allProducts)
+	fmt.Println("allProducts len :", len(allProducts), " cap :", cap(allProducts))
+
+	/**
+		Cette tranche peut accueillir le nouvel élément sans être redimensionnée, mais l'emplacement du tableau qui servira à stocker cet élément
+		est déjà inclus dans la tranche `allProduct1s`. Par conséquent, l'opération d'ajout agrandit la tranche `someProduct1s`
+		et modifie l'une des valeurs accessibles via la tranche `allProduct1s`.
+
+		Si nous utilisons une tranche comme vue fixe d'un tableau, nous pouvons nous attendre à ce que plusieurs tranches nous donnent une
+		vue cohérente de ce tableau, et toutes les nouvelles valeurs que nous attribuons seront reflétées par toutes les tranches qui
+		correspondent à l'élément modifié.
+
+		L'ajout de la valeur 'Gloves' à la tranche someProduct1s modifie la valeur renvoyée par allProduct1s[3] car
+		les tranches partagent le même tableau sous-jacent.
+	    Le résultat montre également que la longueur et la capacité des tranches sont identiques, ce qui signifie qu'il n'est plus
+		possible d'agrandir la tranche sans créer un tableau sous-jacent plus grand.
+	**/
+	product1s := [4]string{"kayak", "lifejacket", "paddle", "Hat"}
+	someProduct1s := product1s[1:3]
+	allProduct1s := product1s[:]
+	someProduct1s = append(someProduct1s, "Gloves")
+	fmt.Println("someProduct1s :", someProduct1s)
+	fmt.Println("someProduct1s len :", len(someProduct1s), " cap :", cap(someProduct1s))
+	fmt.Println("allProduct1s :", allProduct1s)
+	fmt.Println("allProduct1s len :", len(allProduct1s), " cap :", cap(allProduct1s))
+
+	/**
+	Le premier appel à la fonction `append` étend la tranche `someProduct2s` au sein du tableau sous-jacent existant.
+	L'espace disponible étant limité lors du second appel à `append`, un nouveau tableau est créé, son contenu est copié et
+	les deux tranches sont désormais associées à des tableaux différents.
+
+	Le processus de redimensionnement ne copie que les éléments du tableau qui sont mappés par la tranche, ce qui a pour effet
+	de réaligner les indices de la tranche et du tableau.
+	**/
+	product2s := [4]string{"kayak", "lifejacket", "paddle", "Hat"}
+	someProduct2s := product2s[1:3]
+	allProduct2s := product2s[:]
+	someProduct2s = append(someProduct2s, "Gloves")
+	someProduct2s = append(someProduct2s, "Boots")
+	fmt.Println("someProduct2s :", someProduct2s)
+	fmt.Println("someProduct2s len :", len(someProduct2s), " cap :", cap(someProduct2s))
+	fmt.Println("allProduct2s :", allProduct2s)
+	fmt.Println("allProduct2s len :", len(allProduct2s), " cap :", cap(allProduct2s))
 }
