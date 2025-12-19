@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"reflect"
+	"sort"
+)
 
 func main() {
 	/**
@@ -269,4 +273,59 @@ func main() {
 	copy(product9s[0:1], replacementProduct9s)
 	fmt.Println("product9s :", product9s)
 	fmt.Println("replacementProduct9s :", replacementProduct9s)
+
+	/**
+	Suppression d'éléments de tranche
+	Il n'existe pas de fonction intégrée pour supprimer des éléments de tranche, mais cette opération peut être effectuée à
+	l'aide des plages et de la fonction `append`.
+	Dans l'exemple ci-dessous, nous supprimons l'élément à l'indice 2 en créant une nouvelle tranche qui combine les éléments avant et après
+	l'élément supprimé.
+	**/
+	product10s := [4]string{"kayak", "lifejacket", "paddle", "Hat"}
+	deleted := append(product10s[:2], product10s[3:]...)
+	fmt.Println("Deleted from product10s :", deleted)
+
+	/**
+	Énumération des tranches
+	Les tranches sont énumérées de la même manière que les tableaux, avec les mots-clés `for` et `range`.
+	**/
+	product11s := []string{"kayak", "lifejacket", "paddle", "Hat"}
+	for index, value := range product11s {
+		fmt.Println("product11s -> index :", index, " value :", value)
+	}
+
+	/**
+	Tri des tranches
+	Il n'existe pas de prise en charge intégrée du tri des tranches, mais la bibliothèque standard inclut le package sort,
+	qui définit des fonctions pour trier différents types de tranches.
+	**/
+	product12s := []string{"kayak", "lifejacket", "paddle", "Hat"}
+	fmt.Println("product12s :", product12s)
+	sort.Strings(product12s)
+	for index, value := range product12s {
+		fmt.Println("product12s -> index :", index, " value :", value)
+	}
+
+	/**
+	Comparaison des tranches
+	Il existe cependant une méthode pour comparer des tranches. La bibliothèque standard inclut un package nommé `reflect`,
+	qui contient une fonction pratique nommée `DeepEqual`. Cette fonction `DeepEqual` permet de comparer une plus grande variété de
+	types de données que l'opérateur d'égalité, y compris les tranches.
+	**/
+	product13s := []string{"kayak", "lifejacket", "paddle", "Hat"}
+	product14s := product13s
+	fmt.Println("Equal product13s == product14s :", reflect.DeepEqual(product13s, product14s))
+
+	/**
+	Récupérer le tableau sous-jacent à une tranche
+	Si nous avons une tranche mais que nous avons besoin d'un tableau, nous pouvons effectuer une conversion explicite sur la tranche.
+	Dans cet exemple deux instructions sont effectuées :
+	- la première consiste à convertir explicitement le tableau de chaînes de caractères `[]string` en un tableau de trois chaînes
+	de caractères `*[3]string`.
+	- la seconde consiste à déréférencer le pointeur de tableau pour obtenir le tableau réel de trois chaînes de caractères `[3]string`.
+	**/
+	product15s := []string{"kayak", "lifejacket", "paddle", "Hat"}
+	arrayPtr15 := (*[3]string)(product15s)
+	array15 := *arrayPtr15
+	fmt.Println("array15 :", array15)
 }
