@@ -195,4 +195,78 @@ func main() {
 	allProduct4s[1] = "Canoe"
 	fmt.Println("someProduct4s :", someProduct4s)
 	fmt.Println("allProduct4s :", allProduct4s)
+
+	/**
+	La fonction `copy` permet de copier des éléments entre les tranches. Elle peut être utilisée pour garantir que les tranches
+	possèdent des tableaux distincts et pour créer des tranches combinant des éléments provenant de différentes sources.
+	**/
+	/**
+	Utilisation de la fonction `copy` pour garantir la séparation des tableaux de tranches
+	La fonction `copy` permet de dupliquer une tranche existante, en sélectionnant tout ou partie de ses éléments, tout en veillant
+	à ce que la nouvelle tranche soit associée à son propre tableau.
+	La fonction `copy` accepte deux arguments : la tranche de destination et la tranche source.
+
+	Cette fonction `copy` les éléments vers la tranche cible. Les tranches n'ont pas besoin d'avoir la même longueur, car
+	la fonction `copy` s'arrête à la fin de la tranche source ou de destination. La tranche de destination n'est pas redimensionnée,
+	même si le tableau sous-jacent dispose d'espace libre ; nous devons donc nous assurer qu'elle est suffisamment longue pour contenir
+	le nombre d'éléments à copier.
+	**/
+	product5s := [4]string{"kayak", "lifejacket", "paddle", "Hat"}
+	allProduct5s := product5s[1:]
+	someProduct5s := make([]string, 2)
+	copy(someProduct5s, allProduct5s)
+	fmt.Println("someProduct5s :", someProduct5s)
+	fmt.Println("allProduct5s :", allProduct5s)
+
+	/**
+	Une erreur fréquente consiste à tenter de copier des éléments dans une tranche non initialisée.
+	Dans l'exemple ci-dessous, aucun élément n'a été copié dans la tranche de destination. Cela se produit car les tranches non initialisées
+	ont une longueur et une capacité nulles. La fonction `copy` s'arrête lorsque la longueur de la tranche de destination est atteinte,
+	et comme cette longueur est nulle, aucune copie n'a lieu. Aucune erreur n'est signalée car la fonction `copy` a fonctionné comme prévu.
+	**/
+	product6s := [4]string{"kayak", "lifejacket", "paddle", "Hat"}
+	allProduct6s := product6s[1:]
+	var someProduct6s []string
+	copy(someProduct6s, allProduct6s)
+	fmt.Println("someProduct6s :", someProduct6s)
+	fmt.Println("allProduct6s :", allProduct6s)
+
+	/**
+	Un contrôle précis des éléments copiés peut être obtenu grâce à l'utilisation de plages.
+	La plage appliquée à la tranche de destination signifie que les éléments copiés commenceront à la position 1.
+	La plage appliquée à la tranche source signifie que la copie commencera par l'élément en position 2 et qu'un seul élément sera copié.
+	**/
+	product7s := [4]string{"kayak", "lifejacket", "paddle", "Hat"}
+	allProduct7s := product7s[1:]
+	someProduct7s := []string{"Boots", "Canoe"}
+	copy(someProduct7s[1:], allProduct7s[2:3])
+	fmt.Println("someProduct7s :", someProduct7s)
+	fmt.Println("allProduct7s :", allProduct7s)
+
+	/**
+	Copie de tranches de tailles différentes
+	Si la tranche de destination est plus grande que la tranche source, la copie se poursuivra jusqu'à ce que le dernier élément
+	de la source ait été copié.
+
+	La tranche source ne contient que deux éléments et aucune plage n'est utilisée. Par conséquent, la fonction `copy` commence à copier
+	les éléments de la tranche replacementProduct8s vers la tranche product8s et s'arrête lorsque la fin de la tranche replacementProduct8s
+	est atteinte. Les éléments restants dans la tranche product8s ne sont pas affectés par l'opération de copie.
+	**/
+	product8s := []string{"kayak", "lifejacket", "paddle", "Hat"}
+	replacementProduct8s := []string{"Canoe", "Boots"}
+	copy(product8s, replacementProduct8s)
+	fmt.Println("product8s :", product8s)
+	fmt.Println("replacementProduct8s :", replacementProduct8s)
+
+	/**
+	Si la tranche de destination est plus petite que la tranche source, la copie se poursuit jusqu'à ce que tous les éléments de la tranche
+	de destination aient été remplacés.
+	Dans l'exemple ci-dessous, la plage utilisée pour la destination crée une tranche de longueur 1, ce qui signifie qu'un seul élément
+	sera copié du tableau source.
+	**/
+	product9s := []string{"kayak", "lifejacket", "paddle", "Hat"}
+	replacementProduct9s := []string{"Canoe", "Boots"}
+	copy(product9s[0:1], replacementProduct9s)
+	fmt.Println("product9s :", product9s)
+	fmt.Println("replacementProduct9s :", replacementProduct9s)
 }
