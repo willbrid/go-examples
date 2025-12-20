@@ -9,6 +9,6 @@ func main() {
 	}
 
 	printPrice("Kayak", 275, 0.2)
-	_, total3 := calcTotalPrice(products)
-	fmt.Println("Total 3 :", total3)
+	_, total := calcTotalPrice(products)
+	fmt.Println("Total :", total)
 }
