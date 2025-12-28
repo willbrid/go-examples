@@ -154,3 +154,4 @@ La structure de la logique métier est injectée dans la structure du routeur, q
 **Liens utiles**
 
 - [https://12factor.net/fr/](https://12factor.net/fr/)
+- [https://github.com/avelino/awesome-go](https://github.com/avelino/awesome-go)
