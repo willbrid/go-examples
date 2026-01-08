@@ -9,7 +9,7 @@ func doSum(count int, val *int) {
 	}
 }
 
-var waitGroup sync.WaitGroup
+var waitGroup sync.WaitGroup = sync.WaitGroup{}
 
 func doSumWG(count int, val *int) {
 	for i := range count {
