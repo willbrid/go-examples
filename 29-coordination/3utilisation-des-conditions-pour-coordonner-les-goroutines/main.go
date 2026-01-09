@@ -17,7 +17,7 @@ L'argument de la fonction `NewCond` est un `Locker`, qui est une interface qui d
 --- Lock() : cette méthode acquiert le verrou géré par le `Locker`.
 --- Unlock() : cette méthode libère le verrou géré par le `Locker`.
 
-Les structures `Mutex` et `RWMutex` définissent la méthode requise par l'interface `Locker`.
+Les structures `Mutex` et `RWMutex` définissent les méthodes requises par l'interface `Locker`.
 Dans le cas du `RWMutex`, les méthodes `Lock` et `Unlock` fonctionnent sur le verrou en écriture, et la méthode `RLocker` peut être utilisée
 pour obtenir un `Locker` qui fonctionne sur le verrou en lecture.
 Le champ et les méthodes définis par la structure `Cond` :
