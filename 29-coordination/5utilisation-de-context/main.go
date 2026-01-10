@@ -8,12 +8,13 @@ import (
 
 /**
 Go facilite la création d'applications serveur qui reçoivent des requêtes pour le compte des clients et les traitent dans leur propre
-goroutine. Le package context fournit l'interface `Context`, qui simplifie la gestion des requêtes à l'aide des méthodes :
+goroutine.
+Le package `context` fournit l'interface `Context`, qui simplifie la gestion des requêtes à l'aide des méthodes :
 - Value(key) : cette méthode renvoie la valeur associée à la clé spécifiée.
 - Done() : cette méthode renvoie un canal qui peut être utilisé pour recevoir une notification d'annulation.
 - Deadline() : cette méthode renvoie le time.Time qui représente le délai de la requête et une valeur booléenne qui sera fausse si aucun délai
 			   n'a été spécifié.
-- Err() : cette méthode renvoie une erreur qui indique pourquoi le canal Done a reçu un signal. Le package `context` définit deux variables
+- Err() : cette méthode renvoie une erreur qui indique pourquoi le canal `Done` a reçu un signal. Le package `context` définit deux variables
           qui peuvent être utilisées pour comparer l'erreur : `Canceled` indique que la demande a été annulée et `DeadlineExeeded` indique
 		  que le délai est passé.
 
@@ -25,7 +26,7 @@ Le package `context` fournit les fonctions de création de valeurs `context` :
 - WithValue(ctx, key, val) : cette méthode renvoie un contexte contenant la paire clé-valeur spécifiée.
 
 La fonction `processRequest` simule le traitement d'une requête en incrémentant un compteur, et appelle la fonction `time.Sleep`
-pour ralentir l'exécution. La fonction principale utilise une goroutine pour invoquer `processRequest`, en se substituant à une requête
+pour ralentir l'exécution. La fonction main utilise une goroutine pour invoquer `processRequest`, en se substituant à une requête
 provenant d'un client.
 
 La première utilité d'un contexte est d'informer le code traitant la requête lorsque celle-ci est annulée.
@@ -138,7 +139,7 @@ func main() {
 	nouvelles valeurs de contexte avec les autres fonctions.
 
 	La fonction `WithCancel` renvoie un contexte annulable et la fonction appelée pour effectuer l'annulation.
-	Le contexte ainsi obtenu est transmis à la fonction processRequest. La fonction principale appelle la fonction `time.Sleep` pour laisser
+	Le contexte ainsi obtenu est transmis à la fonction processRequestWithCTX. La fonction main appelle la fonction `time.Sleep` pour laisser
 	à processRequestWithCTX le temps d'effectuer certaines opérations, puis appelle la fonction d'annulation.
 	L'appel de la fonction d'annulation envoie un message au canal renvoyé par la méthode `Done` du contexte, lequel est surveillé par
 	une instruction `select`.
@@ -158,14 +159,15 @@ func main() {
 
 	/**
 	Les fonctions WithDeadline et WithTimeout renvoient le contexte dérivé et une fonction d'annulation, permettant d'annuler la requête
-	avant l'expiration du délai. Dans cet exemple, le temps d'exécution de la fonction processRequest dépasse le délai imparti,
+	avant l'expiration du délai. Dans cet exemple, le temps d'exécution de la fonction processRequestWithCTXDeadline dépasse le délai imparti,
 	ce qui entraîne l'arrêt du traitement par le canal Done.
 	**/
 	waitGroup2 := sync.WaitGroup{}
 	waitGroup2.Add(1)
 	Printfln("Request dispatched...")
-	ctx2, _ := context.WithTimeout(context.Background(), time.Second*2)
+	ctx2, cancelWithoutTimeout2 := context.WithTimeout(context.Background(), time.Second*2)
 	go processRequestWithCTXDeadline(ctx2, &waitGroup2, 10)
+	cancelWithoutTimeout2()
 	waitGroup2.Wait()
 
 	/**
@@ -179,9 +181,10 @@ func main() {
 	waitGroup3 := sync.WaitGroup{}
 	waitGroup3.Add(1)
 	Printfln("Request dispatched...")
-	ctx3, _ := context.WithTimeout(context.Background(), time.Second*2)
+	ctx3, cancelWithoutTimeout3 := context.WithTimeout(context.Background(), time.Second*2)
 	ctx3 = context.WithValue(ctx3, countKey, 4)
 	ctx3 = context.WithValue(ctx3, sleepPeriodKey, time.Millisecond*250)
 	go processRequestWithCTXValue(ctx3, &waitGroup3)
+	cancelWithoutTimeout3()
 	waitGroup3.Wait()
 }
