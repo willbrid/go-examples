@@ -422,10 +422,34 @@ La commande **mockery** prend en charge une variété d'indicateurs. Voici quelq
 --- **--name** spécifie le nom ou l'expression régulière à faire correspondre lors de la recherche d'interfaces pour générer des mocks. <br>
 --- **--output** spécifie le répertoire dans lequel placer les mocks générés. Par défaut, il est configuré sur **/mocks**.
 
+### Golangci-lint
+
+- Installation en mode binaire
+
+```
+# Le binaire sera $(go env GOPATH)/bin/golangci-lint
+curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.9.0
+
+golangci-lint --version
+```
+
+- Pour exécuter golangci-lint
+
+```
+golangci-lint run
+```
+
+ou
+
+```
+golangci-lint run ./...
+```
+
 ### Références
  
 - [Go Documentation](https://go.dev/doc/) 
 - [Mockery](https://vektra.github.io/mockery/latest/)
 - [Testify](https://github.com/stretchr/testify)
 - [Zerolog](https://github.com/rs/zerolog)
+- [Golangci-lint](https://golangci-lint.run/docs/)
 - [Book The Complete Guide to Programming Reliable and efficient Software Using Golang of Adam Freeman]()
