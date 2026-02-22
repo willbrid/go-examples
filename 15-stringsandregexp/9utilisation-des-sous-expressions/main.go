@@ -51,4 +51,18 @@ func main() {
 	for _, s := range subs {
 		fmt.Println("SubMatch :", s)
 	}
+
+	/**
+	Les sous-expressions peuvent être nommées, ce qui rend l'expression régulière plus difficile à comprendre mais facilite le traitement des résultats.
+	La syntaxe pour attribuer des noms aux sous-expressions est la suivante : à l’intérieur des parenthèses, un point d’interrogation,
+	suivi d’un P majuscule, puis du nom entre chevrons (?P<type>, ?P<capacity>).
+	Les sous-expressions sont nommées « type » et « capacity ». La méthode `SubexpIndex` renvoie la position d'une sous-expression nommée dans
+	les résultats, ce qui me permet d'obtenir les sous-chaînes correspondant aux sous-expressions « type » et « capacity ».
+	**/
+	pattern2 := regexp.MustCompile("A (?P<type>[A-z]*) for (?P<capacity>[A-z]*) person")
+	subs1 := pattern2.FindStringSubmatch(description)
+	for _, name := range []string{"type", "capacity"} {
+		fmt.Println(name, "=", subs1[pattern2.SubexpIndex(name)])
+	}
+
 }
