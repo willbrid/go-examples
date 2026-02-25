@@ -25,4 +25,5 @@ func main() {
 	Printfln("String : %s", name)
 	Printfln("Character : %c", []rune(name)[0])
 	Printfln("Unicode : %U", []rune(name)[0])
+	Printfln("Category for kayak : %s", products[0].Category)
 }
