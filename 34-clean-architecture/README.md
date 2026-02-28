@@ -132,6 +132,7 @@ La structure de la logique métier est injectée dans la structure du routeur, q
 - Viper (Configuration) : https://github.com/spf13/viper
 - Golang Migrate (Database Migration) : https://github.com/golang-migrate/migrate
 - Go Playground Validator (Validation) : https://github.com/go-playground/validator
+- Zerolog (Logger) : https://github.com/rs/zerolog
 - Logrus (Logger) : https://github.com/sirupsen/logrus
 - Feature complete Kafka library in pure Go : https://github.com/twmb/franz-go
 - Sarama (Kafka Client) : https://github.com/IBM/sarama
