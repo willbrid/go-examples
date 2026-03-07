@@ -1,6 +1,6 @@
 module script
 
-go 1.25.7
+go 1.26.1
 
 require (
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
